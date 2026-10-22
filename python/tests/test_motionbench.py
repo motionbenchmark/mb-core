@@ -95,3 +95,13 @@ def test_tracker_recovers_rendered_run(tmp_path):
         i = min(int(round(t / 0.05)), 40)
         errs.append(math.hypot(x - poses[i][1], y - poses[i][2]))
     assert max(errs) < 0.03, max(errs)
+
+
+def test_viz_builds_self_contained_page(dataset):
+    from motionbench.viz import build
+
+    html = build(dataset, title="tiny")
+    assert html.startswith('<meta charset="utf-8">')
+    assert '"dataset":"tiny"' in html and '"synthetic":true' in html
+    assert html.count('"report":') >= 40  # 50 traces; one may be tampered with by another test
+    assert "</script>" in html and "<\\/" not in html.split('id="mbdata"')[0]

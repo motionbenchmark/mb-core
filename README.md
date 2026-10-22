@@ -60,7 +60,14 @@ motionbench tasks                                   # list tasks
 motionbench synth --out data/synthetic-v0.1         # regenerate the synthetic dataset
 motionbench score data/synthetic-v0.1/MB-VEX-NAV@1.0/dev-01/driver-01/trial-0
 motionbench aggregate data/synthetic-v0.1 -o results/leaderboard.json
+motionbench viz data/synthetic-v0.1 -o explorer.html     # open in a browser to inspect and verify
 ```
+
+`motionbench viz` writes one self-contained HTML page for any dataset folder (synthetic
+or real). It replays every run on its arena, overlays trials or agents, and shows the
+scorer's report. It also re-counts waypoints, deliveries and coverage from the raw poses
+in the browser and runs physical sanity checks (time gaps, speed, leaving the arena,
+budget overruns), flagging any run where the two disagree.
 
 ```python
 import motionbench as mb

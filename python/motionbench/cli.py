@@ -9,6 +9,7 @@
     motionbench track run.mp4 --config field.json --task MB-VEX-NAV@1.0 --seed dev-01 \
         --agent-id driver-01 --agent-class human -o runs/driver-01-t0
     motionbench render RUN.mbtrace -o run.avi     # synthetic camera footage of a trace
+    motionbench viz DATA_DIR -o explorer.html     # interactive explorer + independent checks
 """
 
 from __future__ import annotations
@@ -86,6 +87,11 @@ def main(argv=None) -> int:
     p.add_argument("--tier", default="F", choices=["S", "F", "V"])
     p.add_argument("-o", "--out", required=True)
 
+    p = sub.add_parser("viz", help="write an interactive HTML explorer for a dataset (verification)")
+    p.add_argument("root")
+    p.add_argument("-o", "--out", default="explorer.html")
+    p.add_argument("--title")
+
     p = sub.add_parser("render", help="render synthetic overhead video of a trace (for testing the tracker)")
     p.add_argument("trace")
     p.add_argument("--config")
@@ -139,6 +145,11 @@ def main(argv=None) -> int:
                             agent_name=a.agent_name, trial=a.trial, tier=a.tier)
             print(f"tracked {len(res.poses)} poses ({res.detection_rate:.0%} of frames), "
                   f"calibration RMS {res.calibration_rms_m * 100:.2f} cm -> {out}")
+        elif a.cmd == "viz":
+            from .viz import write
+
+            out = write(a.root, a.out, title=a.title, tasks_dir=a.tasks_dir)
+            print(f"wrote {out} ({out.stat().st_size / 1e6:.1f} MB); open it in a browser")
         elif a.cmd == "render":
             from .tracker.render import render_video
 
