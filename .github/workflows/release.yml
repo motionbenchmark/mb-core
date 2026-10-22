@@ -79,9 +79,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cp README.md python/README.md && pip install maturin && cd python && maturin build --release --out dist && pip install dist/*.whl
       - run: |
           mkdir out
           (cd data && zip -qr ../out/motionbench-synthetic-v0.1.zip synthetic-v0.1)
+          # Dataset explorer for the project site (embed variant) and as a standalone page.
+          motionbench viz data/synthetic-v0.1 --embed --title "MotionBench synthetic v0.1" -o out/explorer-synthetic-v0.1.html
+          motionbench viz data/synthetic-v0.1 --title "MotionBench synthetic v0.1" -o out/explorer-synthetic-v0.1-standalone.html
           cp results/leaderboard-synthetic-v0.1.json out/
           cp tasks/*.json out/
       - uses: actions/upload-artifact@v4
@@ -100,7 +108,7 @@ jobs:
           path: artifacts
       - run: |
           mkdir release pydist
-          find artifacts -type f \( -name 'mb-*' -o -name '*.zip' -o -name '*.json' \) -exec cp {} release/ \;
+          find artifacts -type f \( -name 'mb-*' -o -name '*.zip' -o -name '*.json' -o -name 'explorer-*.html' \) -exec cp {} release/ \;
           find artifacts -type f \( -name '*.whl' -o -name '*.tar.gz' \) -exec cp {} pydist/ \;
           cp pydist/* release/
           (cd release && sha256sum * > SHA256SUMS.txt)
