@@ -60,8 +60,13 @@ def _load_run(d: Path) -> dict:
     }
 
 
-def build(root: "str | Path", title: Optional[str] = None, tasks_dir=None) -> str:
-    """Return the explorer HTML for every trace under ``root``."""
+def build(root: "str | Path", title: Optional[str] = None, tasks_dir=None, embed: bool = False) -> str:
+    """Return the explorer HTML for every trace under ``root``.
+
+    ``embed=True`` produces the variant for hosting inside another page (an iframe on
+    the project site): light theme, no page header, no outer padding, and it posts
+    its height to the parent so the frame can grow to fit.
+    """
     root = Path(root)
     reports, errors = score_dir(root, tasks_dir)
     runs = []
@@ -88,18 +93,26 @@ def build(root: "str | Path", title: Optional[str] = None, tasks_dir=None) -> st
         "load_errors": errors,
     }
     data = json.dumps(payload, separators=(",", ":")).replace("</", "<\\/")
-    return TEMPLATE.replace("__TITLE__", f"{payload['dataset']} explorer").replace("__DATA__", data)
+    html = TEMPLATE.replace("__TITLE__", f"{payload['dataset']} explorer").replace("__DATA__", data)
+    return html.replace("__EMBED__", "true" if embed else "false")
 
 
 def write(root, out: "str | Path", **kw) -> Path:
+    """Write the explorer as a standalone document (with a doctype, so browsers use
+    standards mode). ``build()`` alone returns a fragment for hosts that add their own."""
     out = Path(out)
-    out.write_text(build(root, **kw), encoding="utf-8")
+    out.write_text("<!doctype html>\n" + build(root, **kw), encoding="utf-8")
     return out
 
 
 TEMPLATE = r"""<meta charset="utf-8">
 <title>__TITLE__</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script>
+  // Embed mode (motionbench viz --embed): light theme, host page supplies the header.
+  window.MB_EMBED = __EMBED__;
+  if (window.MB_EMBED) { document.documentElement.dataset.theme = "light"; document.documentElement.classList.add("embed"); }
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
 <style>
@@ -135,7 +148,7 @@ header.top { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: baselin
 .badge { display: inline-block; font-size: 12px; font-weight: 650; padding: 2px 8px; border-radius: 999px; border: 1.5px solid currentColor; }
 .badge.synthetic { color: var(--warn); }
 .app { display: grid; grid-template-columns: 230px minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
-@media (max-width: 1100px) { .app { grid-template-columns: 220px minmax(0, 1fr); } .inspector { grid-column: 1 / -1; } }
+@media (max-width: 1040px) { .app { grid-template-columns: 220px minmax(0, 1fr); } .inspector { grid-column: 1 / -1; } }
 @media (max-width: 700px) { .app { grid-template-columns: minmax(0, 1fr); } }
 .card { background: var(--panel); border: 1px solid var(--grid); border-radius: 8px; padding: 14px; min-width: 0; }
 label.f { display: block; font-size: 12.5px; font-weight: 650; color: var(--ink-2); margin: 10px 0 4px; }
@@ -176,6 +189,8 @@ table.checks td.n { text-align: right; font-variant-numeric: tabular-nums; }
 svg text { fill: var(--ink-2); font-family: var(--font); }
 .hint { font-size: 12.5px; color: var(--ink-2); margin: 8px 0 0; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+html.embed body { padding-block: 0 4px; padding-left: 0; padding-right: 0; background: transparent; }
+html.embed header.top { display: none; }
 </style>
 
 <header class="top">
@@ -571,7 +586,27 @@ const nAgents = new Set(D.runs.map((r) => r.rep.agent_id)).size;
 $("summary").textContent = `${D.runs.length} runs · ${Object.keys(TASKS).length} tasks · ${nAgents} agents`;
 $("synth").hidden = !D.synthetic;
 renderChecks();
-const first = D.runs.find((r) => r.rep.agent_id.startsWith("driver")) || D.runs[0];
+const q = new URLSearchParams(location.search);
+const want = (r) => (!q.get("task") || r.rep.task === q.get("task")) && (!q.get("seed") || r.rep.seed === q.get("seed"))
+  && (!q.get("agent") || r.rep.agent_id === q.get("agent")) && (!q.get("trial") || r.rep.trial === Number(q.get("trial")));
+let pool = D.runs.filter(want);
+if (!q.get("task")) {
+  // Default to the task with the most runs.
+  const counts = {}; for (const r of D.runs) counts[r.rep.task] = (counts[r.rep.task] || 0) + 1;
+  const top = Object.keys(counts).sort((a, b) => counts[b] - counts[a] || a.localeCompare(b))[0];
+  pool = pool.filter((r) => r.rep.task === top);
+}
+const first = pool.find((r) => r.cls === "human") || pool[0] || D.runs[0];
 if (first) selectRun(first, false);
+if (window.MB_EMBED && window.parent !== window) {
+  // Report content height (not scrollHeight, which never drops below the frame's own height).
+  const post = () => {
+    // Bottom of the last block, so the frame never feeds its own height back.
+    const bottom = Math.max(...[...document.body.children].map((e) => e.getBoundingClientRect().bottom + window.scrollY));
+    window.parent.postMessage({ type: "mb-explorer-height", height: Math.ceil(bottom) + 4 }, "*");
+  };
+  new ResizeObserver(post).observe(document.body);
+  post();
+}
 </script>
 """

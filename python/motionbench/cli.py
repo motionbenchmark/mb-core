@@ -91,6 +91,7 @@ def main(argv=None) -> int:
     p.add_argument("root")
     p.add_argument("-o", "--out", default="explorer.html")
     p.add_argument("--title")
+    p.add_argument("--embed", action="store_true", help="variant for an iframe on another site (light theme, no header)")
 
     p = sub.add_parser("render", help="render synthetic overhead video of a trace (for testing the tracker)")
     p.add_argument("trace")
@@ -148,7 +149,7 @@ def main(argv=None) -> int:
         elif a.cmd == "viz":
             from .viz import write
 
-            out = write(a.root, a.out, title=a.title, tasks_dir=a.tasks_dir)
+            out = write(a.root, a.out, title=a.title, tasks_dir=a.tasks_dir, embed=a.embed)
             print(f"wrote {out} ({out.stat().st_size / 1e6:.1f} MB); open it in a browser")
         elif a.cmd == "render":
             from .tracker.render import render_video

@@ -105,3 +105,12 @@ def test_viz_builds_self_contained_page(dataset):
     assert '"dataset":"tiny"' in html and '"synthetic":true' in html
     assert html.count('"report":') >= 40  # 50 traces; one may be tampered with by another test
     assert "</script>" in html and "<\\/" not in html.split('id="mbdata"')[0]
+
+
+def test_viz_write_is_a_standards_mode_document(tmp_path, dataset):
+    from motionbench.viz import write
+
+    out = write(dataset, tmp_path / "e.html", embed=True)
+    text = out.read_text()
+    assert text.startswith("<!doctype html>")
+    assert "window.MB_EMBED = true" in text
