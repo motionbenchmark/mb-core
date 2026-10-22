@@ -1,0 +1,23 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-PICK@1.0",
+  "seed": "dev-01",
+  "agent": {
+    "id": "llm-auton-r10",
+    "class": "ai",
+    "name": "LLM-written auton, round 10",
+    "meta": {
+      "feedback_rounds": 10,
+      "synthetic": true
+    }
+  },
+  "trial": 0,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "ef98ec56010b955fbaf6230eba939d059ea7351b3d6e2191f475dc9d5b3197bc",
+    "events.csv": "a00110921ad9f733a2548a720d1866ebb1865208f236ed8f4c4e3ab0f15b842f",
+    "world_final.json": "f24adfe4e0fde5e7dea9e90c3e5b9170f7010e906d2d31066f25f8640015485c"
+  }
+}

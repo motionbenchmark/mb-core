@@ -1,0 +1,22 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-PICK@1.0",
+  "seed": "dev-01",
+  "agent": {
+    "id": "team-auton-b",
+    "class": "human_auton",
+    "name": "Team auton B (odometry only)",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 4,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "f0a5328f8f437ac07039df70383cd45cb0db3674426abcdcbff666211239c56a",
+    "events.csv": "3011f63028694806c94783ead4d4a39f0f8caad26326692f75d4ac71f61e7d0e",
+    "world_final.json": "be77b4dbab753ed531356bbe3cda7e40d123521aebb777f6a44f0f463848cd14"
+  }
+}

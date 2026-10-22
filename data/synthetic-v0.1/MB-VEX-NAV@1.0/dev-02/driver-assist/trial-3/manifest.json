@@ -1,0 +1,20 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-NAV@1.0",
+  "seed": "dev-02",
+  "agent": {
+    "id": "driver-assist",
+    "class": "hybrid",
+    "name": "Driver 05 with auto-align",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 3,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "2efe425097071c741738270aa0be496cf54670cdbb2fb9971ec1da4ffc6e5f30"
+  }
+}

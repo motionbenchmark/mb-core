@@ -1,0 +1,10 @@
+/target
+__pycache__/
+*.so
+*.pyd
+*.egg-info/
+.venv/
+dist/
+python/README.md
+*.avi
+*.mp4

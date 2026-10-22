@@ -1,0 +1,22 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-PICK@1.0",
+  "seed": "dev-01",
+  "agent": {
+    "id": "driver-assist",
+    "class": "hybrid",
+    "name": "Driver 05 with auto-align",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 3,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "427819940a7baa1ed1d6f43469462a2a7e2604811b08d02fb94bc8d77dcccd40",
+    "events.csv": "5a2c1c486a7b93db18c08d9b8ac19ad3f33bbc670a7bdcb6a0926f6122c4e770",
+    "world_final.json": "9faedf0c7499493bc24e085aeffd9061fe62a6886d3e65bd97fc0962be5ffb27"
+  }
+}

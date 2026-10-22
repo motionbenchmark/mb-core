@@ -1,0 +1,23 @@
+[workspace]
+resolver = "2"
+members = ["crates/motionbench-core", "crates/motionbench-cli", "python"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/motionbench/motionbench"
+homepage = "https://motionbench.org"
+authors = ["MotionBench contributors"]
+rust-version = "1.75"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["float_roundtrip"] }
+csv = "1"
+thiserror = "2"
+sha2 = "0.10"
+
+[profile.release]
+lto = true
+codegen-units = 1

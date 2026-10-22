@@ -1,0 +1,20 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-NAV@1.0",
+  "seed": "dev-01",
+  "agent": {
+    "id": "random-walk",
+    "class": "baseline",
+    "name": "Random walk (floor)",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 4,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "deb22564df59c7c2fa701119ab36240512aa010cf738e34e48052b6d52b22f34"
+  }
+}

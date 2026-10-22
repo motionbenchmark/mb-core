@@ -1,0 +1,20 @@
+[package]
+name = "motionbench-core"
+description = "Scoring core for MotionBench: an open benchmark for goal-directed robots in confined spaces"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+readme = "../../README.md"
+keywords = ["robotics", "benchmark", "vex", "evaluation"]
+categories = ["science::robotics", "simulation"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+csv.workspace = true
+thiserror.workspace = true
+sha2.workspace = true

@@ -1,0 +1,45 @@
+{
+  "id": "MB-VEX-PICK",
+  "version": "1.0",
+  "title": "Collect and deliver on a 12 ft field",
+  "domain": "vex",
+  "description": "Collect six scattered objects and deliver them into the goal zone in the far corner within 60 seconds. Scored on the final world state: an object counts if its centre rests inside the zone. Game-agnostic: any small game object of the current season can stand in.",
+  "arena": {
+    "width_m": 3.6576,
+    "height_m": 3.6576,
+    "obstacles": [
+      { "x": 1.6788, "y": 1.6788, "w": 0.30, "h": 0.30, "label": "center-post" }
+    ],
+    "zones": {
+      "goal": { "x": 2.95, "y": 2.95, "w": 0.7076, "h": 0.7076, "label": "goal-zone" }
+    }
+  },
+  "robot": { "radius_m": 0.229 },
+  "budget": { "time_s": 60 },
+  "goal": { "kind": "delivery", "zone": "goal" },
+  "reference": { "floor": 0 },
+  "layouts": {
+    "dev-01": {
+      "start": { "x": 0.45, "y": 0.45, "theta": 0 },
+      "objects": [
+        { "id": "o1", "x": 0.90, "y": 0.60 },
+        { "id": "o2", "x": 1.80, "y": 0.50 },
+        { "id": "o3", "x": 2.80, "y": 1.20 },
+        { "id": "o4", "x": 0.60, "y": 2.00 },
+        { "id": "o5", "x": 1.40, "y": 2.80 },
+        { "id": "o6", "x": 2.40, "y": 2.20 }
+      ]
+    },
+    "dev-02": {
+      "start": { "x": 0.45, "y": 3.20, "theta": -1.5708 },
+      "objects": [
+        { "id": "o1", "x": 0.70, "y": 2.40 },
+        { "id": "o2", "x": 1.10, "y": 1.20 },
+        { "id": "o3", "x": 2.20, "y": 0.60 },
+        { "id": "o4", "x": 3.10, "y": 0.90 },
+        { "id": "o5", "x": 2.60, "y": 1.60 },
+        { "id": "o6", "x": 1.70, "y": 3.00 }
+      ]
+    }
+  }
+}

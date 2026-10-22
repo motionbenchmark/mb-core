@@ -1,0 +1,24 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-COVER@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "person-02",
+    "class": "human",
+    "name": "Person 02 with stick vacuum",
+    "meta": {
+      "skill": 0.598,
+      "lane_m": 0.3,
+      "skip_p": 0.098,
+      "stop_at_s": 145.9,
+      "synthetic": true
+    }
+  },
+  "trial": 1,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "b64d26f2e9d2f9be075e14e5f649db8ffcc59c87e26700370f30dced2c6e28cb"
+  }
+}

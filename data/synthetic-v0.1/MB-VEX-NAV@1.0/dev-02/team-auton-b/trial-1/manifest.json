@@ -1,0 +1,20 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-NAV@1.0",
+  "seed": "dev-02",
+  "agent": {
+    "id": "team-auton-b",
+    "class": "human_auton",
+    "name": "Team auton B (odometry only)",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 1,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "241d742408576978feb01f24580be76d89348626ac0291b873b273ee506370c9"
+  }
+}

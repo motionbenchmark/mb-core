@@ -1,0 +1,20 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-NAV@1.0",
+  "seed": "dev-02",
+  "agent": {
+    "id": "team-auton-c",
+    "class": "human_auton",
+    "name": "Team auton C (timed, open loop)",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 2,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "c9e7282a6113fb76dc415219fad857a88ab83856a1b6cf148d2d22cab4081ab8"
+  }
+}

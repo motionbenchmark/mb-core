@@ -1,0 +1,22 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-PICK@1.0",
+  "seed": "dev-01",
+  "agent": {
+    "id": "team-auton-c",
+    "class": "human_auton",
+    "name": "Team auton C (timed, open loop)",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 1,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "b087458d7be34083fa4f8c66eb8eec213846386084d338a083e97305968bb598",
+    "events.csv": "f0927a3ab9e4fad83ecd335d43341afe986c239d307afc332590f63e40e4ac65",
+    "world_final.json": "8045767eeba7bb243a9dd949f1138593235e9cd4567c7577a51057d7c256ba49"
+  }
+}
