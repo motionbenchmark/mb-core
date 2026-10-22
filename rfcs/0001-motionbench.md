@@ -160,9 +160,9 @@ SHA-256 is used only for integrity hashes of trace files. No encryption.
 
 ### Required resources
 
-- Git repository: `github.com/motionbench/motionbench` (code, tasks, data).
+- Git repository: `github.com/motionbenchmark/mb-core` (code, tasks, data).
 - Issue tracker and Discussions on the same repository.
-- Project site (separate repository) for the leaderboard, downloads and sign-ups.
+- Project site in a separate repository (`motionbenchmark/mb-web`) for the leaderboard, downloads and sign-ups.
 - Release artifacts on GitHub Releases, PyPI and crates.io.
 - A community chat (Discord) and a low-volume announcements list.
 

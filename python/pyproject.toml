@@ -27,7 +27,7 @@ dev = ["pytest>=7"]
 
 [project.urls]
 Homepage = "https://motionbench.org"
-Repository = "https://github.com/motionbench/motionbench"
+Repository = "https://github.com/motionbenchmark/mb-core"
 
 [project.scripts]
 motionbench = "motionbench.cli:main"

@@ -7,7 +7,7 @@ authors:
 version: 0.1.0
 date-released: 2026-10-22
 license: Apache-2.0
-repository-code: "https://github.com/motionbench/motionbench"
+repository-code: "https://github.com/motionbenchmark/mb-core"
 url: "https://motionbench.org"
 keywords:
   - robotics
