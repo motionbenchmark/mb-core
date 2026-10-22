@@ -1,0 +1,21 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-NAV@1.0",
+  "seed": "dev-01",
+  "agent": {
+    "id": "driver-08",
+    "class": "human",
+    "name": "Driver 08",
+    "meta": {
+      "skill": 0.309,
+      "synthetic": true
+    }
+  },
+  "trial": 1,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "2c8eef651f53471480802f26c0798a7d7aa89968430881baf064e7389a74f873"
+  }
+}

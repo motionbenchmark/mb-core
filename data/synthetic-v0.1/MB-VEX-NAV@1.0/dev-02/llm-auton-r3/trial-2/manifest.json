@@ -1,0 +1,21 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-NAV@1.0",
+  "seed": "dev-02",
+  "agent": {
+    "id": "llm-auton-r3",
+    "class": "ai",
+    "name": "LLM-written auton, round 3",
+    "meta": {
+      "feedback_rounds": 3,
+      "synthetic": true
+    }
+  },
+  "trial": 2,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "d15d159eb8de4d07d8586a44114a522bd3c9f76a3ec665a75158bfcf79f98fbe"
+  }
+}

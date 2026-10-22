@@ -1,0 +1,13 @@
+t_s,type,object_id,detail
+1.300,pickup,o1,
+5.500,deliver,o1,
+8.600,pickup,o6,
+11.350,deliver,o6,
+14.800,pickup,o5,
+17.900,deliver,o5,
+21.250,pickup,o3,
+24.500,deliver,o3,
+28.550,pickup,o4,
+32.350,deliver,o4,
+36.500,pickup,o2,
+40.400,deliver,o2,

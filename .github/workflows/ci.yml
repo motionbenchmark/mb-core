@@ -1,0 +1,51 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
+
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cp README.md python/README.md
+      - run: pip install maturin pytest opencv-contrib-python-headless
+      - run: cd python && maturin build --release --out dist && pip install dist/*.whl
+      - run: pytest python/tests
+
+  reproducibility:
+    # The committed synthetic dataset and leaderboard must regenerate byte-for-byte.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cp README.md python/README.md && pip install maturin && cd python && maturin build --release --out dist && pip install dist/*.whl
+      - run: |
+          motionbench synth --out /tmp/regen --seed 2026
+          diff -r data/synthetic-v0.1 /tmp/regen
+          motionbench aggregate data/synthetic-v0.1 -o /tmp/lb.json
+          diff results/leaderboard-synthetic-v0.1.json /tmp/lb.json

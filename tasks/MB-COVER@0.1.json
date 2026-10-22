@@ -1,0 +1,24 @@
+{
+  "id": "MB-COVER",
+  "version": "0.1",
+  "title": "Room floor coverage",
+  "domain": "indoor-floor",
+  "description": "Sweep the free floor of a 4 m x 3 m room with a sofa and a table, using a 30 cm cleaning tool, within 180 seconds. Scored on the percentage of free floor area swept. Applies equally to a robot vacuum and to a person with a stick vacuum tracked by the same overhead camera.",
+  "arena": {
+    "width_m": 4.0,
+    "height_m": 3.0,
+    "obstacles": [
+      { "x": 0.0, "y": 2.2, "w": 1.8, "h": 0.8, "label": "sofa" },
+      { "x": 2.4, "y": 0.9, "w": 0.7, "h": 0.7, "label": "table" }
+    ],
+    "zones": {}
+  },
+  "robot": { "radius_m": 0.17 },
+  "budget": { "time_s": 180 },
+  "goal": { "kind": "coverage", "cell_m": 0.05, "tool_width_m": 0.30 },
+  "reference": { "floor": 0 },
+  "layouts": {
+    "dev-01": { "start": { "x": 0.30, "y": 0.30, "theta": 0 } },
+    "dev-02": { "start": { "x": 3.70, "y": 0.30, "theta": 1.5708 } }
+  }
+}

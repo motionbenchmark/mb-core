@@ -1,0 +1,56 @@
+{
+  "id": "MB-VEX-NAV",
+  "version": "1.0",
+  "title": "Waypoint navigation on a 12 ft field",
+  "domain": "vex",
+  "description": "Drive through six seeded waypoints in order, arriving within 5 cm and 5 degrees of each target pose, inside 20 seconds. Game-agnostic: uses only the standard 12 ft x 12 ft field and two generic barrier elements.",
+  "arena": {
+    "width_m": 3.6576,
+    "height_m": 3.6576,
+    "obstacles": [
+      { "x": 1.6788, "y": 1.6788, "w": 0.30, "h": 0.30, "label": "center-post" },
+      { "x": 1.00, "y": 1.79, "w": 0.50, "h": 0.08, "label": "west-barrier" },
+      { "x": 2.16, "y": 1.79, "w": 0.50, "h": 0.08, "label": "east-barrier" }
+    ],
+    "zones": {}
+  },
+  "robot": { "radius_m": 0.229 },
+  "budget": { "time_s": 20 },
+  "goal": { "kind": "waypoints", "pos_tol_m": 0.05, "heading_tol_rad": 0.0873 },
+  "reference": { "floor": 0 },
+  "layouts": {
+    "dev-01": {
+      "start": { "x": 0.45, "y": 0.45, "theta": 0 },
+      "waypoints": [
+        { "x": 1.40, "y": 0.60, "theta": 0 },
+        { "x": 2.90, "y": 0.80, "theta": 1.5708 },
+        { "x": 3.05, "y": 2.40, "theta": 1.5708 },
+        { "x": 2.20, "y": 3.10, "theta": 3.1416 },
+        { "x": 0.80, "y": 2.90, "theta": -1.5708 },
+        { "x": 0.60, "y": 1.20, "theta": -1.5708 }
+      ]
+    },
+    "dev-02": {
+      "start": { "x": 3.20, "y": 0.45, "theta": 1.5708 },
+      "waypoints": [
+        { "x": 3.10, "y": 1.30, "theta": 1.5708 },
+        { "x": 2.00, "y": 0.70, "theta": 3.1416 },
+        { "x": 0.60, "y": 0.90, "theta": 1.5708 },
+        { "x": 0.70, "y": 2.60, "theta": 0 },
+        { "x": 1.90, "y": 3.00, "theta": 0 },
+        { "x": 3.00, "y": 2.50, "theta": -1.5708 }
+      ]
+    },
+    "dev-03": {
+      "start": { "x": 0.45, "y": 3.20, "theta": -1.5708 },
+      "waypoints": [
+        { "x": 0.55, "y": 2.30, "theta": -1.5708 },
+        { "x": 1.00, "y": 0.70, "theta": 0 },
+        { "x": 2.80, "y": 0.60, "theta": 0 },
+        { "x": 3.10, "y": 1.40, "theta": 1.5708 },
+        { "x": 2.40, "y": 2.50, "theta": 3.1416 },
+        { "x": 1.20, "y": 2.90, "theta": 3.1416 }
+      ]
+    }
+  }
+}

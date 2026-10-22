@@ -1,0 +1,119 @@
+# Tag vX.Y.Z to publish:
+#   * `mb` binaries for Linux, macOS and Windows       -> GitHub Release
+#   * Python wheels (abi3) + sdist                       -> PyPI (trusted publishing) and the Release
+#   * motionbench-core / motionbench-cli                 -> crates.io
+#   * the synthetic dataset zip, leaderboard, checksums  -> the Release
+# The project site's Downloads page reads the latest GitHub Release.
+
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  cli:
+    strategy:
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: x86_64-unknown-linux-gnu, name: mb-linux-x86_64 }
+          - { os: macos-14, target: aarch64-apple-darwin, name: mb-macos-arm64 }
+          - { os: macos-13, target: x86_64-apple-darwin, name: mb-macos-x86_64 }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc, name: mb-windows-x86_64.exe }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - run: cargo build --release -p motionbench-cli --target ${{ matrix.target }}
+      - shell: bash
+        run: |
+          src=target/${{ matrix.target }}/release/mb
+          [ -f "$src.exe" ] && src="$src.exe"
+          cp "$src" ${{ matrix.name }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: ${{ matrix.name }}
+
+  wheels:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-14, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - shell: bash
+        run: cp README.md python/README.md
+      - uses: PyO3/maturin-action@v1
+        with:
+          working-directory: python
+          args: --release --out ../dist
+          manylinux: auto
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: dist
+
+  sdist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp README.md python/README.md
+      - uses: PyO3/maturin-action@v1
+        with:
+          working-directory: python
+          command: sdist
+          args: --out ../dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist
+
+  dataset:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          mkdir out
+          (cd data && zip -qr ../out/motionbench-synthetic-v0.1.zip synthetic-v0.1)
+          cp results/leaderboard-synthetic-v0.1.json out/
+          cp tasks/*.json out/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dataset
+          path: out
+
+  publish:
+    needs: [cli, wheels, sdist, dataset]
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - run: |
+          mkdir release pydist
+          find artifacts -type f \( -name 'mb-*' -o -name '*.zip' -o -name '*.json' \) -exec cp {} release/ \;
+          find artifacts -type f \( -name '*.whl' -o -name '*.tar.gz' \) -exec cp {} pydist/ \;
+          cp pydist/* release/
+          (cd release && sha256sum * > SHA256SUMS.txt)
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: pydist
+      - uses: dtolnay/rust-toolchain@stable
+      - run: |
+          cargo publish -p motionbench-core
+          cargo publish -p motionbench-cli
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true

@@ -1,0 +1,23 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-PICK@1.0",
+  "seed": "dev-01",
+  "agent": {
+    "id": "driver-12",
+    "class": "human",
+    "name": "Driver 12",
+    "meta": {
+      "skill": 0.876,
+      "synthetic": true
+    }
+  },
+  "trial": 3,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "5f54aadbd5780524fcfad0a7a37da93c5cdd742e38b3d865f6b6335510ebf657",
+    "events.csv": "5edd7469a9f03abc19f7b9a484da59f2da5267e81e44bdd37b5440a301057161",
+    "world_final.json": "db09d8907aa52a567137cc768cbd54317414e731fa74500cbca30b7590e11185"
+  }
+}

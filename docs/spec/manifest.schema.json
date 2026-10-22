@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motionbench.org/schema/v0.1/manifest.json",
+  "title": "MotionBench trace manifest",
+  "type": "object",
+  "required": ["task", "seed", "agent"],
+  "properties": {
+    "spec_version": { "type": "string" },
+    "task": { "type": "string", "pattern": "^MB-[A-Z0-9-]+@[0-9]+\\.[0-9]+$" },
+    "seed": { "type": "string" },
+    "agent": {
+      "type": "object",
+      "required": ["id", "class"],
+      "properties": {
+        "id": { "type": "string" },
+        "class": { "enum": ["human", "human_auton", "ai", "hybrid", "product", "baseline"] },
+        "name": { "type": "string" },
+        "meta": { "type": "object" }
+      }
+    },
+    "trial": { "type": "integer", "minimum": 0 },
+    "tier": { "enum": ["S", "F", "V"] },
+    "capture": { "type": "string" },
+    "notes": { "type": "string" },
+    "files": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" } }
+  }
+}

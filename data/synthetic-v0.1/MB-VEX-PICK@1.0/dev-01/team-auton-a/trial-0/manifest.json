@@ -1,0 +1,22 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-VEX-PICK@1.0",
+  "seed": "dev-01",
+  "agent": {
+    "id": "team-auton-a",
+    "class": "human_auton",
+    "name": "Team auton A (odometry + GPS correction)",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 0,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "d1e4e589fd1c24d116e8b976d001479d0e6fdf40603cecb8c04153525241628d",
+    "events.csv": "503b8ea2e3d1ff2adaaa8ca93cf37e4ec79cf6443cd37ed2a848ae6157f6a54f",
+    "world_final.json": "980868bd7211de74d88e741e4d509f9903cb744213e91cc5574b9655dc731388"
+  }
+}

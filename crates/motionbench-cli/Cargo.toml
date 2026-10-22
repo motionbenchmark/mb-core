@@ -1,0 +1,19 @@
+[package]
+name = "motionbench-cli"
+description = "The `mb` command: score, validate and aggregate MotionBench runs"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+authors.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "mb"
+path = "src/main.rs"
+
+[dependencies]
+motionbench-core = { path = "../motionbench-core", version = "0.1.0" }
+serde_json.workspace = true
+clap = { version = "4", features = ["derive"] }

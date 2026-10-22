@@ -1,0 +1,21 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-COVER@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "vac-bump",
+    "class": "product",
+    "name": "Robot vacuum, bump-and-turn",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 0,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "2bb07f1865ce4b4e33e6535ce56a88b6199e00af08c47323bda5cf9f96b2d21f",
+    "events.csv": "759e8cfdcfcabaae47dd2afcd8443a976b457d7d3c59f242c9454ced1a703ee4"
+  }
+}

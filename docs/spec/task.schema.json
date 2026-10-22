@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://motionbench.org/schema/v0.1/task.json",
+  "title": "MotionBench task",
+  "type": "object",
+  "required": ["id", "version", "title", "domain", "arena", "robot", "budget", "goal", "layouts"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^MB-[A-Z0-9-]+$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+    "title": { "type": "string" },
+    "domain": { "type": "string" },
+    "description": { "type": "string" },
+    "arena": {
+      "type": "object",
+      "required": ["width_m", "height_m"],
+      "properties": {
+        "width_m": { "type": "number", "exclusiveMinimum": 0 },
+        "height_m": { "type": "number", "exclusiveMinimum": 0 },
+        "obstacles": { "type": "array", "items": { "$ref": "#/$defs/rect" } },
+        "zones": { "type": "object", "additionalProperties": { "$ref": "#/$defs/rect" } }
+      }
+    },
+    "robot": { "type": "object", "required": ["radius_m"], "properties": { "radius_m": { "type": "number", "exclusiveMinimum": 0 } } },
+    "budget": { "type": "object", "required": ["time_s"], "properties": { "time_s": { "type": "number", "exclusiveMinimum": 0 } } },
+    "goal": {
+      "oneOf": [
+        { "type": "object", "required": ["kind", "pos_tol_m", "heading_tol_rad"], "properties": { "kind": { "const": "waypoints" }, "pos_tol_m": { "type": "number" }, "heading_tol_rad": { "type": "number" } } },
+        { "type": "object", "required": ["kind", "zone"], "properties": { "kind": { "const": "delivery" }, "zone": { "type": "string" } } },
+        { "type": "object", "required": ["kind", "cell_m", "tool_width_m"], "properties": { "kind": { "const": "coverage" }, "cell_m": { "type": "number" }, "tool_width_m": { "type": "number" } } }
+      ]
+    },
+    "reference": { "type": "object", "properties": { "floor": { "type": "number" } } },
+    "layouts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["start"],
+        "properties": {
+          "start": { "$ref": "#/$defs/pose" },
+          "waypoints": { "type": "array", "items": { "$ref": "#/$defs/pose" } },
+          "objects": { "type": "array", "items": { "type": "object", "required": ["id", "x", "y"], "properties": { "id": { "type": "string" }, "x": { "type": "number" }, "y": { "type": "number" } } } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "rect": { "type": "object", "required": ["x", "y", "w", "h"], "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "w": { "type": "number" }, "h": { "type": "number" }, "label": { "type": "string" } } },
+    "pose": { "type": "object", "required": ["x", "y"], "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "theta": { "type": "number" } } }
+  }
+}
