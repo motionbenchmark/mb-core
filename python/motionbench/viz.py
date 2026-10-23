@@ -111,9 +111,15 @@ TEMPLATE = r"""<meta charset="utf-8">
 <title>__TITLE__</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <script>
-  // Embed mode (motionbench viz --embed): light theme, host page supplies the header.
+  // Embed mode (motionbench viz --embed): the host page supplies the header and the theme
+  // (?theme=light|dark, or a {type: "mb-theme", theme} message); light by default.
   window.MB_EMBED = __EMBED__;
-  if (window.MB_EMBED) { document.documentElement.dataset.theme = "light"; document.documentElement.classList.add("embed"); }
+  if (window.MB_EMBED) {
+    let th = "light";
+    try { const q = new URLSearchParams(location.search).get("theme"); if (q === "dark" || q === "light") th = q; } catch (e) {}
+    document.documentElement.dataset.theme = th;
+    document.documentElement.classList.add("embed");
+  }
 </script>
 <!-- Self-contained: no external fonts or requests. Uses Archivo if installed, else the system UI font. -->
 <style>
@@ -628,6 +634,12 @@ $("play").addEventListener("click", () => {
   raf = requestAnimationFrame(tick);
 });
 window.addEventListener("resize", () => { resize(); draw(); });
+window.addEventListener("message", (e) => {
+  const d = e.data;
+  if (!window.MB_EMBED || !d || d.type !== "mb-theme" || (d.theme !== "light" && d.theme !== "dark")) return;
+  document.documentElement.dataset.theme = d.theme;
+  renderLegend(); draw(); renderStrip();
+});
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
 new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
