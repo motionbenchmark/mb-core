@@ -1,0 +1,41 @@
+{
+  "id": "MB-AIM-NAV",
+  "version": "0.1",
+  "title": "Waypoint navigation for VEX AIM on a 6 x 4 ft table",
+  "domain": "vex-aim",
+  "description": "Drive a VEX AIM coding robot (or any small classroom robot) through five seeded waypoints in order, arriving within 3 cm and 10 degrees of each target pose, inside 20 seconds. The arena is a MotionBench-defined 1.83 m x 1.22 m (6 ft x 4 ft) area on a table or floor with one block in the middle; it is not an official VEX field. Holonomic drives may strafe; only the arrival pose is scored.",
+  "arena": {
+    "width_m": 1.8288,
+    "height_m": 1.2192,
+    "obstacles": [
+      { "x": 0.8344, "y": 0.5296, "w": 0.16, "h": 0.16, "label": "center-block" }
+    ],
+    "zones": {}
+  },
+  "robot": { "radius_m": 0.04 },
+  "budget": { "time_s": 20 },
+  "goal": { "kind": "waypoints", "pos_tol_m": 0.03, "heading_tol_rad": 0.1745 },
+  "reference": { "floor": 0 },
+  "layouts": {
+    "dev-01": {
+      "start": { "x": 0.15, "y": 0.15, "theta": 0 },
+      "waypoints": [
+        { "x": 0.70, "y": 0.25, "theta": 0 },
+        { "x": 1.55, "y": 0.30, "theta": 1.5708 },
+        { "x": 1.60, "y": 0.95, "theta": 3.1416 },
+        { "x": 0.95, "y": 1.02, "theta": 3.1416 },
+        { "x": 0.30, "y": 0.80, "theta": -1.5708 }
+      ]
+    },
+    "dev-02": {
+      "start": { "x": 1.68, "y": 0.15, "theta": 3.1416 },
+      "waypoints": [
+        { "x": 1.20, "y": 0.35, "theta": 1.5708 },
+        { "x": 1.35, "y": 1.00, "theta": 3.1416 },
+        { "x": 0.60, "y": 1.00, "theta": -1.5708 },
+        { "x": 0.25, "y": 0.40, "theta": 0 },
+        { "x": 0.75, "y": 0.20, "theta": 0 }
+      ]
+    }
+  }
+}

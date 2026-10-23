@@ -140,6 +140,31 @@ fn delivery_counts_world_final_and_flags_unknown_objects() {
 }
 
 #[test]
+fn sorting_counts_only_the_matching_zone() {
+    let task = find_task("MB-AIM-SORT@0.1", None).unwrap();
+    let l = task.layout("dev-01").unwrap();
+    let mut objs = l.objects.clone();
+    // o1, o2 -> orange zone (correct); b1 -> orange zone (wrong colour); b2 -> blue (correct)
+    for o in objs.iter_mut() {
+        match o.id.as_str() {
+            "o1" | "o2" | "b1" => (o.x, o.y) = (0.15, 0.61),
+            "b2" => (o.x, o.y) = (1.68, 0.61),
+            _ => {}
+        }
+    }
+    let tr = Trace {
+        manifest: manifest("MB-AIM-SORT@0.1", "dev-01", "s", AgentClass::Human, 0),
+        poses: drive(&[(0.91, 0.12, 1.57), (0.15, 0.61, 3.0)], 0.3),
+        events: vec![],
+        world_final: Some(WorldFinal { objects: objs }),
+        path: None,
+    };
+    let r = score(&task, &tr).unwrap();
+    assert_eq!(r.success.score, 3.0);
+    assert_eq!(r.success.max_score, 6.0);
+}
+
+#[test]
 fn coverage_of_a_lawnmower_sweep() {
     let task = find_task("MB-COVER@0.1", None).unwrap();
     // Boustrophedon rows across the bottom 0.9 m strip (below the table).

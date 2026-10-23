@@ -1,0 +1,24 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-NAV@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "random-walk",
+    "class": "baseline",
+    "name": "Random walk (floor)",
+    "meta": {
+      "walk": [
+        0.25,
+        0.2
+      ],
+      "synthetic": true
+    }
+  },
+  "trial": 1,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "ca0275d2a35a0f5380c53b68303f52c0de9b52908b9fc5f53879eeac909675fe"
+  }
+}

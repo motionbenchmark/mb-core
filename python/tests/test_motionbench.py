@@ -22,7 +22,7 @@ def dataset(tmp_path_factory):
 
 def test_tasks_builtin():
     keys = {f"{t['id']}@{t['version']}" for t in mb.tasks()}
-    assert {"MB-VEX-NAV@1.0", "MB-VEX-PICK@1.0", "MB-COVER@0.1"} <= keys
+    assert {"MB-VEX-NAV@1.0", "MB-VEX-PICK@1.0", "MB-COVER@0.1", "MB-AIM-NAV@0.1", "MB-AIM-SORT@0.1"} <= keys
 
 
 def test_write_and_score_roundtrip(tmp_path):
@@ -114,3 +114,19 @@ def test_viz_write_is_a_standards_mode_document(tmp_path, dataset):
     text = out.read_text()
     assert text.startswith("<!doctype html>")
     assert "window.MB_EMBED = true" in text
+
+
+def test_aim_sort_counts_only_matching_colour(tmp_path):
+    plan = {"MB-AIM-SORT@0.1": {"seeds": ["dev-01"], "trials": 1, "roster": "aim"}}
+    generate(tmp_path, master_seed=3, plan=plan, quiet=True)
+    task = mb.load_task("MB-AIM-SORT@0.1")
+    zones = task["arena"]["zones"]
+    targets = {o["id"]: zones[o["zone"]] for o in task["layouts"]["dev-01"]["objects"]}
+    for run in sorted((tmp_path / "MB-AIM-SORT@0.1" / "dev-01").glob("*/trial-0")):
+        world = json.loads((run / "world_final.json").read_text())
+        expected = sum(
+            1 for o in world["objects"]
+            if targets[o["id"]]["x"] <= o["x"] <= targets[o["id"]]["x"] + targets[o["id"]]["w"]
+            and targets[o["id"]]["y"] <= o["y"] <= targets[o["id"]]["y"] + targets[o["id"]]["h"]
+        )
+        assert mb.score(run)["success"]["score"] == expected

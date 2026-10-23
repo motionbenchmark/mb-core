@@ -25,7 +25,7 @@
     "goal": {
       "oneOf": [
         { "type": "object", "required": ["kind", "pos_tol_m", "heading_tol_rad"], "properties": { "kind": { "const": "waypoints" }, "pos_tol_m": { "type": "number" }, "heading_tol_rad": { "type": "number" } } },
-        { "type": "object", "required": ["kind", "zone"], "properties": { "kind": { "const": "delivery" }, "zone": { "type": "string" } } },
+        { "type": "object", "required": ["kind"], "properties": { "kind": { "const": "delivery" }, "zone": { "type": "string", "description": "Default target zone; objects may name their own" } } },
         { "type": "object", "required": ["kind", "cell_m", "tool_width_m"], "properties": { "kind": { "const": "coverage" }, "cell_m": { "type": "number" }, "tool_width_m": { "type": "number" } } }
       ]
     },
@@ -39,7 +39,7 @@
         "properties": {
           "start": { "$ref": "#/$defs/pose" },
           "waypoints": { "type": "array", "items": { "$ref": "#/$defs/pose" } },
-          "objects": { "type": "array", "items": { "type": "object", "required": ["id", "x", "y"], "properties": { "id": { "type": "string" }, "x": { "type": "number" }, "y": { "type": "number" } } } }
+          "objects": { "type": "array", "items": { "type": "object", "required": ["id", "x", "y"], "properties": { "id": { "type": "string" }, "x": { "type": "number" }, "y": { "type": "number" }, "zone": { "type": "string", "description": "Target zone for this object (e.g. sorting by colour); defaults to goal.zone" }, "kind": { "type": "string", "description": "Object type, display only (e.g. barrel-orange)" } } } }
         }
       }
     }

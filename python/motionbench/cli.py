@@ -68,6 +68,7 @@ def main(argv=None) -> int:
     p = sub.add_parser("field", help="write a tracker field config")
     g = p.add_mutually_exclusive_group()
     g.add_argument("--vex", action="store_true", help="12 ft VEX field (default)")
+    g.add_argument("--aim", action="store_true", help="6 x 4 ft VEX AIM table arena (tags 20-24)")
     g.add_argument("--room", nargs=2, type=float, metavar=("WIDTH_M", "HEIGHT_M"))
     p.add_argument("-o", "--out", default="field.json")
 
@@ -125,7 +126,7 @@ def main(argv=None) -> int:
         elif a.cmd == "field":
             from .tracker import FieldConfig
 
-            cfg = FieldConfig.room(*a.room) if a.room else FieldConfig.vex()
+            cfg = FieldConfig.room(*a.room) if a.room else FieldConfig.aim() if a.aim else FieldConfig.vex()
             cfg.save(a.out)
             print(f"wrote {a.out}")
         elif a.cmd == "tags":

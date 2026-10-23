@@ -1,0 +1,25 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-SORT@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "random-walk",
+    "class": "baseline",
+    "name": "Random walk (floor)",
+    "meta": {
+      "walk": [
+        0.25,
+        0.2
+      ],
+      "synthetic": true
+    }
+  },
+  "trial": 2,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "f2bf583cf964c373f95ee8c25cfbc3542979da75fbde64414b5b9c35bf105d16",
+    "world_final.json": "d873b5c39f8aa7ba69fad8eba48926fde98906e97680d35879bfee3e62abeed3"
+  }
+}

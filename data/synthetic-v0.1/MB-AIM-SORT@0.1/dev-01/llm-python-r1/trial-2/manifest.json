@@ -1,0 +1,23 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-SORT@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "llm-python-r1",
+    "class": "ai",
+    "name": "LLM-written Python, round 1",
+    "meta": {
+      "feedback_rounds": 1,
+      "synthetic": true
+    }
+  },
+  "trial": 2,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "994322b6222b3110bde349410443e4c10b6c8008edcc5a26d7c2ddb9627fcb82",
+    "events.csv": "6e0e691167ba969f9d5639dbcaf86b1b5a5725eeac3b313de1fd52047105c3b3",
+    "world_final.json": "c6359ab45d33342466dc930a68ec196011e808453ea43512302f07d6419147d1"
+  }
+}

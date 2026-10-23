@@ -1,0 +1,23 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-SORT@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "llm-python-r3",
+    "class": "ai",
+    "name": "LLM-written Python, round 3 (uses AI Vision)",
+    "meta": {
+      "feedback_rounds": 3,
+      "synthetic": true
+    }
+  },
+  "trial": 4,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "e1fb6734c1780b216833f8561c16d29e3e2bfe52d3c21b69c234cf6eff7b949e",
+    "events.csv": "42cd4f050551d8fc13c5e30f3c23661a8da6d13f976185cde8db618c308cf016",
+    "world_final.json": "2c2a2fcaf2be0b00f52658f3b07e5bd5748bc9bbbde40badc1a7fa7048390d50"
+  }
+}
