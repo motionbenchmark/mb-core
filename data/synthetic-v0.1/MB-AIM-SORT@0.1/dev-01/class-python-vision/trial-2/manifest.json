@@ -1,0 +1,22 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-SORT@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "class-python-vision",
+    "class": "human_auton",
+    "name": "Class code B (Python, AI Vision on tags and barrels)",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 2,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "aeb9548cce7f6dd5fa3f33b5096104d2b51fd660a487ce013a8ce03d833db676",
+    "events.csv": "f0f758c0c9734aa6bea3e2fd02140b8296ef6c3657a00940766ab852b131a4e7",
+    "world_final.json": "e0cb3463f3bb81e2ea26c9da9c3b8ca803f701e0425aa8ca49b451e10af28554"
+  }
+}

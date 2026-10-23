@@ -1,0 +1,22 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-SORT@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "student-assist",
+    "class": "hybrid",
+    "name": "Student 04 with AI Vision auto-aim",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 1,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "381596b5a13902bd6d6ff4730d72438599058fd2acc3a6cc6dce4c26771a8f7c",
+    "events.csv": "f23af8a50a217309062f4baca0d67a54e500afea7cd69141aae6ea4ae58a5e72",
+    "world_final.json": "d7c7ad6c7f95e3942fa3f53e0e7bf260ec2c4d59477d804b87444cf8d9ccbf0b"
+  }
+}

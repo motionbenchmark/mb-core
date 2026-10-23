@@ -284,9 +284,10 @@ function recount(r) {
     return { score: hits.length, hits };
   }
   if (g.kind === "delivery") {
-    const z = task.arena.zones[g.zone];
+    // each object's own target zone (e.g. sorting by colour), else the goal's zone
+    const target = new Map(lay.objects.map((o) => [o.id, task.arena.zones[o.zone || g.zone]]));
     const ids = new Set(lay.objects.map((o) => o.id));
-    const inZ = (o) => o.x >= z.x && o.x <= z.x + z.w && o.y >= z.y && o.y <= z.y + z.h;
+    const inZ = (o) => { const z = target.get(o.id); return !!z && o.x >= z.x && o.x <= z.x + z.w && o.y >= z.y && o.y <= z.y + z.h; };
     if (r.world) return { score: r.world.objects.filter((o) => ids.has(o.id) && inZ(o)).length };
     return { score: new Set(r.events.filter((e) => e[1] === "deliver" && ids.has(e[2])).map((e) => e[2])).size };
   }
@@ -412,8 +413,13 @@ function draw() {
   ctx.fillStyle = css("--obstacle");
   for (const o of task.arena.obstacles) ctx.fillRect(X(o.x), Y(o.y + o.h), o.w * sc, o.h * sc);
   ctx.setLineDash([6, 4]); ctx.strokeStyle = css("--c-ai"); ctx.lineWidth = 2;
+  const zoneNames = Object.keys(task.arena.zones || {});
   for (const z of Object.values(task.arena.zones || {})) ctx.strokeRect(X(z.x), Y(z.y + z.h), z.w * sc, z.h * sc);
   ctx.setLineDash([]);
+  if (zoneNames.length > 1) {
+    ctx.fillStyle = css("--ink"); ctx.font = "700 11px " + css("--font"); ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+    for (const [name, z] of Object.entries(task.arena.zones)) ctx.fillText(name + " zone", X(z.x + z.w / 2), Y(z.y + z.h) - 4);
+  }
 
   // overlays
   const all = runsFor(S.task, S.seed);
@@ -434,10 +440,19 @@ function draw() {
   });
   if (lay.objects) {
     const fin = new Map((r.world ? r.world.objects : []).map((o) => [o.id, o]));
+    const sorted = zoneNames.length > 1;
     for (const o of lay.objects) {
-      ctx.beginPath(); ctx.arc(X(o.x), Y(o.y), 6, 0, 7); ctx.strokeStyle = css("--c-human_auton"); ctx.lineWidth = 2; ctx.stroke();
+      const objCol = sorted ? css("--ink") : css("--c-human_auton");
+      ctx.beginPath(); ctx.arc(X(o.x), Y(o.y), 6, 0, 7); ctx.strokeStyle = objCol; ctx.lineWidth = 2; ctx.stroke();
       const f = fin.get(o.id);
-      if (f && S.t >= r.T[r.n - 1] - r.T[0]) { ctx.beginPath(); ctx.arc(X(f.x), Y(f.y), 6, 0, 7); ctx.fillStyle = css("--c-human_auton"); ctx.fill(); }
+      const ended = f && S.t >= r.T[r.n - 1] - r.T[0];
+      if (ended) { ctx.beginPath(); ctx.arc(X(f.x), Y(f.y), 6, 0, 7); ctx.fillStyle = objCol; ctx.fill(); }
+      if (sorted && o.zone) {
+        // letter = target zone, drawn at the start ring and, once the run ends, on the final position
+        ctx.font = "700 9px " + css("--font"); ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillStyle = objCol; ctx.fillText(o.zone[0].toUpperCase(), X(o.x), Y(o.y) - 13);
+        if (ended) { ctx.fillStyle = css("--panel"); ctx.fillText(o.zone[0].toUpperCase(), X(f.x), Y(f.y) + 0.5); }
+      }
     }
   }
   // start pose
@@ -497,7 +512,9 @@ function inspect() {
   $("time").value = String(Math.round(S.t * 100));
   $("tout").textContent = `${S.t.toFixed(1)} s`;
   $("hint").textContent = task.goal.kind === "waypoints" ? "Filled dots on the path mark where this page counted each waypoint as reached."
-    : task.goal.kind === "delivery" ? "Rings are starting object positions; filled dots are final positions from world_final.json (shown at the end of the run)."
+    : task.goal.kind === "delivery" ? (Object.keys(task.arena.zones || {}).length > 1
+      ? "Rings are starting object positions, lettered with their target zone; filled dots are final positions from world_final.json (shown at the end of the run). An object counts only inside its own zone."
+      : "Rings are starting object positions; filled dots are final positions from world_final.json (shown at the end of the run).")
     : "Shading shows swept floor; darker means swept more than once.";
 }
 

@@ -53,6 +53,28 @@ scorer re-bases time to the first pose sample.
 After the run, record where every object ended up (`world_final.json`), either by
 measuring or by a still photo with the tags visible. Verified-tier runs require it.
 
+## 6. VEX AIM on a table
+
+The AIM tasks (`MB-AIM-NAV@0.1`, `MB-AIM-SORT@0.1`) use a 6 ft × 4 ft
+(1.83 m × 1.22 m) area. Tape the outline on a table or the floor; it is a
+MotionBench arena, not an official VEX field.
+
+```bash
+motionbench field --aim -o aim-field.json   # floor tags 20-23, robot tag 24
+motionbench tags --config aim-field.json --out tags/
+```
+
+* The AIM kit's AprilTag signs use IDs 0-4. The AIM preset uses 20-24 so the
+  tracker and the robot's AI Vision never read each other's tags. Keep the kit's
+  signs off the arena unless your program uses them, and tell us if it does.
+* Print the floor tags at 8 cm and the robot tag at 4.5 cm, and stick the robot
+  tag flat on top of the robot facing forward.
+* The robot is small, so mount the phone higher and more directly overhead
+  (about 1.5 m above the centre of the table), and measure the camera position
+  into `camera_xyz_m` so the 7.5 cm tag height is corrected.
+* For sorting, after the run note where each barrel ended up (or take a photo
+  from the camera position) to fill in `world_final.json`.
+
 ## Privacy
 
 Frame the camera so people are not identifiable, or blur them before sharing.

@@ -1,0 +1,20 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-NAV@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "student-assist",
+    "class": "hybrid",
+    "name": "Student 04 with AI Vision auto-aim",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 0,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "f2fb335f5f300283bcce7c29b6a934f37830678f58814cd35c2ed9a05b2619ab"
+  }
+}

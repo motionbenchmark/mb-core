@@ -1,0 +1,23 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-SORT@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "student-04",
+    "class": "human",
+    "name": "Student 04 (One Stick controller)",
+    "meta": {
+      "skill": 0.274,
+      "synthetic": true
+    }
+  },
+  "trial": 0,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "3571baadccd042cd4765ffea1e8efd9318c587d62d703d0f062094ff20496dfd",
+    "events.csv": "e14e65fe913d50b1884a5ca52d05250d3b8357aefcceb4d1888d619d9c771390",
+    "world_final.json": "356f005e43d57863a1e9946806530bd7053048c96c768f5d050267dcbaa97a42"
+  }
+}

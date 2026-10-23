@@ -55,8 +55,12 @@ pub enum Goal {
         pos_tol_m: f64,
         heading_tol_rad: f64,
     },
-    /// Move objects into a named zone; scored on the final world state.
-    Delivery { zone: String },
+    /// Move objects into zones; scored on the final world state. `zone` is the
+    /// default target; an object may name its own (e.g. sorting by colour).
+    Delivery {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        zone: Option<String>,
+    },
     /// Sweep the free floor area with a tool of the given width.
     Coverage { cell_m: f64, tool_width_m: f64 },
 }
@@ -101,6 +105,12 @@ pub struct Object {
     pub id: String,
     pub x: f64,
     pub y: f64,
+    /// Target zone for this object; falls back to the goal's `zone`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub zone: Option<String>,
+    /// Free-form object type, e.g. `barrel-orange` (display only).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
 }
 
 impl Task {
@@ -134,6 +144,18 @@ impl Task {
     }
 
     /// Area of the arena not covered by obstacles (m²).
+    /// The zone an object must end in (delivery tasks).
+    pub fn target_zone(&self, o: &Object) -> Option<&Rect> {
+        let default = match &self.goal {
+            Goal::Delivery { zone } => zone.as_ref(),
+            _ => None,
+        };
+        o.zone
+            .as_ref()
+            .or(default)
+            .and_then(|z| self.arena.zones.get(z))
+    }
+
     pub fn free_area(&self) -> f64 {
         let obst: f64 = self.arena.obstacles.iter().map(|o| o.area()).sum();
         self.arena.width_m * self.arena.height_m - obst
@@ -153,11 +175,34 @@ impl Task {
             )));
         }
         if let Goal::Delivery { zone } = &self.goal {
-            if !self.arena.zones.contains_key(zone) {
-                return Err(Error::InvalidTask(format!(
-                    "{}: goal zone '{zone}' not defined",
-                    self.key()
-                )));
+            if let Some(z) = zone {
+                if !self.arena.zones.contains_key(z) {
+                    return Err(Error::InvalidTask(format!(
+                        "{}: goal zone '{z}' not defined",
+                        self.key()
+                    )));
+                }
+            }
+            for (seed, layout) in &self.layouts {
+                for o in &layout.objects {
+                    match o.zone.as_ref().or(zone.as_ref()) {
+                        None => {
+                            return Err(Error::InvalidTask(format!(
+                                "{}: object '{}' in layout '{seed}' has no target zone",
+                                self.key(),
+                                o.id
+                            )))
+                        }
+                        Some(z) if !self.arena.zones.contains_key(z) => {
+                            return Err(Error::InvalidTask(format!(
+                                "{}: object '{}' targets undefined zone '{z}'",
+                                self.key(),
+                                o.id
+                            )))
+                        }
+                        _ => {}
+                    }
+                }
             }
         }
         if self.layouts.is_empty() {
@@ -182,6 +227,14 @@ const BUILTIN: &[(&str, &str)] = &[
     (
         "MB-COVER@0.1",
         include_str!("../../../tasks/MB-COVER@0.1.json"),
+    ),
+    (
+        "MB-AIM-NAV@0.1",
+        include_str!("../../../tasks/MB-AIM-NAV@0.1.json"),
+    ),
+    (
+        "MB-AIM-SORT@0.1",
+        include_str!("../../../tasks/MB-AIM-SORT@0.1.json"),
     ),
 ];
 
@@ -215,7 +268,7 @@ mod tests {
     #[test]
     fn builtins_parse() {
         let ts = builtin_tasks();
-        assert_eq!(ts.len(), 3);
+        assert_eq!(ts.len(), 5);
         for t in ts {
             assert!(t.free_area() > 0.0);
         }

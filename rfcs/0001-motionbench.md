@@ -93,8 +93,8 @@ fast, dependency-light core that compiles to native, Python and WebAssembly.
 
 - Spec v0.1 (this document) reviewed and accepted.
 - `motionbench-core` 0.1 and `motionbench` 0.1 published to crates.io and PyPI.
-- Three tasks: `MB-VEX-NAV@1.0`, `MB-VEX-PICK@1.0`, `MB-COVER@0.1`.
-- A synthetic dataset (330 runs) that exercises the full pipeline.
+- Five tasks: `MB-VEX-NAV@1.0`, `MB-VEX-PICK@1.0`, `MB-COVER@0.1`, and for VEX AIM classrooms `MB-AIM-NAV@0.1` and `MB-AIM-SORT@0.1`.
+- A synthetic dataset (570 runs) that exercises the full pipeline.
 - Human baselines from 20+ real drivers across 3-5 pilot teams.
 - A first report: human drivers vs team-written vs AI-written routines, with
   confidence intervals, reviewed by the pilot teams before publication.

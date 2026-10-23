@@ -101,8 +101,12 @@ Onboard logging for VEX V5 (PROS): [integrations/vex/pros](integrations/vex/pros
 | `MB-VEX-NAV@1.0` | VEX 12 ft field | 6 waypoints in order, ±5 cm / ±5° | 20 s | dev-01..03 |
 | `MB-VEX-PICK@1.0` | VEX 12 ft field | Deliver 6 objects to a corner zone | 60 s | dev-01..02 |
 | `MB-COVER@0.1` | 4 m × 3 m room | Sweep free floor with a 30 cm tool | 180 s | dev-01..02 |
+| `MB-AIM-NAV@0.1` | 6 × 4 ft table, VEX AIM | 5 waypoints in order, ±3 cm / ±10° | 20 s | dev-01..02 |
+| `MB-AIM-SORT@0.1` | 6 × 4 ft table, VEX AIM | Sort 3 orange + 3 blue barrels into their colour zones | 45 s | dev-01..02 |
 
 VEX tasks are game-agnostic primitives; they do not reproduce any season's game.
+The VEX AIM tasks use a MotionBench-defined 6 × 4 ft arena (tape it out on a table or
+floor), not an official VEX field, and the barrels that come with the AIM kit.
 
 ## First results — synthetic data only
 
@@ -128,10 +132,25 @@ VEX tasks are game-agnostic primitives; they do not reproduce any season's game.
 | LLM-written planner, round 3 | ai | 89.7% | 1.08 | 1.04 |
 | Robot vacuum, bump-and-turn | product | 59.0% | 0.26 | 0.40 |
 
+**MB-AIM-SORT@0.1** (VEX AIM classroom roster; median of 10 simulated students = 4.7 of 6 barrels sorted):
+
+| Agent | Class | Mean | Worst of 5 | HNS | MBI |
+| --- | --- | --- | --- | --- | --- |
+| Class code B (Python, AI Vision) | human_auton | 6.0 | 6 | 1.28 | 1.17 |
+| LLM-written Python, round 3 (AI Vision) | ai | 6.0 | 6 | 1.28 | 1.17 |
+| Student with AI Vision auto-aim | hybrid | 6.0 | 6 | 1.28 | 1.16 |
+| Class code A (Blocks, gyro and encoders) | human_auton | 2.6 | 2 | 0.55 | 0.76 |
+| LLM-written Python, round 1 | ai | 1.4 | 1 | 0.30 | 0.63 |
+
+The AIM agents' speeds and errors are assumptions for a small omni-drive robot,
+not measurements of VEX AIM.
+
 Full board: [results/leaderboard-synthetic-v0.1.json](results/leaderboard-synthetic-v0.1.json).
 Two method lessons already visible: success saturates on NAV for strong agents (so
 efficiency and time decide), and Team auton B's worst run (1 of 6) shows why
-worst-of-N is reported next to the mean.
+worst-of-N is reported next to the mean. On AIM, the open-loop Blocks program is
+near the top for navigation but falls behind on sorting, where small drift makes it
+miss barrels: the task, not the robot, decides what matters.
 
 ## Repository layout
 
@@ -142,7 +161,7 @@ python/                   PyO3 bindings + motionbench Python package
   motionbench/synth.py      synthetic dataset generator
   motionbench/tracker/      AprilTag overhead-camera tracker, renderer, tag sheets
 tasks/                    task specs (ID@VERSION.json)
-data/synthetic-v0.1/      330 synthetic traces (CC BY 4.0)
+data/synthetic-v0.1/      570 synthetic traces (CC BY 4.0)
 results/                  leaderboards and per-run reports
 integrations/vex/pros/    onboard pose logger for VEX V5 (PROS)
 rfcs/                     RFC process and RFC-0001

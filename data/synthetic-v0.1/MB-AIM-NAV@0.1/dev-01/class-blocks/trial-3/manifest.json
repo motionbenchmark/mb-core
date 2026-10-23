@@ -1,0 +1,20 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-NAV@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "class-blocks",
+    "class": "human_auton",
+    "name": "Class code A (Blocks, gyro and encoders)",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 3,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "4b70c3d4434c0b6ce12035b9d453505336b7d6a6f14ca786fb57a284901bf282"
+  }
+}

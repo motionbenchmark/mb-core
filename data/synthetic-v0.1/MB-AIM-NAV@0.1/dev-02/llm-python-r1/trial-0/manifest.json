@@ -1,0 +1,21 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-NAV@0.1",
+  "seed": "dev-02",
+  "agent": {
+    "id": "llm-python-r1",
+    "class": "ai",
+    "name": "LLM-written Python, round 1",
+    "meta": {
+      "feedback_rounds": 1,
+      "synthetic": true
+    }
+  },
+  "trial": 0,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "8e907f28f37a4e2f66177cd855bd589b098439be1c0095c61c3b2bedb18fd09e"
+  }
+}

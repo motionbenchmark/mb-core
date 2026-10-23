@@ -1,0 +1,22 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-SORT@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "class-blocks",
+    "class": "human_auton",
+    "name": "Class code A (Blocks, gyro and encoders)",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 4,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "c8023d395a1aa58b0c23038097dc47a45b6d83238a047ce6df9f51fe2deb875c",
+    "events.csv": "9f7e6743c8c66e03e2d3574acca809566d1cbdab4947d1773b2ccc0fd1d395cc",
+    "world_final.json": "8c03a4d5e4903b6a3cf6145699007fdadd47f24adcc87f9c7afa2ad1ac7ccbaf"
+  }
+}

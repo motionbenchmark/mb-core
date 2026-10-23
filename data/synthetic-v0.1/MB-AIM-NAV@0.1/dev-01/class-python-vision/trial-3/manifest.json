@@ -1,0 +1,20 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-NAV@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "class-python-vision",
+    "class": "human_auton",
+    "name": "Class code B (Python, AI Vision on tags and barrels)",
+    "meta": {
+      "synthetic": true
+    }
+  },
+  "trial": 3,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "0486c2ad8ec00aa75a9cd8997448d98addeb32f2160fe575aaec37549abe1f02"
+  }
+}

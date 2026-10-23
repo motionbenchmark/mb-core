@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 VEX_FIELD_M = 3.6576  # 12 ft
+AIM_ARENA_M = (1.8288, 1.2192)  # 6 ft x 4 ft, MotionBench-defined arena for VEX AIM tasks
 
 
 @dataclass
@@ -41,6 +42,26 @@ class FieldConfig:
             height_m=h,
             tag_size_m=tag_size_m,
             corner_tags={0: [inset_m, inset_m], 1: [w - inset_m, inset_m], 2: [w - inset_m, h - inset_m], 3: [inset_m, h - inset_m]},
+        )
+
+    @classmethod
+    def aim(cls, inset_m: float = 0.06, tag_size_m: float = 0.08) -> "FieldConfig":
+        """6 ft x 4 ft table arena for the VEX AIM tasks.
+
+        The AIM kit's own AprilTag signs use IDs 0-4, so the floor tags here are
+        20-23 and the robot tag is 24: the tracker never confuses them with signs
+        the robot itself is looking at. The robot tag sits on top of the robot
+        (about 7.5 cm up), so measure the camera position for parallax correction.
+        """
+        w, h = AIM_ARENA_M
+        return cls(
+            width_m=w,
+            height_m=h,
+            tag_size_m=tag_size_m,
+            corner_tags={20: [inset_m, inset_m], 21: [w - inset_m, inset_m], 22: [w - inset_m, h - inset_m], 23: [inset_m, h - inset_m]},
+            robot_tag_id=24,
+            robot_tag_size_m=0.045,
+            robot_tag_height_m=0.075,
         )
 
     @classmethod

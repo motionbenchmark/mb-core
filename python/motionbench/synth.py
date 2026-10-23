@@ -56,6 +56,7 @@ class Profile:
     placement_spread: float = 0.5  # 0 = zone centre, 1 = anywhere in zone, >1 can miss
     suboptimal_order_p: float = 0.0
     track_noise: float = 0.004  # capture noise added to recorded positions (m)
+    holonomic: bool = False  # omni drive: translates in any direction without turning first
     meta: dict = field(default_factory=dict)
 
 
@@ -105,14 +106,14 @@ class Sim:
             self.th = _wrap(self.th + step)
             self._step()
 
-    def drive_to(self, tx, ty, v_max, accel, wobble=0.0, turn_rate=3.0):
+    def drive_to(self, tx, ty, v_max, accel, wobble=0.0, turn_rate=3.0, holonomic=False):
         if self.bounds:
             x0, y0, x1, y1 = self.bounds
             tx, ty = min(max(tx, x0), x1), min(max(ty, y0), y1)
         d0 = math.hypot(tx - self.x, ty - self.y)
         if d0 < 1e-3:
             return
-        if d0 > 0.15:
+        if d0 > 0.15 and not holonomic:
             self.turn_to(math.atan2(ty - self.y, tx - self.x), turn_rate)
         sx, sy = self.x, self.y
         ux, uy = (tx - sx) / d0, (ty - sy) / d0
@@ -129,7 +130,9 @@ class Sim:
                 nx, ny = min(max(nx, self.bounds[0]), self.bounds[2]), min(max(ny, self.bounds[1]), self.bounds[3])
             self.odometer += math.hypot(nx - self.x, ny - self.y)
             self.x, self.y = nx, ny
-            if d0 > 0.15:
+            if holonomic:
+                self.th = _wrap(self.th + 0.2 * wobble * math.cos(phase + 6 * s) * self.dt)
+            elif d0 > 0.15:
                 self.th = _wrap(math.atan2(uy, ux) + 0.5 * wobble * math.cos(phase + 6 * s))
             self._step()
 
@@ -205,6 +208,59 @@ def vex_roster(master_seed: int) -> list[Profile]:
     return out
 
 
+def aim_roster(master_seed: int) -> list[Profile]:
+    """Classroom roster for VEX AIM tasks. Speeds and errors are assumptions, not AIM specifications."""
+    rng = _rng(master_seed, "aim-roster")
+    out = []
+    for i in range(1, 11):
+        skill = float(np.clip(rng.beta(2.2, 2.0), 0.05, 0.98))
+        out.append(
+            Profile(
+                id=f"student-{i:02d}",
+                cls="human",
+                name=f"Student {i:02d} (One Stick controller)",
+                v_max=0.16 + 0.16 * skill,
+                accel=0.6 + 0.6 * skill,
+                turn_rate=1.8 + 1.4 * skill,
+                stop_err=0.045 - 0.03 * skill,
+                head_err=0.20 - 0.12 * skill,
+                wobble=0.02 - 0.014 * skill,
+                closed_loop=True,
+                corr_gain=0.55,
+                reaction=(0.4 - 0.25 * skill, 0.9 - 0.5 * skill),
+                hesitate_p=0.3 - 0.22 * skill,
+                pick_time=(0.6 - 0.3 * skill, 1.2 - 0.6 * skill),
+                placement_spread=1.1 - 0.6 * skill,
+                suboptimal_order_p=0.45 - 0.35 * skill,
+                track_noise=0.003,
+                holonomic=True,
+                meta={"skill": round(skill, 3)},
+            )
+        )
+    common = dict(holonomic=True, track_noise=0.002)
+    out += [
+        Profile("class-blocks", "human_auton", "Class code A (Blocks, gyro and encoders)", v_max=0.28, accel=0.9,
+                turn_rate=2.5, stop_err=0.008, head_err=0.03, drift_per_m=0.012, closed_loop=False, max_corrections=0,
+                pick_time=(0.4, 0.5), placement_spread=0.5, **common),
+        Profile("class-python-vision", "human_auton", "Class code B (Python, AI Vision on tags and barrels)", v_max=0.26,
+                accel=0.9, turn_rate=2.5, stop_err=0.01, head_err=0.04, closed_loop=True, max_corrections=3,
+                reaction=(0.15, 0.3), pick_time=(0.4, 0.6), placement_spread=0.45, **common),
+        Profile("llm-python-r1", "ai", "LLM-written Python, round 1", v_max=0.35, accel=1.2, turn_rate=3.0,
+                stop_err=0.015, head_err=0.08, drift_per_m=0.035, closed_loop=False, max_corrections=0,
+                pick_time=(0.3, 0.4), placement_spread=0.9, suboptimal_order_p=1.0,
+                meta={"feedback_rounds": 1}, **common),
+        Profile("llm-python-r3", "ai", "LLM-written Python, round 3 (uses AI Vision)", v_max=0.3, accel=1.1,
+                turn_rate=2.8, stop_err=0.01, head_err=0.04, closed_loop=True, max_corrections=2, reaction=(0.1, 0.2),
+                pick_time=(0.3, 0.45), placement_spread=0.5, meta={"feedback_rounds": 3}, **common),
+        Profile("student-assist", "hybrid", "Student 04 with AI Vision auto-aim", v_max=0.28, accel=1.0,
+                turn_rate=2.8, stop_err=0.012, head_err=0.05, wobble=0.008, closed_loop=True, reaction=(0.2, 0.4),
+                pick_time=(0.35, 0.6), placement_spread=0.6, holonomic=True, track_noise=0.003),
+        Profile("random-walk", "baseline", "Random walk (floor)", v_max=0.2, accel=0.6,
+                meta={"walk": (0.25, 0.2)}, **common),
+    ]
+    return out
+
+
 def room_roster(master_seed: int) -> list[Profile]:
     rng = _rng(master_seed, "room-roster")
     out = []
@@ -239,13 +295,13 @@ def _offset(rng, p: Profile, sim: Sim, scale=1.0):
     return ex, ey
 
 
-def _random_walk(sim: Sim, rng, task):
+def _random_walk(sim: Sim, rng, task, step=0.6, speed=0.5):
     w, h = task["arena"]["width_m"], task["arena"]["height_m"]
     r = task["robot"]["radius_m"]
     while True:
-        tx = float(np.clip(sim.x + rng.normal(0, 0.6), r, w - r))
-        ty = float(np.clip(sim.y + rng.normal(0, 0.6), r, h - r))
-        sim.drive_to(tx, ty, 0.5, 1.0)
+        tx = float(np.clip(sim.x + rng.normal(0, step), r, w - r))
+        ty = float(np.clip(sim.y + rng.normal(0, step), r, h - r))
+        sim.drive_to(tx, ty, speed, 1.0)
         sim.pause(rng.uniform(0.2, 1.0))
 
 
@@ -256,10 +312,10 @@ def run_waypoints(task, layout, p: Profile, rng, dt):
     p = replace(p, meta=dict(p.meta))
     try:
         if p.cls == "baseline":
-            _random_walk(sim, rng, task)
+            _random_walk(sim, rng, task, *p.meta.get("walk", (0.6, 0.5)))
         for w in layout["waypoints"]:
             ex, ey = _offset(rng, p, sim)
-            sim.drive_to(w["x"] + ex, w["y"] + ey, p.v_max, p.accel, p.wobble, p.turn_rate)
+            sim.drive_to(w["x"] + ex, w["y"] + ey, p.v_max, p.accel, p.wobble, p.turn_rate, p.holonomic)
             sim.turn_to(w["theta"] + rng.normal(0, p.head_err), p.turn_rate)
             n = 0
             while p.closed_loop and n < p.max_corrections:
@@ -269,7 +325,7 @@ def run_waypoints(task, layout, p: Profile, rng, dt):
                 sim.pause(rng.uniform(*p.reaction))
                 g = p.corr_gain**n
                 ex, ey = rng.normal(0, p.stop_err * g, 2)
-                sim.drive_to(w["x"] + ex, w["y"] + ey, min(p.v_max, 0.35), p.accel, 0.0, p.turn_rate)
+                sim.drive_to(w["x"] + ex, w["y"] + ey, min(p.v_max, 0.35), p.accel, 0.0, p.turn_rate, p.holonomic)
                 sim.turn_to(w["theta"] + rng.normal(0, p.head_err * g), p.turn_rate)
             sim.pause(rng.uniform(*p.reaction) + (rng.uniform(0.3, 1.2) if rng.random() < p.hesitate_p else 0))
         sim.pause(0.2)
@@ -281,22 +337,24 @@ def run_waypoints(task, layout, p: Profile, rng, dt):
 def run_delivery(task, layout, p: Profile, rng, dt):
     s = layout["start"]
     sim = Sim(s["x"], s["y"], s["theta"], task["budget"]["time_s"], dt, rng, p.track_noise, _bounds(task))
-    zone = task["arena"]["zones"][task["goal"]["zone"]]
-    zx, zy = zone["x"] + zone["w"] / 2, zone["y"] + zone["h"] / 2
+    zones = task["arena"]["zones"]
+    default_zone = task["goal"].get("zone")
     final = {o["id"]: (o["x"], o["y"]) for o in layout["objects"]}
     remaining = [dict(o) for o in layout["objects"]]
     carrying: Optional[str] = None
-    intake = 0.12
+    small = task["robot"]["radius_m"] < 0.1  # classroom robots (VEX AIM) vs competition robots
+    intake = 0.035 if small else 0.12
+    drop_noise = 0.4 if small else 1.0
     rects = _inflated(task, task["robot"]["radius_m"])
     p = replace(p, meta=dict(p.meta))
 
     def go(tx, ty, v, wobble):
         for wx, wy in _route((sim.x, sim.y), (tx, ty), rects):
-            sim.drive_to(wx, wy, v, p.accel, wobble, p.turn_rate)
+            sim.drive_to(wx, wy, v, p.accel, wobble, p.turn_rate, p.holonomic)
 
     try:
         if p.cls == "baseline":
-            _random_walk(sim, rng, task)
+            _random_walk(sim, rng, task, *p.meta.get("walk", (0.6, 0.5)))
         while remaining:
             if rng.random() < p.suboptimal_order_p:
                 o = remaining[0] if p.suboptimal_order_p >= 1 else remaining[int(rng.integers(len(remaining)))]
@@ -312,16 +370,18 @@ def run_delivery(task, layout, p: Profile, rng, dt):
                     break
                 tries += 1
                 sim.pause(rng.uniform(*p.reaction))
-                sim.drive_to(o["x"], o["y"], 0.4, p.accel, 0.0, p.turn_rate)
+                sim.drive_to(o["x"], o["y"], min(0.4, p.v_max), p.accel, 0.0, p.turn_rate, p.holonomic)
             else:
                 sim.pause(rng.uniform(*p.pick_time))
                 sim.event("pickup", o["id"])
                 carrying = o["id"]
-                half = zone["w"] / 2 * p.placement_spread
-                ax, ay = zx + rng.uniform(-half, half), zy + rng.uniform(-half, half)
+                zone = zones[o.get("zone") or default_zone]
+                zx, zy = zone["x"] + zone["w"] / 2, zone["y"] + zone["h"] / 2
+                hx, hy = zone["w"] / 2 * p.placement_spread, zone["h"] / 2 * p.placement_spread
+                ax, ay = zx + rng.uniform(-hx, hx), zy + rng.uniform(-hy, hy)
                 ex, ey = _offset(rng, p, sim)
                 go(ax + ex, ay + ey, p.v_max, p.wobble)
-                dx, dy = rng.normal(0, 0.03 + 0.04 * p.placement_spread, 2)
+                dx, dy = rng.normal(0, (0.03 + 0.04 * p.placement_spread) * drop_noise, 2)
                 final[carrying] = (sim.x + dx, sim.y + dy)
                 sim.event("deliver", carrying)
                 carrying = None
@@ -449,7 +509,11 @@ DEFAULT_PLAN = {
     "MB-VEX-NAV@1.0": {"seeds": ["dev-01", "dev-02"], "trials": 5, "roster": "vex"},
     "MB-VEX-PICK@1.0": {"seeds": ["dev-01"], "trials": 5, "roster": "vex"},
     "MB-COVER@0.1": {"seeds": ["dev-01"], "trials": 3, "roster": "room"},
+    "MB-AIM-NAV@0.1": {"seeds": ["dev-01", "dev-02"], "trials": 5, "roster": "aim"},
+    "MB-AIM-SORT@0.1": {"seeds": ["dev-01"], "trials": 5, "roster": "aim"},
 }
+
+ROSTERS = {"vex": vex_roster, "room": room_roster, "aim": aim_roster}
 
 
 def generate(out: "str | Path", master_seed: int = 2026, plan: Optional[dict] = None, quiet: bool = False) -> int:
@@ -460,7 +524,7 @@ def generate(out: "str | Path", master_seed: int = 2026, plan: Optional[dict] = 
     for key, cfg in plan.items():
         task = load_task(key)
         runner, dt = RUNNERS[task["goal"]["kind"]]
-        roster = vex_roster(master_seed) if cfg["roster"] == "vex" else room_roster(master_seed)
+        roster = ROSTERS[cfg["roster"]](master_seed)
         for seed in cfg["seeds"]:
             layout = task["layouts"][seed]
             for prof in roster:
@@ -494,6 +558,11 @@ assumptions; any ranking derived from this dataset illustrates the method only.
 | MB-VEX-NAV@1.0 | dev-01, dev-02 | 12 simulated drivers, 3 team autons, 3 LLM-auton rounds, 1 hybrid, 1 random walk | 5 |
 | MB-VEX-PICK@1.0 | dev-01 | same roster | 5 |
 | MB-COVER@0.1 | dev-01 | 6 simulated people, 2 robot vacuums, 1 LLM planner, 1 random walk | 3 |
+| MB-AIM-NAV@0.1 | dev-01, dev-02 | 10 simulated students, 2 class programs, 2 LLM-Python rounds, 1 hybrid, 1 random walk | 5 |
+| MB-AIM-SORT@0.1 | dev-01 | same classroom roster | 5 |
+
+The VEX AIM agents use assumed speeds and errors for a small omni-drive
+classroom robot; they are not measurements or specifications of VEX AIM.
 
 Regenerate byte-for-byte:
 

@@ -1,0 +1,21 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-AIM-NAV@0.1",
+  "seed": "dev-01",
+  "agent": {
+    "id": "student-01",
+    "class": "human",
+    "name": "Student 01 (One Stick controller)",
+    "meta": {
+      "skill": 0.722,
+      "synthetic": true
+    }
+  },
+  "trial": 1,
+  "tier": "S",
+  "capture": "synthetic",
+  "notes": "Synthetic run from motionbench.synth (master_seed=2026). Not real data.",
+  "files": {
+    "poses.csv": "8ef93b006c629b234d73334462bbed8a756b76db1b3a30e1d189730b990b536c"
+  }
+}

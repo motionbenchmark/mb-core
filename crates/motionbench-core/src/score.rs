@@ -150,9 +150,8 @@ pub fn score(task: &Task, trace: &Trace) -> Result<Report> {
             pos_tol_m,
             heading_tol_rad,
         } => waypoints(layout, &poses, &cum, *pos_tol_m, *heading_tol_rad),
-        Goal::Delivery { zone } => {
-            let rect = task.arena.zones[zone].clone();
-            delivery(layout, &rect, &poses, &cum, &events, trace, &mut warnings)
+        Goal::Delivery { .. } => {
+            delivery(task, layout, &poses, &cum, &events, trace, &mut warnings)
         }
         Goal::Coverage {
             cell_m,
@@ -363,15 +362,16 @@ fn waypoints(
 }
 
 /// Greedy single-carry tour: from the current position go to the nearest
-/// remaining object, carry it to the zone centre, repeat. Returns the cumulative
+/// remaining object, carry it to its zone centre, repeat. Returns the cumulative
 /// oracle length after each delivery.
-fn greedy_delivery_oracle(layout: &Layout, zone: &Rect) -> Vec<f64> {
-    let (zx, zy) = zone.center();
-    let mut remaining: Vec<(f64, f64)> = layout
+fn greedy_delivery_oracle(task: &Task, layout: &Layout) -> Vec<f64> {
+    let mut remaining: Vec<(f64, f64, (f64, f64))> = layout
         .objects
         .iter()
-        .filter(|o| !zone.contains(o.x, o.y))
-        .map(|o| (o.x, o.y))
+        .filter_map(|o| {
+            let z = task.target_zone(o)?;
+            (!z.contains(o.x, o.y)).then(|| (o.x, o.y, z.center()))
+        })
         .collect();
     let (mut px, mut py) = (layout.start.x, layout.start.y);
     let mut acc = 0.0;
@@ -380,10 +380,10 @@ fn greedy_delivery_oracle(layout: &Layout, zone: &Rect) -> Vec<f64> {
         let (j, _) = remaining
             .iter()
             .enumerate()
-            .map(|(j, &(ox, oy))| (j, dist(px, py, ox, oy)))
+            .map(|(j, &(ox, oy, _))| (j, dist(px, py, ox, oy)))
             .min_by(|a, b| a.1.partial_cmp(&b.1).unwrap())
             .unwrap();
-        let (ox, oy) = remaining.remove(j);
+        let (ox, oy, (zx, zy)) = remaining.remove(j);
         acc += dist(px, py, ox, oy) + dist(ox, oy, zx, zy);
         out.push(acc);
         px = zx;
@@ -393,38 +393,44 @@ fn greedy_delivery_oracle(layout: &Layout, zone: &Rect) -> Vec<f64> {
 }
 
 fn delivery(
+    task: &Task,
     layout: &Layout,
-    zone: &Rect,
     poses: &[PoseSample],
     cum: &[f64],
     events: &[Event],
     trace: &Trace,
     warnings: &mut Vec<String>,
 ) -> Scored {
-    let known: BTreeSet<&str> = layout.objects.iter().map(|o| o.id.as_str()).collect();
-    let (zx, zy) = zone.center();
+    let targets: BTreeMap<&str, &Rect> = layout
+        .objects
+        .iter()
+        .filter_map(|o| task.target_zone(o).map(|z| (o.id.as_str(), z)))
+        .collect();
     let mut errs = vec![];
     let delivered: usize = match &trace.world_final {
         Some(w) => {
             let mut finals: BTreeMap<&str, (f64, f64)> = BTreeMap::new();
             for o in &w.objects {
-                if known.contains(o.id.as_str()) {
+                if targets.contains_key(o.id.as_str()) {
                     finals.insert(&o.id, (o.x, o.y));
                 } else {
                     warnings.push(format!("world_final lists unknown object '{}'", o.id));
                 }
             }
             finals
-                .values()
-                .filter(|(x, y)| zone.contains(*x, *y))
-                .inspect(|(x, y)| errs.push(dist(*x, *y, zx, zy)))
+                .iter()
+                .filter(|(id, (x, y))| targets[*id].contains(*x, *y))
+                .inspect(|(id, (x, y))| {
+                    let (zx, zy) = targets[*id].center();
+                    errs.push(dist(*x, *y, zx, zy))
+                })
                 .count()
         }
         None => {
             warnings.push("no world_final.json; using deliver events (lower confidence)".into());
             events
                 .iter()
-                .filter(|e| e.kind == "deliver" && known.contains(e.object_id.as_str()))
+                .filter(|e| e.kind == "deliver" && targets.contains_key(e.object_id.as_str()))
                 .map(|e| e.object_id.as_str())
                 .collect::<BTreeSet<_>>()
                 .len()
@@ -447,7 +453,7 @@ fn delivery(
         }
         None => *cum.last().unwrap(),
     };
-    let oracle_steps = greedy_delivery_oracle(layout, zone);
+    let oracle_steps = greedy_delivery_oracle(task, layout);
     let oracle = if delivered == 0 {
         0.0
     } else {
