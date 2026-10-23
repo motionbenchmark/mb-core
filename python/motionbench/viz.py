@@ -113,8 +113,7 @@ TEMPLATE = r"""<meta charset="utf-8">
   window.MB_EMBED = __EMBED__;
   if (window.MB_EMBED) { document.documentElement.dataset.theme = "light"; document.documentElement.classList.add("embed"); }
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap">
+<!-- Self-contained: no external fonts or requests. Uses Archivo if installed, else the system UI font. -->
 <style>
 /* Layout: control rail | field canvas with scrubber | run inspector; checks + strip plot below. */
 :root {
