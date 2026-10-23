@@ -168,7 +168,7 @@ def main():
             x, y, th = lay["start"]["x"], lay["start"]["y"], rng.uniform(-math.pi, math.pi)
             rows = []
             for n in range(int(a.budget / STEP) + 1):
-                rows.append((n * STEP, x, y, th))
+                rows.append((n * STEP, x, y, math.atan2(math.sin(th), math.cos(th))))
                 th += rng.gauss(0, 0.6)
                 nx, ny = x + 1.2 * STEP * math.cos(th), y + 1.2 * STEP * math.sin(th)
                 if 0.3 < nx < W - 0.3 and 0.3 < ny < H - 0.3:

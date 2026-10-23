@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import base64
 import csv
+import math
 import json
 from array import array
 from pathlib import Path
@@ -39,7 +40,8 @@ def _load_run(d: Path) -> dict:
             t.append(round(float(r["t_s"]) * 1000))
             x.append(round(float(r["x_m"]) * 1000))
             y.append(round(float(r["y_m"]) * 1000))
-            th.append(round(float(r["theta_rad"]) * 1000))
+            h = float(r["theta_rad"])  # wrap to (-pi, pi] so it fits the 16-bit wire format
+            th.append(round(math.atan2(math.sin(h), math.cos(h)) * 1000))
     events = []
     if (d / "events.csv").exists():
         with open(d / "events.csv") as f:
@@ -84,7 +86,13 @@ def build(root: "str | Path", title: Optional[str] = None, tasks_dir=None, embed
         runs.append(run)
     used = {r["report"]["task"] for r in runs}
     task_specs = [t for t in list_tasks(tasks_dir) if f"{t['id']}@{t['version']}" in used]
-    synthetic = any("synthetic" in (r["capture"] + r["notes"]).lower() for r in runs)
+    # A run is synthetic when its notes or capture say so, or it is tier S. The badge reads
+    # "Synthetic data" only when every run is; a mix of real and simulated runs (say real
+    # people plus a simulated random-walk floor) is labelled as such instead.
+    is_syn = [
+        "synthetic" in (r["capture"] + r["notes"]).lower() or r["report"].get("tier") == "S" for r in runs
+    ]
+    synthetic = "all" if runs and all(is_syn) else ("some" if any(is_syn) else "")
     payload = {
         "dataset": title or root.name,
         "synthetic": synthetic,
@@ -648,6 +656,7 @@ $("title").textContent = D.dataset;
 const nAgents = new Set(D.runs.map((r) => r.rep.agent_id)).size;
 $("summary").textContent = `${D.runs.length} runs · ${Object.keys(TASKS).length} tasks · ${nAgents} agents`;
 $("synth").hidden = !D.synthetic;
+if (D.synthetic === "some") $("synth").textContent = "Includes simulated runs";
 renderChecks();
 const q = new URLSearchParams(location.search);
 const want = (r) => (!q.get("task") || r.rep.task === q.get("task")) && (!q.get("seed") || r.rep.seed === q.get("seed"))
