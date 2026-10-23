@@ -75,6 +75,31 @@ motionbench tags --config aim-field.json --out tags/
 * For sorting, after the run note where each barrel ended up (or take a photo
   from the camera position) to fill in `world_final.json`.
 
+## 7. No tags: an ordinary phone video
+
+Printed tags give the most accurate results, but MotionBench can also measure a run
+from a plain video, like a robot vacuum filmed from the end of a hallway.
+
+1. **Film it.** Hold the phone still (a little hand shake is fine) high enough to see
+   the whole floor area and the robot's whole path. Keep people out of the picture.
+2. **Calibrate.** `motionbench calibrate run.mov -o calib.html`, open the page, and tap
+   the four corners of a rectangle on the floor whose long sides run along the walls
+   (far-left, far-right, near-right, near-left). Optionally trace the full floor
+   outline (door nooks) and cut off the bottom of the picture. If you can, type in a
+   tape-measured width (and length): one measurement makes the size exact, two also
+   fix the lens. Download `calib.json`.
+3. **Track and score.** `motionbench track run.mov --untagged --calib calib.json -o out/ --overlay`.
+   Check `out/overlay.mp4`: the ring should sit on the robot's base all the way through.
+
+How it works: frames are aligned to the first one, the median of all frames is the
+empty floor, the robot is whatever is darker (or lighter) than it, and its centre is the
+lowest point of its silhouette plus half its diameter. Without measurements the
+robot's own size is the ruler. Floor the camera never saw is marked `unobserved` and
+left out of the score.
+
+Expected accuracy (rendered test video with known positions): about 2 cm with a
+measured width and length, about 6 cm from the robot's size alone.
+
 ## Privacy
 
 Frame the camera so people are not identifiable, or blur them before sharing.

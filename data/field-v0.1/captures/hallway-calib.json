@@ -1,0 +1,81 @@
+{
+  "frame_size": [
+    540,
+    960
+  ],
+  "floor_corners_px": [
+    [
+      125.7,
+      229.5
+    ],
+    [
+      376.1,
+      226.7
+    ],
+    [
+      622.5,
+      901.4
+    ],
+    [
+      -44.7,
+      925.8
+    ]
+  ],
+  "floor_polygon_px": [
+    [
+      108,
+      229
+    ],
+    [
+      380,
+      228
+    ],
+    [
+      420,
+      347
+    ],
+    [
+      448,
+      350
+    ],
+    [
+      490,
+      460
+    ],
+    [
+      480,
+      510
+    ],
+    [
+      539,
+      683
+    ],
+    [
+      539,
+      905
+    ],
+    [
+      0,
+      905
+    ],
+    [
+      0,
+      520
+    ],
+    [
+      72,
+      500
+    ],
+    [
+      100,
+      310
+    ]
+  ],
+  "measured_width_m": null,
+  "measured_length_m": null,
+  "robot_diameter_m": 0.35,
+  "robot_height_m": 0.1,
+  "robot_polarity": "dark",
+  "max_y_px": 905,
+  "notes": "Home hallway, IMG_5418.mov (iPhone 12 Pro, hand-held). Corners are the corridor's main rectangle; the outline adds the door nooks."
+}

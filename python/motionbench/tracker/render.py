@@ -123,3 +123,88 @@ def render_video(poses, cfg: FieldConfig, out_path: "str | Path", fps: float = 3
     if writer is not None:
         writer.release()
     return out_path
+
+
+def render_floor_video(
+    poses: Sequence[Sequence[float]],
+    out_path: "str | Path",
+    *,
+    floor_m: tuple[float, float, float, float] = (-0.6, 0.8, 0.6, 3.6),
+    robot_diameter_m: float = 0.35,
+    robot_height_m: float = 0.10,
+    f_px: float = 820.0,
+    camera_height_m: float = 1.4,
+    tilt_deg: float = 38.0,
+    size: tuple[int, int] = (540, 960),
+    fps: float = 15.0,
+    shake_px: float = 6.0,
+    seed: int = 0,
+) -> dict:
+    """Render a hand-held phone view of a dark disc robot on a planked floor
+    (no tags), for testing the untagged tracker. ``poses`` are ``(t, x, y, theta)``
+    in the floor's world frame (x across, y away from the camera, metres).
+    Returns the camera and the floor corners in image pixels."""
+    cv2 = _cv2()
+    from .floorcam import FloorCam
+
+    rng = np.random.default_rng(seed)
+    W, H = size
+    x0, y0, x1, y1 = floor_m
+    th = math.radians(tilt_deg)
+    # camera looking along +y, pitched down by tilt
+    r1 = np.array([1.0, 0.0, 0.0])
+    r2 = np.array([0.0, -math.sin(th), math.cos(th)])
+    up = np.cross(r1, r2)
+    cam = FloorCam.__new__(FloorCam)
+    cam.f, cam.c = f_px, (W / 2, H / 2)
+    cam.K = np.array([[f_px, 0, W / 2], [0, f_px, H / 2], [0, 0, 1.0]])
+    cam.Ki = np.linalg.inv(cam.K)
+    cam.R = np.stack([r1, r2, up], 1)
+    cam.h = camera_height_m
+    # floor texture, top-down
+    ppm = 300
+    tw, thh = int((x1 - x0) * ppm), int((y1 - y0) * ppm)
+    tex = np.zeros((thh, tw, 3), np.uint8)
+    plank = int(0.057 * ppm)
+    for k, x in enumerate(range(0, tw, plank)):
+        shade = 150 + int(rng.integers(-18, 18))
+        tex[:, x:x + plank] = (int(shade * 0.55), int(shade * 0.78), shade)
+        y = int(rng.integers(0, thh))
+        while y < thh:  # butt joints
+            cv2.line(tex, (x, y), (x + plank, y), (60, 80, 110), 1)
+            y += int(rng.integers(int(0.4 * ppm), int(1.2 * ppm)))
+        cv2.line(tex, (x, 0), (x, thh), (70, 95, 125), 1)
+    tex = cv2.add(tex, rng.integers(0, 14, tex.shape, dtype=np.uint8))
+    # homography texture px -> image (floor plane)
+    src = np.float32([[0, 0], [tw, 0], [tw, thh], [0, thh]])
+    world = np.array([[x0, y1], [x1, y1], [x1, y0], [x0, y0]])
+    dst = cam.project(world).astype(np.float32)
+    Ht = cv2.getPerspectiveTransform(src, dst)
+    base = np.full((H, W, 3), (200, 210, 214), np.uint8)
+    cv2.rectangle(base, (0, 0), (W, int(dst[:2, 1].mean())), (40, 52, 60), -1)  # back wall
+    floor = cv2.warpPerspective(tex, Ht, (W, H))
+    mask = cv2.warpPerspective(np.full((thh, tw), 255, np.uint8), Ht, (W, H)) > 0
+    base[mask] = floor[mask]
+    P = np.asarray(poses, float)
+    ang = np.linspace(0, 2 * np.pi, 48)
+    r = robot_diameter_m / 2
+    vw = cv2.VideoWriter(str(out_path), cv2.VideoWriter_fourcc(*"mp4v"), fps, (W, H))
+    for t in np.arange(P[0, 0], P[-1, 0], 1 / fps):
+        x = np.interp(t, P[:, 0], P[:, 1]); y = np.interp(t, P[:, 0], P[:, 2])
+        img = base.copy()
+        lo = cam.project(np.c_[x + r * np.cos(ang), y + r * np.sin(ang), np.zeros(48)])
+        hi = cam.project(np.c_[x + r * np.cos(ang), y + r * np.sin(ang), np.full(48, robot_height_m)])
+        hull = cv2.convexHull(np.r_[lo, hi].astype(np.float32)).astype(np.int32)
+        cv2.fillConvexPoly(img, hull, (28, 28, 30), cv2.LINE_AA)
+        cv2.fillConvexPoly(img, cv2.convexHull(hi.astype(np.float32)).astype(np.int32), (45, 45, 48), cv2.LINE_AA)
+        if shake_px:
+            # hand shake relative to the first frame (the tracker aligns everything to frame one)
+            d = rng.normal(0, shake_px / 3, 2) + shake_px * np.array([math.sin(t * 0.7), math.cos(t * 0.5) - 1.0])
+            if t == P[0, 0]:
+                d = np.zeros(2)
+            M = np.float32([[1, 0, d[0]], [0, 1, d[1]]])
+            img = cv2.warpAffine(img, M, (W, H), borderMode=cv2.BORDER_REPLICATE)
+        img = cv2.add(img, rng.integers(0, 6, img.shape, dtype=np.uint8))
+        vw.write(img)
+    vw.release()
+    return {"camera": cam, "corners_px": dst.tolist(), "floor_m": floor_m}

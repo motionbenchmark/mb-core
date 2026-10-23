@@ -293,20 +293,36 @@ function recount(r) {
   // coverage
   const cell = g.cell_m, rt = g.tool_width_m / 2, W = task.arena.width_m, H = task.arena.height_m;
   const nx = Math.ceil(W / cell), ny = Math.ceil(H / cell);
-  const free = new Uint8Array(nx * ny), cov = new Uint16Array(nx * ny);
+  const free = new Uint8Array(nx * ny), cov = new Uint16Array(nx * ny), kind = new Uint8Array(nx * ny);
+  const inR = (o, cx, cy) => cx >= o.x && cx <= o.x + o.w && cy >= o.y && cy <= o.y + o.h;
   let nFree = 0;
+  // kind: 0 free floor, 1 blocked (obstacle / outside), 2 not observed by the capture
   for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
     const cx = (i + 0.5) * cell, cy = (j + 0.5) * cell;
-    const f = cx <= W && cy <= H && !task.arena.obstacles.some((o) => cx >= o.x && cx <= o.x + o.w && cy >= o.y && cy <= o.y + o.h);
-    free[j * nx + i] = f ? 1 : 0; nFree += f ? 1 : 0;
+    const kd = cx > W || cy > H || task.arena.obstacles.some((o) => inR(o, cx, cy)) ? 1
+      : (task.arena.unobserved || []).some((o) => inR(o, cx, cy)) ? 2 : 0;
+    kind[j * nx + i] = kd; free[j * nx + i] = kd === 0 ? 1 : 0; nFree += kd === 0 ? 1 : 0;
   }
+  // edge cells (side-brush reach): free cells touching a wall, obstacle or the boundary
+  const edge = new Uint8Array(nx * ny);
+  for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
+    if (!free[j * nx + i]) continue;
+    let e = 0;
+    for (let dj = -1; dj <= 1 && !e; dj++) for (let di = -1; di <= 1; di++) {
+      const a = i + di, b = j + dj;
+      if (a < 0 || b < 0 || a >= nx || b >= ny || kind[b * nx + a] === 1) { e = 1; break; }
+    }
+    edge[j * nx + i] = e;
+  }
+  const re = Math.max(rt, g.edge_reach_m || 0);
   let nCov = 0;
   const stamp = (x, y) => {
-    const i0 = Math.max(0, Math.floor((x - rt) / cell)), i1 = Math.min(nx, Math.ceil((x + rt) / cell));
-    const j0 = Math.max(0, Math.floor((y - rt) / cell)), j1 = Math.min(ny, Math.ceil((y + rt) / cell));
+    const i0 = Math.max(0, Math.floor((x - re) / cell)), i1 = Math.min(nx, Math.ceil((x + re) / cell));
+    const j0 = Math.max(0, Math.floor((y - re) / cell)), j1 = Math.min(ny, Math.ceil((y + re) / cell));
     for (let j = j0; j < j1; j++) for (let i = i0; i < i1; i++) {
       const k = j * nx + i; if (!free[k]) continue;
-      if (Math.hypot(x - (i + 0.5) * cell, y - (j + 0.5) * cell) <= rt) { if (!cov[k]) nCov++; if (cov[k] < 65535) cov[k]++; }
+      const d = Math.hypot(x - (i + 0.5) * cell, y - (j + 0.5) * cell);
+      if (d <= rt || (edge[k] && d <= re)) { if (!cov[k]) nCov++; if (cov[k] < 65535) cov[k]++; }
     }
   };
   stamp(r.X[0], r.Y[0]);
@@ -411,7 +427,7 @@ function draw() {
   }
   // Field captures mark floor the camera never saw as "not-in-view": drawn faint, not as a solid obstacle.
   let hatch = null;
-  for (const o of task.arena.obstacles) {
+  for (const o of [...task.arena.obstacles, ...(task.arena.unobserved || []).map((u) => ({ ...u, label: "not-in-view" }))]) {
     if (o.label === "not-in-view") {
       if (!hatch) {
         const pc = document.createElement("canvas"); pc.width = pc.height = 8;
@@ -526,7 +542,7 @@ function inspect() {
     : task.goal.kind === "delivery" ? (Object.keys(task.arena.zones || {}).length > 1
       ? "Rings are starting object positions, lettered with their target zone; filled dots are final positions from world_final.json (shown at the end of the run). An object counts only inside its own zone."
       : "Rings are starting object positions; filled dots are final positions from world_final.json (shown at the end of the run).")
-    : task.arena.obstacles.some((o) => o.label === "not-in-view")
+    : (task.arena.unobserved || []).length || task.arena.obstacles.some((o) => o.label === "not-in-view")
     ? "Shaded cells are floor swept by the tool so far. Hatched cells were outside the camera's view and are left out of the score; dark cells are walls; plain cells are floor not yet swept."
     : "Shading shows swept floor; darker means swept more than once.";
 }

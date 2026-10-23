@@ -71,11 +71,13 @@ def track_frames(frames: Iterable[np.ndarray], cfg: FieldConfig, fps: float, *,
                  max_gap_s: float = 0.25, recalibrate: bool = True) -> TrackResult:
     """Track the robot through an iterable of BGR or grayscale frames.
 
-    The camera is assumed static. A homography (image -> field) is fitted from the
-    reference tag corners on the first frame where all of them are visible and,
-    with ``recalibrate``, refined whenever a better fit appears. Gaps in robot
-    detection up to ``max_gap_s`` are linearly interpolated; longer gaps are left
-    as gaps and reported.
+    ``frames`` yields BGR/grayscale arrays or ``(t_seconds, frame)`` pairs (real
+    timestamps, see ``video.iter_frames``). A homography (image -> field) is fitted
+    from the reference tag corners whenever all of them are visible; with
+    ``recalibrate`` (default) each such frame uses its own fit, so a hand-held or
+    drifting camera stays calibrated, and frames without all four tags reuse the
+    latest fit. Gaps in robot detection up to ``max_gap_s`` are linearly
+    interpolated; longer gaps are left as gaps and reported.
     """
     cv2 = _cv2()
     det = _detector(cv2, cfg.family)
@@ -85,7 +87,11 @@ def track_frames(frames: Iterable[np.ndarray], cfg: FieldConfig, fps: float, *,
     raw: list[tuple[float, float, float, float]] = []
     need = set(cfg.corner_tags)
 
-    for i, frame in enumerate(frames):
+    for i, item in enumerate(frames):
+        if isinstance(item, tuple):
+            t_s, frame = item
+        else:
+            t_s, frame = i / fps, item
         res.n_frames += 1
         gray = frame if frame.ndim == 2 else cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         corners, ids, _ = det.detectMarkers(gray)
@@ -101,8 +107,8 @@ def track_frames(frames: Iterable[np.ndarray], cfg: FieldConfig, fps: float, *,
             H_new, rms = _fit_homography(cv2, img_pts, field_pts)
             if H_new is not None:
                 res.calibrated_frames += 1
-                if rms < best_rms:
-                    H, best_rms = H_new, rms
+                H = H_new  # this frame's own calibration (handles camera motion)
+                best_rms = min(best_rms, rms)
 
         if H is None or cfg.robot_tag_id not in found:
             continue
@@ -120,7 +126,7 @@ def track_frames(frames: Iterable[np.ndarray], cfg: FieldConfig, fps: float, *,
             tx, ty = cx + (tx - cx) * k, cy + (ty - cy) * k
         theta = math.atan2(ty - y, tx - x) + cfg.robot_tag_yaw_offset
         theta = (theta + math.pi) % (2 * math.pi) - math.pi
-        raw.append((i / fps, float(x), float(y), theta))
+        raw.append((float(t_s), float(x), float(y), theta))
 
     res.calibration_rms_m = None if H is None else best_rms
     if H is None:
@@ -156,21 +162,9 @@ def _fill_gaps(raw, fps, max_gap_s):
 
 
 def track_video(path: "str | Path", cfg: FieldConfig, **kw) -> TrackResult:
-    """Track a video file. See :func:`track_frames` for options."""
-    cv2 = _cv2()
-    cap = cv2.VideoCapture(str(path))
-    if not cap.isOpened():
-        raise FileNotFoundError(f"cannot open video {path}")
-    fps = cap.get(cv2.CAP_PROP_FPS) or 30.0
+    """Track a video file (phone rotation applied, real frame timestamps).
+    See :func:`track_frames` for options."""
+    from .video import iter_frames, probe
 
-    def frames():
-        while True:
-            ok, f = cap.read()
-            if not ok:
-                return
-            yield f
-
-    try:
-        return track_frames(frames(), cfg, fps, **kw)
-    finally:
-        cap.release()
+    info = probe(path)
+    return track_frames(iter_frames(path), cfg, info.fps, **kw)

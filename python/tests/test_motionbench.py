@@ -130,3 +130,63 @@ def test_aim_sort_counts_only_matching_colour(tmp_path):
             and targets[o["id"]]["y"] <= o["y"] <= targets[o["id"]]["y"] + targets[o["id"]]["h"]
         )
         assert mb.score(run)["success"]["score"] == expected
+
+
+def _lawnmower(x0=-0.4, x1=0.4, y_start=1.0, y_end=2.4, lane=0.35, v=0.3):
+    t, y, left = 0.0, y_start, True
+    path, cur = [(0.0, x0, y_start)], (x0, y_start)
+    while y < y_end:
+        nx = x1 if left else x0
+        t += abs(nx - cur[0]) / v
+        cur = (nx, y)
+        path.append((t, *cur))
+        y += lane
+        t += lane / v
+        cur = (cur[0], y)
+        path.append((t, *cur))
+        left = not left
+    return path
+
+
+def _err_vs_truth(res, path, origin):
+    P = [p for p in res.poses]
+    tt = [p[0] + res.stats["track_start_s"] for p in P]
+    import numpy as np
+
+    T, X, Y = (np.array(v) for v in zip(*path))
+    tx = np.interp(tt, T, X) - origin[0]
+    ty = np.interp(tt, T, Y) - origin[1]
+    e = np.hypot(np.array([p[1] for p in P]) - tx, np.array([p[2] for p in P]) - ty)
+    return float(np.median(e))
+
+
+def test_untagged_tracker_on_rendered_handheld_video(tmp_path):
+    """Hand-held, untagged video of a dark disc robot on planks: positions within a few cm."""
+    from motionbench.tracker.render import render_floor_video
+    from motionbench.tracker.untagged import Calibration, track_untagged
+
+    path = _lawnmower()
+    info = render_floor_video([(t, x, y, 0.0) for t, x, y in path], tmp_path / "v.mp4", floor_m=(-0.6, 0.8, 0.6, 3.0))
+    corners = info["corners_px"]
+    exact = track_untagged(tmp_path / "v.mp4", Calibration([540, 960], corners, measured_width_m=1.2, measured_length_m=2.2))
+    assert exact.camera["mode"] == "measured"
+    assert _err_vs_truth(exact, path, (-0.6, 0.8)) < 0.04
+    assert exact.task["arena"]["unobserved"], "floor outside the frame should be marked unobserved"
+    rough = track_untagged(tmp_path / "v.mp4", Calibration([540, 960], corners))
+    assert rough.camera["mode"] == "robot-size"
+    assert _err_vs_truth(rough, path, (-0.6, 0.8)) < 0.12
+    out = exact.write(tmp_path / "out", task_id="T-UNTAGGED", seed="s1", agent_id="disc", agent_class="product")
+    r = mb.score(out / "trace", tasks_dir=out / "tasks")
+    assert 0 < r["coverage"]["covered_pct"] <= 100
+
+
+def test_calibration_page_is_self_contained(tmp_path):
+    from motionbench.tracker.calibrate import write_calibration_page
+    from motionbench.tracker.render import render_floor_video
+
+    render_floor_video([(0, 0, 1.5, 0), (3, 0.3, 1.8, 0)], tmp_path / "v.mp4", floor_m=(-0.6, 0.8, 0.6, 3.0))
+    page = write_calibration_page(tmp_path / "v.mp4", tmp_path / "c.html", png=tmp_path / "bg.png")
+    html = page.read_text()
+    assert "far-left" in html and "data:image/jpeg;base64," in html and "calib.json" in html
+    assert "http://" not in html and "https://" not in html  # works offline, sends nothing anywhere
+    assert (tmp_path / "bg.png").exists()

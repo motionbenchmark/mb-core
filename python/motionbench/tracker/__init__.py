@@ -12,10 +12,14 @@ Setup (VEX field):
     result.write("run.mbtrace", task="MB-VEX-NAV@1.0", seed="dev-01",
                  agent_id="driver-01", agent_class="human")
 
+No tags? ``motionbench.tracker.untagged`` tracks a robot in an ordinary phone
+video from four tapped floor corners (``motionbench calibrate`` makes the page).
+
 Requires the `tracker` extra: ``pip install motionbench[tracker]``.
 """
 
 from .field import FieldConfig
 from .track import TrackResult, track_video, track_frames
+from .untagged import Calibration, UntaggedResult, track_untagged
 
-__all__ = ["FieldConfig", "TrackResult", "track_video", "track_frames"]
+__all__ = ["FieldConfig", "TrackResult", "track_video", "track_frames", "Calibration", "UntaggedResult", "track_untagged"]
