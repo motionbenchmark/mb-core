@@ -5,6 +5,5 @@ __pycache__/
 *.egg-info/
 .venv/
 dist/
-python/README.md
 *.avi
 *.mp4
