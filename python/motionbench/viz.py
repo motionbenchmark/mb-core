@@ -92,10 +92,12 @@ def build(root: "str | Path", title: Optional[str] = None, tasks_dir=None, embed
     is_syn = [
         "synthetic" in (r["capture"] + r["notes"]).lower() or r["report"].get("tier") == "S" for r in runs
     ]
-    synthetic = "all" if runs and all(is_syn) else ("some" if any(is_syn) else "")
+    synthetic = bool(runs) and all(is_syn)
+    mixed = any(is_syn) and not synthetic
     payload = {
         "dataset": title or root.name,
         "synthetic": synthetic,
+        "mixed": mixed,
         "tasks": task_specs,
         "runs": runs,
         "load_errors": errors,
@@ -655,8 +657,8 @@ new MutationObserver(draw).observe(document.documentElement, { attributes: true,
 $("title").textContent = D.dataset;
 const nAgents = new Set(D.runs.map((r) => r.rep.agent_id)).size;
 $("summary").textContent = `${D.runs.length} runs · ${Object.keys(TASKS).length} tasks · ${nAgents} agents`;
-$("synth").hidden = !D.synthetic;
-if (D.synthetic === "some") $("synth").textContent = "Includes simulated runs";
+$("synth").hidden = !(D.synthetic || D.mixed);
+if (D.mixed) $("synth").textContent = "Includes simulated runs";
 renderChecks();
 const q = new URLSearchParams(location.search);
 const want = (r) => (!q.get("task") || r.rep.task === q.get("task")) && (!q.get("seed") || r.rep.seed === q.get("seed"))
