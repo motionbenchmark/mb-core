@@ -93,7 +93,9 @@ def build(root: "str | Path", title: Optional[str] = None, tasks_dir=None, embed
         "load_errors": errors,
     }
     data = json.dumps(payload, separators=(",", ":")).replace("</", "<\\/")
-    html = TEMPLATE.replace("__TITLE__", f"{payload['dataset']} explorer").replace("__DATA__", data)
+    import html as _html
+
+    html = TEMPLATE.replace("__TITLE__", _html.escape(f"{payload['dataset']} explorer")).replace("__DATA__", data)
     return html.replace("__EMBED__", "true" if embed else "false")
 
 
@@ -547,16 +549,19 @@ function inspect() {
     : "Shading shows swept floor; darker means swept more than once.";
 }
 
+// Names, ids and messages come from submitted traces: escape before putting them in HTML.
+const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
 // ---------- checks table
 function renderChecks() {
   const rows = CHECKS.map((c) => {
     const bad = D.runs.filter((r) => !r.checks[c.id]);
     const chip = bad.length === 0 ? `<span class="chip pass">pass</span>` : `<span class="chip ${c.sev}">${bad.length}</span>`;
-    const list = bad.slice(0, 24).map((r) => `<button type="button" data-run="${D.runs.indexOf(r)}">${r.rep.agent_id} ${r.rep.seed} t${r.rep.trial}</button>`).join("")
+    const list = bad.slice(0, 24).map((r) => `<button type="button" data-run="${D.runs.indexOf(r)}">${esc(r.rep.agent_id)} ${esc(r.rep.seed)} t${esc(r.rep.trial)}</button>`).join("")
       + (bad.length > 24 ? `<span class="muted"> +${bad.length - 24} more</span>` : "");
     return `<tr><td>${chip}</td><td>${c.label}${bad.length ? `<div class="flagged">${list}</div>` : ""}</td><td class="n">${D.runs.length - bad.length}/${D.runs.length}</td></tr>`;
   });
-  const errs = D.load_errors.length ? `<tr><td><span class="chip fail">${D.load_errors.length}</span></td><td>Traces the scorer could not load<div class="flagged muted">${D.load_errors.slice(0, 5).map((e) => e.error).join("<br>")}</div></td><td class="n"></td></tr>` : "";
+  const errs = D.load_errors.length ? `<tr><td><span class="chip fail">${D.load_errors.length}</span></td><td>Traces the scorer could not load<div class="flagged muted">${D.load_errors.slice(0, 5).map((e) => esc(e.error)).join("<br>")}</div></td><td class="n"></td></tr>` : "";
   $("checks").innerHTML = `<thead><tr><th>Result</th><th>Check</th><th class="n">Passing</th></tr></thead><tbody>${rows.join("")}${errs}</tbody>`;
 }
 $("checks").addEventListener("click", (e) => { const b = e.target.closest("button[data-run]"); if (b) selectRun(D.runs[Number(b.dataset.run)]); });
@@ -582,10 +587,10 @@ function renderStrip() {
   agents.forEach((a, i) => {
     const y = top + i * rowH + rowH / 2;
     const sel = a.id === S.agent;
-    s += `<text x="${L - 10}" y="${y + 4}" text-anchor="end" font-size="11.5" style="fill:var(--${sel ? "ink" : "ink-2"});font-weight:${sel ? 700 : 400}">${a.name.length > 30 ? a.name.slice(0, 29) + "…" : a.name}</text>`;
+    s += `<text x="${L - 10}" y="${y + 4}" text-anchor="end" font-size="11.5" style="fill:var(--${sel ? "ink" : "ink-2"});font-weight:${sel ? 700 : 400}">${esc(a.name.length > 30 ? a.name.slice(0, 29) + "…" : a.name)}</text>`;
     rs.filter((r) => r.rep.agent_id === a.id).forEach((r, j) => {
       const jitter = ((j % 5) - 2) * 2.2;
-      s += `<circle cx="${x(r.rep.success.score)}" cy="${y + jitter}" r="${sel && r.rep.trial === S.trial && r.rep.seed === S.seed ? 5.5 : 3.6}" fill="var(--c-${r.cls})" stroke="var(--panel)" stroke-width="1.2" data-run="${D.runs.indexOf(r)}" style="cursor:pointer"><title>${r.rep.agent_name}, ${r.rep.seed} trial ${r.rep.trial}: ${r.rep.success.score.toFixed(task.goal.kind === "coverage" ? 1 : 0)}</title></circle>`;
+      s += `<circle cx="${x(r.rep.success.score)}" cy="${y + jitter}" r="${sel && r.rep.trial === S.trial && r.rep.seed === S.seed ? 5.5 : 3.6}" fill="var(--c-${r.cls})" stroke="var(--panel)" stroke-width="1.2" data-run="${D.runs.indexOf(r)}" style="cursor:pointer"><title>${esc(r.rep.agent_name)}, ${esc(r.rep.seed)} trial ${esc(r.rep.trial)}: ${r.rep.success.score.toFixed(task.goal.kind === "coverage" ? 1 : 0)}</title></circle>`;
     });
   });
   svg.innerHTML = s;
