@@ -16,6 +16,16 @@ exists for this hallway yet, so there is no human-normalized score.
 
 This is one clip from one home: a test of the method, not a review of any product.
 
+The published trace was made with the prototype converter. The same video through the
+released converter, with the committed calibration (`captures/hallway-calib.json`):
+
+    motionbench track IMG_5418.mov --untagged --calib data/field-v0.1/captures/hallway-calib.json \
+        --task-id MB-FIELD-HALLWAY -o hallway/ --overlay
+
+gives 86.6% covered (hallway 1.03 m x 3.02 m, scale from the robot's size), within the
+method's stated uncertainty of the published 85.0%. The source video is not in the
+repository (it shows the inside of a home); ask the maintainers if you need it.
+
     motionbench --tasks-dir data/field-v0.1/tasks aggregate data/field-v0.1 -o results/leaderboard-field-v0.1.json
 
 License: CC BY 4.0.

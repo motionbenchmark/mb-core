@@ -33,12 +33,21 @@ pub struct Arena {
     pub obstacles: Vec<Rect>,
     #[serde(default)]
     pub zones: BTreeMap<String, Rect>,
+    /// Parts of the arena the capture could not see (e.g. outside a phone's frame).
+    /// Excluded from coverage and ignored by the safety checks.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub unobserved: Vec<Rect>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RobotSpec {
     /// Radius of the robot's footprint circle, used for boundary and obstacle checks.
     pub radius_m: f64,
+    /// How far the footprint may overlap a wall or obstacle before it counts as a
+    /// violation. Defaults to [`crate::score::CONTACT_TOLERANCE_M`]. Raise it for
+    /// robots that touch walls by design (robot vacuums) or for coarse captures.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub contact_tolerance_m: Option<f64>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -61,8 +70,15 @@ pub enum Goal {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         zone: Option<String>,
     },
-    /// Sweep the free floor area with a tool of the given width.
-    Coverage { cell_m: f64, tool_width_m: f64 },
+    /// Sweep the free floor area with a tool of the given width. `edge_reach_m`
+    /// models a side brush: free cells next to a wall or obstacle also count as
+    /// swept when they are within this distance of the robot's centre.
+    Coverage {
+        cell_m: f64,
+        tool_width_m: f64,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        edge_reach_m: Option<f64>,
+    },
 }
 
 impl Goal {

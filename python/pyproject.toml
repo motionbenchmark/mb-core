@@ -23,6 +23,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 tracker = ["opencv-contrib-python-headless>=4.7"]
+mcp = ["mcp>=1.2", "httpx>=0.25"]
 dev = ["pytest>=7"]
 
 [project.urls]
@@ -31,6 +32,7 @@ Repository = "https://github.com/motionbenchmark/mb-core"
 
 [project.scripts]
 motionbench = "motionbench.cli:main"
+motionbench-mcp = "motionbench.mcp_server:main"
 
 [tool.maturin]
 module-name = "motionbench._core"

@@ -251,3 +251,70 @@ fn aggregate_normalizes_to_human_median() {
     assert_eq!(bot.rank, 1);
     assert_eq!(lb.overall[0].agent_id, "bot");
 }
+
+fn small_room(extra: &str) -> motionbench_core::Task {
+    let json = format!(
+        r#"{{
+        "id": "T-ROOM", "version": "0.1", "title": "test room", "domain": "indoor-floor",
+        "arena": {{ "width_m": 1.0, "height_m": 1.0, "obstacles": [], "zones": {{}} {extra} }},
+        "robot": {{ "radius_m": 0.1 }},
+        "budget": {{ "time_s": 60 }},
+        "goal": {{ "kind": "coverage", "cell_m": 0.05, "tool_width_m": 0.2 }},
+        "layouts": {{ "s": {{ "start": {{ "x": 0.5, "y": 0.5 }} }} }}
+    }}"#
+    );
+    motionbench_core::Task::from_json(&json, std::path::Path::new("t.json")).unwrap()
+}
+
+fn sweep_middle() -> Trace {
+    Trace {
+        manifest: manifest("T-ROOM@0.1", "s", "r", AgentClass::Product, 0),
+        poses: drive(&[(0.1, 0.5, 0.0), (0.9, 0.5, 0.0)], 0.3),
+        events: vec![],
+        world_final: None,
+        path: None,
+    }
+}
+
+#[test]
+fn unobserved_cells_leave_the_denominator() {
+    let full = score(&small_room(""), &sweep_middle()).unwrap();
+    // Hide the top half of the room: the same sweep now covers a larger share of what was seen.
+    let hidden = small_room(r#", "unobserved": [{ "x": 0.0, "y": 0.75, "w": 1.0, "h": 0.25 }]"#);
+    let part = score(&hidden, &sweep_middle()).unwrap();
+    assert!(
+        part.success.score > full.success.score + 5.0,
+        "{} vs {}",
+        part.success.score,
+        full.success.score
+    );
+    // ...and touching that region is not a safety event.
+    assert_eq!(part.safety.obstacle_intrusions, 0);
+}
+
+#[test]
+fn contact_tolerance_and_edge_reach() {
+    let mut t = small_room("");
+    // drive along the wall: centre 0.055 m from it with a 0.10 m radius
+    let tr = Trace {
+        manifest: manifest("T-ROOM@0.1", "s", "r", AgentClass::Product, 0),
+        poses: drive(&[(0.2, 0.055, 0.0), (0.8, 0.055, 0.0)], 0.3),
+        events: vec![],
+        world_final: None,
+        path: None,
+    };
+    assert!(score(&t, &tr).unwrap().safety.boundary_violations > 0);
+    t.robot.contact_tolerance_m = Some(0.05);
+    assert_eq!(score(&t, &tr).unwrap().safety.boundary_violations, 0);
+
+    let plain = score(&small_room(""), &sweep_middle())
+        .unwrap()
+        .success
+        .score;
+    let mut brush = small_room("");
+    if let motionbench_core::task::Goal::Coverage { edge_reach_m, .. } = &mut brush.goal {
+        *edge_reach_m = Some(0.2);
+    }
+    let with_brush = score(&brush, &sweep_middle()).unwrap().success.score;
+    assert!(with_brush > plain, "{with_brush} vs {plain}");
+}

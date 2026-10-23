@@ -156,7 +156,15 @@ pub fn score(task: &Task, trace: &Trace) -> Result<Report> {
         Goal::Coverage {
             cell_m,
             tool_width_m,
-        } => coverage(task, &poses, path_length, *cell_m, *tool_width_m),
+            edge_reach_m,
+        } => coverage(
+            task,
+            &poses,
+            path_length,
+            *cell_m,
+            *tool_width_m,
+            *edge_reach_m,
+        ),
     };
 
     Ok(Report {
@@ -211,7 +219,11 @@ fn episodes(flags: impl Iterator<Item = bool>) -> u32 {
 }
 
 fn safety(task: &Task, poses: &[PoseSample], events: &[Event]) -> Safety {
-    let r = (task.robot.radius_m - CONTACT_TOLERANCE_M).max(0.0);
+    let tol = task
+        .robot
+        .contact_tolerance_m
+        .unwrap_or(CONTACT_TOLERANCE_M);
+    let r = (task.robot.radius_m - tol).max(0.0);
     let (w, h) = (task.arena.width_m, task.arena.height_m);
     let boundary = episodes(
         poses
@@ -487,36 +499,66 @@ fn coverage(
     path_length: f64,
     cell: f64,
     tool_width: f64,
+    edge_reach: Option<f64>,
 ) -> Scored {
     let (w, h) = (task.arena.width_m, task.arena.height_m);
     let nx = (w / cell).ceil() as usize;
     let ny = (h / cell).ceil() as usize;
     let center = |i: usize, j: usize| ((i as f64 + 0.5) * cell, (j as f64 + 0.5) * cell);
-    let mut free = vec![false; nx * ny];
+    // 0 = free floor, 1 = blocked (obstacle or outside), 2 = not observed
+    let mut kind = vec![1u8; nx * ny];
     for j in 0..ny {
         for i in 0..nx {
             let (cx, cy) = center(i, j);
-            free[j * nx + i] =
-                cx <= w && cy <= h && !task.arena.obstacles.iter().any(|o| o.contains(cx, cy));
+            kind[j * nx + i] =
+                if cx > w || cy > h || task.arena.obstacles.iter().any(|o| o.contains(cx, cy)) {
+                    1
+                } else if task.arena.unobserved.iter().any(|o| o.contains(cx, cy)) {
+                    2
+                } else {
+                    0
+                };
         }
     }
+    let free: Vec<bool> = kind.iter().map(|k| *k == 0).collect();
+    // Edge cells: free cells touching a wall, an obstacle or the arena boundary (8-neighbourhood).
+    let edge: Vec<bool> = (0..nx * ny)
+        .map(|k| {
+            if !free[k] {
+                return false;
+            }
+            let (i, j) = ((k % nx) as i64, (k / nx) as i64);
+            (-1..=1).any(|dj| {
+                (-1..=1).any(|di| {
+                    let (a, b) = (i + di, j + dj);
+                    a < 0
+                        || b < 0
+                        || a >= nx as i64
+                        || b >= ny as i64
+                        || kind[b as usize * nx + a as usize] == 1
+                })
+            })
+        })
+        .collect();
     let n_free = free.iter().filter(|f| **f).count().max(1);
     let mut covered = vec![false; nx * ny];
     let mut n_cov = 0usize;
     let rt = tool_width / 2.0;
+    let re = edge_reach.unwrap_or(0.0).max(rt);
     let mut t90 = None;
 
     let stamp = |x: f64, y: f64, covered: &mut Vec<bool>, n_cov: &mut usize| {
-        let i0 = ((x - rt) / cell).floor().max(0.0) as usize;
-        let i1 = (((x + rt) / cell).ceil() as usize).min(nx);
-        let j0 = ((y - rt) / cell).floor().max(0.0) as usize;
-        let j1 = (((y + rt) / cell).ceil() as usize).min(ny);
+        let i0 = ((x - re) / cell).floor().max(0.0) as usize;
+        let i1 = (((x + re) / cell).ceil() as usize).min(nx);
+        let j0 = ((y - re) / cell).floor().max(0.0) as usize;
+        let j1 = (((y + re) / cell).ceil() as usize).min(ny);
         for j in j0..j1 {
             for i in i0..i1 {
                 let k = j * nx + i;
                 if free[k] && !covered[k] {
                     let (cx, cy) = center(i, j);
-                    if dist(x, y, cx, cy) <= rt {
+                    let d = dist(x, y, cx, cy);
+                    if d <= rt || (edge[k] && d <= re) {
                         covered[k] = true;
                         *n_cov += 1;
                     }

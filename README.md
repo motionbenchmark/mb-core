@@ -92,6 +92,22 @@ motionbench score runs/driver-07-t0
 
 See [docs/capture-guide.md](docs/capture-guide.md). On rendered test footage the
 tracker recovers the robot in 100% of frames with sub-centimetre mean position error.
+No tags? Score an ordinary phone video:
+
+```bash
+pip install "motionbench[tracker]"
+motionbench calibrate run.mov -o calib.html      # tap the floor's corners, download calib.json
+motionbench track run.mov --untagged --calib calib.json -o out/ --overlay
+```
+
+Use it from an AI assistant with the MCP server (`pip install "motionbench[tracker,mcp]"`,
+command `motionbench-mcp`): it can inspect a video, build the calibration, convert,
+score and submit a run to the project site for review.
+
+```json
+{"mcpServers": {"motionbench": {"command": "motionbench-mcp"}}}
+```
+
 Onboard logging for VEX V5 (PROS): [integrations/vex/pros](integrations/vex/pros).
 
 ## Tasks (v0.1)

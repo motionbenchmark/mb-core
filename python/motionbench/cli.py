@@ -8,6 +8,8 @@
     motionbench tags --config field.json --out tags/
     motionbench track run.mp4 --config field.json --task MB-VEX-NAV@1.0 --seed dev-01 \
         --agent-id driver-01 --agent-class human -o runs/driver-01-t0
+    motionbench calibrate run.mov -o calib.html   # tap the floor corners, save calib.json
+    motionbench track run.mov --untagged --calib calib.json -o out/   # no tags needed
     motionbench render RUN.mbtrace -o run.avi     # synthetic camera footage of a trace
     motionbench viz DATA_DIR -o explorer.html     # interactive explorer + independent checks
 """
@@ -76,16 +78,33 @@ def main(argv=None) -> int:
     p.add_argument("--config")
     p.add_argument("--out", default="tags")
 
-    p = sub.add_parser("track", help="track a video into a .mbtrace")
+    p = sub.add_parser("calibrate", help="make the empty-floor picture of a video and a page to tap the floor corners")
+    p.add_argument("video")
+    p.add_argument("-o", "--out", default="calib.html")
+    p.add_argument("--png", help="also save the empty-floor picture")
+    p.add_argument("--width", type=int, default=540, help="working width in pixels (default 540)")
+    p.add_argument("--robot-diameter", type=float, default=0.35)
+
+    p = sub.add_parser("track", help="track a video into a .mbtrace (tags, or --untagged with a calib.json)")
     p.add_argument("video")
     p.add_argument("--config", help="field.json (default: VEX field)")
-    p.add_argument("--task", required=True)
-    p.add_argument("--seed", required=True)
-    p.add_argument("--agent-id", required=True)
-    p.add_argument("--agent-class", required=True, choices=["human", "human_auton", "ai", "hybrid", "product", "baseline"])
+    p.add_argument("--untagged", action="store_true", help="no tags: needs --calib from `motionbench calibrate`")
+    p.add_argument("--calib", help="calib.json (untagged mode)")
+    p.add_argument("--task", help="task key (tagged mode); untagged mode writes its own coverage task")
+    p.add_argument("--task-id", default="MB-FIELD-CAPTURE", help="untagged: id for the generated task")
+    p.add_argument("--task-version", default="0.1")
+    p.add_argument("--tool-width", type=float, default=0.30, help="untagged: cleaning width (m)")
+    p.add_argument("--edge-reach", type=float, help="untagged: side-brush reach from the centre (m)")
+    p.add_argument("--contact-tolerance", type=float, default=0.08, help="untagged: allowed wall contact (m)")
+    p.add_argument("--fps", type=float, default=15.0, help="untagged: frames per second to analyse")
+    p.add_argument("--overlay", action="store_true", help="untagged: also write overlay.mp4 to check the track")
+    p.add_argument("--seed", default="field-01")
+    p.add_argument("--agent-id", default="robot")
+    p.add_argument("--agent-class", default="product", choices=["human", "human_auton", "ai", "hybrid", "product", "baseline"])
     p.add_argument("--agent-name", default="")
     p.add_argument("--trial", type=int, default=0)
     p.add_argument("--tier", default="F", choices=["S", "F", "V"])
+    p.add_argument("--json", action="store_true", help="print a JSON summary (for scripts)")
     p.add_argument("-o", "--out", required=True)
 
     p = sub.add_parser("viz", help="write an interactive HTML explorer for a dataset (verification)")
@@ -134,9 +153,43 @@ def main(argv=None) -> int:
 
             for p in write_tags(_field(a), a.out):
                 print(p)
+        elif a.cmd == "calibrate":
+            from .tracker.calibrate import write_calibration_page
+
+            out = write_calibration_page(a.video, a.out, width=a.width, png=a.png,
+                                         defaults={"robot_diameter_m": a.robot_diameter})
+            print(f"wrote {out}: open it, tap the floor corners, and download calib.json")
+        elif a.cmd == "track" and a.untagged:
+            from .tracker.untagged import Calibration, track_untagged
+
+            if not a.calib:
+                raise ValueError("--untagged needs --calib calib.json (make one with `motionbench calibrate VIDEO`)")
+            calib = Calibration.load(a.calib)
+            out = Path(a.out)
+            res = track_untagged(a.video, calib, fps=a.fps, tool_width_m=a.tool_width, edge_reach_m=a.edge_reach,
+                                 contact_tolerance_m=a.contact_tolerance, overlay=out / "overlay.mp4" if a.overlay else None,
+                                 progress=None if a.json else (lambda m: print(m, file=sys.stderr)))
+            res.write(out, task_id=a.task_id, version=a.task_version, seed=a.seed, agent_id=a.agent_id,
+                      agent_class=a.agent_class, agent_name=a.agent_name)
+            key = f"{a.task_id}@{a.task_version}"
+            report = mb.score(out / "trace", tasks_dir=out / "tasks")
+            (out / "report.json").write_text(json.dumps(report, indent=1))
+            summary = {"out": str(out), "task": key, "poses": len(res.poses), "camera": res.camera, "stats": res.stats,
+                       "warnings": res.warnings, "coverage": report.get("coverage"), "success": report["success"],
+                       "path_length_m": report["efficiency"]["path_length_m"], "safety": report["safety"]}
+            if a.json:
+                print(json.dumps(summary, default=float))
+            else:
+                for w in res.warnings:
+                    print(f"warning: {w}", file=sys.stderr)
+                _print_report(report)
+                print(f"wrote {out}/ (tasks/, trace/, report.json{', overlay.mp4' if a.overlay else ''}); "
+                      f"rescore with: motionbench --tasks-dir {out}/tasks score {out}/trace")
         elif a.cmd == "track":
             from .tracker import track_video
 
+            if not a.task:
+                raise ValueError("tagged tracking needs --task (or use --untagged)")
             res = track_video(a.video, _field(a))
             for w in res.warnings:
                 print(f"warning: {w}", file=sys.stderr)
