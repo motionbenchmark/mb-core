@@ -119,7 +119,7 @@ TEMPLATE = r"""<meta charset="utf-8">
 /* Layout: control rail | field canvas with scrubber | run inspector; checks + strip plot below. */
 :root {
   --bg: #e3e6e1; --panel: #f4f5f2; --ink: #18212b; --ink-2: #47525e; --grid: #c3c9c1; --rule: #b4bbb2;
-  --tile: #d3d8d1; --tile-line: #bcc3ba; --obstacle: #3b4652; --frame: #18212b;
+  --tile: #d3d8d1; --tile-line: #bcc3ba; --obstacle: #3b4652; --unseen: #eceee9; --frame: #18212b;
   --good: #1e7d4f; --warn: #a15c00; --bad: #b42335; --focus: #1f6fd1;
   --c-human: #d23f5b; --c-ai: #1f6fd1; --c-human_auton: #d98316; --c-product: #178a62; --c-hybrid: #8a4fd0; --c-baseline: #7c8590;
   --font: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -127,13 +127,13 @@ TEMPLATE = r"""<meta charset="utf-8">
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #141a20; --panel: #1c242c; --ink: #e6ebef; --ink-2: #a5b0ba; --grid: #34404b; --rule: #3a4651;
-  --tile: #26303a; --tile-line: #313d48; --obstacle: #8796a5; --frame: #0d1115;
+  --tile: #26303a; --tile-line: #313d48; --obstacle: #8796a5; --unseen: #12181e; --frame: #0d1115;
   --good: #4cc38a; --warn: #e3a447; --bad: #f0707f; --focus: #6aa6f5;
   --c-human: #f0607a; --c-ai: #5b9bf0; --c-human_auton: #e6a33a; --c-product: #3db88b; --c-hybrid: #b07fe8; --c-baseline: #95a0ab;
   color-scheme: dark; } }
 :root[data-theme="dark"] {
   --bg: #141a20; --panel: #1c242c; --ink: #e6ebef; --ink-2: #a5b0ba; --grid: #34404b; --rule: #3a4651;
-  --tile: #26303a; --tile-line: #313d48; --obstacle: #8796a5; --frame: #0d1115;
+  --tile: #26303a; --tile-line: #313d48; --obstacle: #8796a5; --unseen: #12181e; --frame: #0d1115;
   --good: #4cc38a; --warn: #e3a447; --bad: #f0707f; --focus: #6aa6f5;
   --c-human: #f0607a; --c-ai: #5b9bf0; --c-human_auton: #e6a33a; --c-product: #3db88b; --c-hybrid: #b07fe8; --c-baseline: #95a0ab;
   color-scheme: dark; }
@@ -410,8 +410,20 @@ function draw() {
     }
     ctx.globalAlpha = 1;
   }
-  ctx.fillStyle = css("--obstacle");
-  for (const o of task.arena.obstacles) ctx.fillRect(X(o.x), Y(o.y + o.h), o.w * sc, o.h * sc);
+  // Field captures mark floor the camera never saw as "not-in-view": drawn faint, not as a solid obstacle.
+  let hatch = null;
+  for (const o of task.arena.obstacles) {
+    if (o.label === "not-in-view") {
+      if (!hatch) {
+        const pc = document.createElement("canvas"); pc.width = pc.height = 8;
+        const g = pc.getContext("2d"); g.fillStyle = css("--unseen"); g.fillRect(0, 0, 8, 8);
+        g.strokeStyle = css("--rule"); g.lineWidth = 1; g.beginPath(); g.moveTo(0, 8); g.lineTo(8, 0); g.stroke();
+        hatch = ctx.createPattern(pc, "repeat");
+      }
+      ctx.fillStyle = hatch;
+    } else ctx.fillStyle = css("--obstacle");
+    ctx.fillRect(X(o.x), Y(o.y + o.h), o.w * sc + 0.5, o.h * sc + 0.5);
+  }
   ctx.setLineDash([6, 4]); ctx.strokeStyle = css("--c-ai"); ctx.lineWidth = 2;
   const zoneNames = Object.keys(task.arena.zones || {});
   for (const z of Object.values(task.arena.zones || {})) ctx.strokeRect(X(z.x), Y(z.y + z.h), z.w * sc, z.h * sc);
@@ -515,6 +527,8 @@ function inspect() {
     : task.goal.kind === "delivery" ? (Object.keys(task.arena.zones || {}).length > 1
       ? "Rings are starting object positions, lettered with their target zone; filled dots are final positions from world_final.json (shown at the end of the run). An object counts only inside its own zone."
       : "Rings are starting object positions; filled dots are final positions from world_final.json (shown at the end of the run).")
+    : task.arena.obstacles.some((o) => o.label === "not-in-view")
+    ? "Shaded cells are floor swept by the tool so far. Hatched cells were outside the camera's view and are left out of the score; dark cells are walls; plain cells are floor not yet swept."
     : "Shading shows swept floor; darker means swept more than once.";
 }
 

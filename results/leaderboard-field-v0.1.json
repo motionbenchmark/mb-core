@@ -1,0 +1,54 @@
+{
+  "spec_version": "0.1",
+  "scorer_version": "0.1.0",
+  "weights": {
+    "success": 0.5,
+    "efficiency": 0.2,
+    "consistency": 0.15,
+    "safety": 0.15,
+    "hns_clip": 2.0
+  },
+  "n_runs": 1,
+  "tasks": [
+    {
+      "task": "MB-FIELD-HALLWAY@0.1",
+      "title": "Hallway floor coverage (field capture, single phone, no tags)",
+      "kind": "coverage",
+      "domain": "indoor-floor",
+      "n_runs": 1,
+      "floor": 0.0,
+      "floor_source": "task",
+      "max_score": 100.0,
+      "human_reference": null,
+      "rows": [
+        {
+          "rank": 1,
+          "agent_id": "robot-vacuum-hallway",
+          "agent_name": "Robot vacuum (home hallway, field clip)",
+          "class": "product",
+          "n_trials": 1,
+          "success_mean": 85.00772797527047,
+          "success_median": 85.00772797527047,
+          "success_std": 0.0,
+          "success_worst": 85.00772797527047,
+          "success_best": 85.00772797527047,
+          "success_ci95": [
+            85.00772797527047,
+            85.00772797527047
+          ],
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.49334920582786,
+          "violations_mean": 37.0,
+          "hns": null,
+          "hns_ci95": null,
+          "hns_expert": null,
+          "consistency": 1.0,
+          "safety": 0.02631578947368421,
+          "mbi": null
+        }
+      ]
+    }
+  ],
+  "overall": []
+}

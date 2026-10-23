@@ -91,6 +91,9 @@ jobs:
           motionbench viz data/synthetic-v0.1 --embed --title "MotionBench synthetic v0.1" -o out/explorer-synthetic-v0.1.html
           motionbench viz data/synthetic-v0.1 --title "MotionBench synthetic v0.1" -o out/explorer-synthetic-v0.1-standalone.html
           cp results/leaderboard-synthetic-v0.1.json out/
+          # Real field runs (unverified), with their own task specs.
+          motionbench --tasks-dir data/field-v0.1/tasks viz data/field-v0.1 --embed --title "MotionBench field runs v0.1" -o out/explorer-field-v0.1.html
+          cp results/leaderboard-field-v0.1.json out/
           cp tasks/*.json out/
       - uses: actions/upload-artifact@v4
         with:
