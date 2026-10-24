@@ -1,16 +1,17 @@
 # MotionBench
 
-**An open benchmark for goal-directed robots in confined spaces.**
+**An open benchmark for how well agents complete goals in bounded spaces.**
 Score any run — a student driving a VEX robot, a team's autonomous routine, an
-AI-written program, a robot vacuum — against human reference runs on the same task.
+AI-written program, a driver with robot assistance, a robot vacuum — against the
+task's goals, measured the same way every time.
 
 [![License](https://img.shields.io/badge/code-Apache--2.0-blue)](LICENSE)
 [![Data](https://img.shields.io/badge/data-CC%20BY%204.0-green)](data/synthetic-v0.1/README.md)
-[![Spec](https://img.shields.io/badge/spec-v0.1%20draft-orange)](rfcs/0001-motionbench.md)
+[![Spec](https://img.shields.io/badge/spec-v0.2%20draft-orange)](rfcs/0002-goal-referenced-scoring.md)
 
-> **Scope.** MotionBench is for machines that move inside a *bounded* space towards
-> an *explicit* goal that a person could also do: competition fields, rooms,
-> warehouse cells, yards. It is **not** a benchmark for self-driving cars, road or
+> **Scope.** MotionBench is for agents that move inside a *bounded* space towards
+> an *explicit*, measurable goal: competition fields, classroom tables, rooms,
+> warehouse cells. It is **not** a benchmark for self-driving cars, road or
 > sidewalk vehicles, or open-airspace drones, and nothing here is a safety
 > certification. Read the [manifesto](MANIFESTO.md) for why that line matters.
 
@@ -26,16 +27,26 @@ AI-written program, a robot vacuum — against human reference runs on the same 
    motionbench-core (Rust)  ──►  report: success · efficiency · precision
             │                           coverage · safety · process
             ▼
-   aggregate ──► leaderboard: human-normalized score (HNS), MotionBench Index (MBI),
+   aggregate ──► per-task board: goal score, MotionBench Index (MBI), chance level,
                  95% CIs, worst-of-N, shared ranks
 ```
 
-* **HNS** = (agent − floor) / (median human − floor). 1.0 means "as good as the
-  median human on this task"; the floor is a random-walk baseline.
-* **MBI** = 0.5·HNS + 0.2·efficiency HNS + 0.15·consistency + 0.15·safety
-  (HNS clipped to [0, 2]; weights frozen per spec major version).
+* **Goal score** = the share of the task's goal a run achieved (waypoints reached,
+  objects delivered, floor covered), from 0 to 100%. Every agent — a person, team-written
+  code, AI-written code, a person with robot assistance, a commercial robot — is scored
+  against the same goal.
+* **Chance level** = what a random walk achieves on the same task, shown beside every
+  board so a score can be read against luck.
+* **MBI** = 0.5·goal + 0.2·path efficiency + 0.15·consistency + 0.15·safety, all on
+  [0, 1]. It ranks agents within one task; MotionBench never ranks across tasks.
+* **People comparison (optional).** Where a person can do exactly the same job with the
+  same means (students driving the same VEX robot their code drives), the board also
+  reports each agent against the median person. Where the means differ (a robot vacuum
+  and a person with a stick vacuum), it doesn't.
 
-Full rules: [RFC-0001](rfcs/0001-motionbench.md) and [docs/spec](docs/spec).
+Full rules: [RFC-0001](rfcs/0001-motionbench.md) (spec v0.1),
+[RFC-0002](rfcs/0002-goal-referenced-scoring.md) (scoring in spec v0.2) and
+[docs/spec](docs/spec).
 
 ## Install
 
@@ -129,40 +140,40 @@ floor), not an official VEX field, and the barrels that come with the AIM kit.
 > These numbers come from **simulated** agents (`motionbench.synth`) and exist to
 > exercise the pipeline. They are not evidence about real robots or real people.
 
-**MB-VEX-NAV@1.0** (median of 12 simulated drivers = 5.5 waypoints):
+**MB-VEX-NAV@1.0** (goal: 6 waypoints; drivers use the same robot, so people are compared too: median of 12 simulated drivers = 5.5):
 
-| Agent | Class | Mean | Worst of 10 | HNS | MBI |
+| Agent | Class | Goal | Worst of 10 | MBI | vs median driver |
 | --- | --- | --- | --- | --- | --- |
-| LLM-written auton, round 10 | ai | 6.0 | 6 | 1.09 | 1.11 |
-| Team auton A (odometry + GPS) | human_auton | 6.0 | 6 | 1.09 | 1.10 |
-| Driver with auto-align | hybrid | 6.0 | 6 | 1.09 | 1.08 |
-| Team auton B (odometry only) | human_auton | 4.9 | 1 | 0.89 | 0.95 |
-| LLM-written auton, round 1 | ai | 2.1 | 0 | 0.38 | 0.49 |
-| Team auton C (timed, open loop) | human_auton | 1.2 | 0 | 0.22 | 0.42 |
+| LLM-written auton, round 10 | ai | 100% | 100% | 0.99 | 1.09 |
+| Team auton A (odometry + GPS) | human_auton | 100% | 100% | 0.99 | 1.09 |
+| Driver with auto-align | hybrid | 100% | 100% | 0.97 | 1.09 |
+| Team auton B (odometry only) | human_auton | 82% | 17% | 0.84 | 0.89 |
+| LLM-written auton, round 1 | ai | 35% | 0% | 0.42 | 0.38 |
+| Team auton C (timed, open loop) | human_auton | 20% | 0% | 0.36 | 0.22 |
 
-**MB-COVER@0.1** (median of 6 simulated people = 86.9% covered; random-walk floor 49.2%):
+**MB-COVER@0.1** (goal: the whole free floor; chance, a random walk, covers 49%. No robot-versus-person comparison: the means differ):
 
-| Agent | Class | Covered | HNS | MBI |
-| --- | --- | --- | --- | --- |
-| Robot vacuum, lane-planning | product | 94.7% | 1.21 | 1.03 |
-| LLM-written planner, round 3 | ai | 89.7% | 1.08 | 1.04 |
-| Robot vacuum, bump-and-turn | product | 59.0% | 0.26 | 0.40 |
+| Agent | Class | Goal (floor covered) | MBI |
+| --- | --- | --- | --- |
+| Robot vacuum, lane-planning | product | 95% | 0.86 |
+| LLM-written planner, round 3 | ai | 90% | 0.90 |
+| Robot vacuum, bump-and-turn | product | 59% | 0.53 |
 
-**MB-AIM-SORT@0.1** (VEX AIM classroom roster; median of 10 simulated students = 4.7 of 6 barrels sorted):
+**MB-AIM-SORT@0.1** (goal: 6 barrels in their colour zones; median of 10 simulated students = 4.7):
 
-| Agent | Class | Mean | Worst of 5 | HNS | MBI |
+| Agent | Class | Goal | Worst of 5 | MBI | vs median student |
 | --- | --- | --- | --- | --- | --- |
-| Class code B (Python, AI Vision) | human_auton | 6.0 | 6 | 1.28 | 1.17 |
-| LLM-written Python, round 3 (AI Vision) | ai | 6.0 | 6 | 1.28 | 1.17 |
-| Student with AI Vision auto-aim | hybrid | 6.0 | 6 | 1.28 | 1.16 |
-| Class code A (Blocks, gyro and encoders) | human_auton | 2.6 | 2 | 0.55 | 0.76 |
-| LLM-written Python, round 1 | ai | 1.4 | 1 | 0.30 | 0.63 |
+| Class code B (Python, AI Vision) | human_auton | 100% | 100% | 0.99 | 1.28 |
+| LLM-written Python, round 3 (AI Vision) | ai | 100% | 100% | 0.99 | 1.28 |
+| Student with AI Vision auto-aim | hybrid | 100% | 100% | 0.98 | 1.28 |
+| Class code A (Blocks, gyro and encoders) | human_auton | 43% | 33% | 0.65 | 0.55 |
+| LLM-written Python, round 1 | ai | 23% | 17% | 0.55 | 0.30 |
 
 The AIM agents' speeds and errors are assumptions for a small omni-drive robot,
 not measurements of VEX AIM.
 
 Full board: [results/leaderboard-synthetic-v0.1.json](results/leaderboard-synthetic-v0.1.json).
-Two method lessons already visible: success saturates on NAV for strong agents (so
+Two method lessons already visible: the goal saturates on NAV for strong agents (so
 efficiency and time decide), and Team auton B's worst run (1 of 6) shows why
 worst-of-N is reported next to the mean. On AIM, the open-loop Blocks program is
 near the top for navigation but falls behind on sorting, where small drift makes it

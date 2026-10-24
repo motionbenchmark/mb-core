@@ -163,7 +163,13 @@
       "type": "object",
       "properties": {
         "floor": {
-          "type": "number"
+          "type": "number",
+          "description": "Chance level in task units, used when the data has no baseline runs."
+        },
+        "people_comparable": {
+          "type": "boolean",
+          "default": false,
+          "description": "True when a person can do exactly the same job with the same means (for example driving the same robot), so a comparison with people is reported."
         }
       }
     },

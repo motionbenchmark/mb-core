@@ -218,11 +218,11 @@ fn budget_is_enforced_and_boundary_counted() {
 }
 
 #[test]
-fn aggregate_normalizes_to_human_median() {
-    let task = find_task("MB-VEX-NAV@1.0", None).unwrap();
-    let l = task.layout("dev-01").unwrap();
+fn aggregate_scores_against_the_goal_and_compares_people_only_when_allowed() {
+    let mut task = find_task("MB-VEX-NAV@1.0", None).unwrap();
+    let l = task.layout("dev-01").unwrap().clone();
     let mut reports = vec![];
-    // Humans reach 2, 3, 4 waypoints → median 3. A bot reaching all 6 → HNS 2.
+    // People reach 2, 3, 4 of 6 waypoints (median 3). A bot reaching all 6 completes the goal.
     for (id, n, class) in [
         ("h1", 2, AgentClass::Human),
         ("h2", 3, AgentClass::Human),
@@ -242,14 +242,31 @@ fn aggregate_normalizes_to_human_median() {
             reports.push(score(&task, &tr).unwrap());
         }
     }
+
+    // VEX navigation is people-comparable: drivers and code use the same robot.
+    let tasks = BTreeMap::from([(task.key(), task.clone())]);
+    let lb = aggregate(&reports, &tasks);
+    let b = &lb.tasks[0];
+    let bot = b.rows.iter().find(|r| r.agent_id == "bot").unwrap();
+    let h2 = b.rows.iter().find(|r| r.agent_id == "h2").unwrap();
+    assert!((bot.goal - 1.0).abs() < 1e-9);
+    assert!((h2.goal - 0.5).abs() < 1e-9);
+    assert_eq!(bot.rank, 1);
+    assert!(b.people_comparable);
+    assert_eq!(b.people.as_ref().unwrap().median, 3.0);
+    assert!((bot.vs_people.unwrap() - 2.0).abs() < 1e-9);
+
+    // The same runs on a task that is not people-comparable: goal scores are
+    // unchanged, and no comparison with people is reported.
+    task.reference.people_comparable = false;
     let tasks = BTreeMap::from([(task.key(), task)]);
     let lb = aggregate(&reports, &tasks);
     let b = &lb.tasks[0];
-    assert_eq!(b.human_reference.as_ref().unwrap().median, 3.0);
     let bot = b.rows.iter().find(|r| r.agent_id == "bot").unwrap();
-    assert!((bot.hns.unwrap() - 2.0).abs() < 1e-9);
-    assert_eq!(bot.rank, 1);
-    assert_eq!(lb.overall[0].agent_id, "bot");
+    assert!((bot.goal - 1.0).abs() < 1e-9);
+    assert!(b.people.is_none());
+    assert!(bot.vs_people.is_none());
+    assert!(b.rows.iter().all(|r| (0.0..=1.0).contains(&r.mbi)));
 }
 
 fn small_room(extra: &str) -> motionbench_core::Task {

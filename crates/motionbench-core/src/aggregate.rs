@@ -1,12 +1,21 @@
-//! Many reports → a human-normalized leaderboard.
+//! Many reports → a per-task board, scored against the task's goals.
 //!
-//! * HNS (human-normalized score) = (S_agent − S_floor) / (S_human_median − S_floor),
-//!   where S_floor is the median baseline-agent score if the data has baseline runs,
-//!   else the task's fixed floor.
-//! * MBI (MotionBench Index) = 0.5·clip(HNS_success) + 0.2·clip(HNS_efficiency)
-//!   + 0.15·Consistency + 0.15·Safety, with HNS clipped to [0, 2].
+//! * Goal score = share of the task's goal a run achieved (success / max score),
+//!   averaged over an agent's trials, with a 95% bootstrap interval. Every agent
+//!   class (people, team-written code, AI-written code, assisted, commercial) is
+//!   scored this way, against the same goals.
+//! * Chance level = the median goal score of baseline agents (a random walk) when
+//!   the data has any, else the task's fixed floor. Reported, not subtracted.
+//! * MotionBench Index = 0.5·goal + 0.2·path efficiency + 0.15·consistency +
+//!   0.15·safety. Every term is already on [0, 1], so no reference group is
+//!   needed. The index ranks agents within one task and is never averaged across
+//!   tasks.
+//! * People comparison (optional) = (S_agent − S_chance) / (S_people_median − S_chance),
+//!   computed only when the task declares `reference.people_comparable` (a person
+//!   can do exactly the same job with the same means, e.g. driving the same robot)
+//!   and the data contains people.
 //!
-//! Weights are frozen per major spec version (see RFC-0001).
+//! Spec 0.2 (RFC-0002). Weights are frozen per spec version.
 
 use crate::score::Report;
 use crate::stats::{bootstrap_ci95, fnv1a, mean, median, percentile, std_dev};
@@ -19,7 +28,6 @@ pub const W_SUCCESS: f64 = 0.5;
 pub const W_EFFICIENCY: f64 = 0.2;
 pub const W_CONSISTENCY: f64 = 0.15;
 pub const W_SAFETY: f64 = 0.15;
-pub const HNS_CLIP: f64 = 2.0;
 pub const BOOTSTRAP_ITERS: usize = 2000;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -29,7 +37,6 @@ pub struct Leaderboard {
     pub weights: Weights,
     pub n_runs: usize,
     pub tasks: Vec<TaskBoard>,
-    pub overall: Vec<OverallRow>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -38,17 +45,16 @@ pub struct Weights {
     pub efficiency: f64,
     pub consistency: f64,
     pub safety: f64,
-    pub hns_clip: f64,
 }
 
+/// People who did the same job with the same means, on tasks that allow it.
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct HumanReference {
-    /// Median of per-driver mean success.
+pub struct PeopleReference {
+    /// Median of per-person mean success (task units).
     pub median: f64,
-    /// 90th percentile of per-driver mean success.
+    /// 90th percentile of per-person mean success (task units).
     pub expert: f64,
-    pub median_path_efficiency: f64,
-    pub n_drivers: usize,
+    pub n_people: usize,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -58,17 +64,21 @@ pub struct TaskBoard {
     pub kind: String,
     pub domain: String,
     pub n_runs: usize,
-    pub floor: f64,
-    /// `baseline` (median of baseline-class agents in the data) or `task` (fixed in the task spec).
-    pub floor_source: String,
     pub max_score: f64,
-    pub human_reference: Option<HumanReference>,
+    /// Chance level as a goal score in [0, 1]: what a random walk achieves.
+    pub chance: f64,
+    /// `baseline` (median of baseline-class agents in the data) or `task` (fixed in the task spec).
+    pub chance_source: String,
+    /// Whether the task allows a like-for-like comparison with people.
+    pub people_comparable: bool,
+    /// Present only when `people_comparable` and the data contains people.
+    pub people: Option<PeopleReference>,
     pub rows: Vec<AgentRow>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct AgentRow {
-    /// Shared rank: agents whose HNS confidence intervals overlap share a rank.
+    /// Shared rank: agents whose goal-score intervals overlap the group leader's share a rank.
     pub rank: usize,
     pub agent_id: String,
     pub agent_name: String,
@@ -80,35 +90,25 @@ pub struct AgentRow {
     pub success_worst: f64,
     pub success_best: f64,
     pub success_ci95: [f64; 2],
+    /// Mean share of the goal achieved, in [0, 1].
+    pub goal: f64,
+    pub goal_ci95: [f64; 2],
+    pub goal_worst: f64,
     pub completion_rate: f64,
     pub time_to_goal_mean_s: Option<f64>,
     pub path_efficiency: f64,
     pub violations_mean: f64,
-    pub hns: Option<f64>,
-    pub hns_ci95: Option<[f64; 2]>,
-    pub hns_expert: Option<f64>,
     pub consistency: f64,
     pub safety: f64,
-    pub mbi: Option<f64>,
+    pub mbi: f64,
+    /// Compared with the median person (1.0) and chance (0); only on people-comparable tasks.
+    pub vs_people: Option<f64>,
+    pub vs_people_ci95: Option<[f64; 2]>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct OverallRow {
-    pub rank: usize,
-    pub agent_id: String,
-    pub agent_name: String,
-    pub class: AgentClass,
-    pub n_tasks: usize,
-    pub mbi_mean: f64,
-    pub hns_mean: f64,
-}
-
-fn clip(x: f64) -> f64 {
-    x.clamp(0.0, HNS_CLIP)
-}
-
-/// Aggregate reports. `tasks` supplies titles and floors; reports for unknown
-/// tasks are still aggregated with a floor of 0.
+/// Aggregate reports. `tasks` supplies titles, floors and whether people are a
+/// valid comparison; reports for unknown tasks are aggregated with a floor of 0
+/// and no people comparison.
 pub fn aggregate(reports: &[Report], tasks: &BTreeMap<String, Task>) -> Leaderboard {
     let mut by_task: BTreeMap<&str, Vec<&Report>> = BTreeMap::new();
     for r in reports {
@@ -125,9 +125,8 @@ pub fn aggregate(reports: &[Report], tasks: &BTreeMap<String, Task>) -> Leaderbo
             by_agent.entry(&r.agent_id).or_default().push(r);
         }
 
-        // Floor: median of baseline agents when the dataset has any (a random walk
-        // covers half a room by accident, so 0 would flatter every agent);
-        // otherwise the task's fixed floor.
+        // Chance: median of baseline agents when the dataset has any (a random walk
+        // covers half a room by accident); otherwise the task's fixed floor.
         let baselines: Vec<f64> = by_agent
             .values()
             .filter(|rs| rs[0].agent_class == AgentClass::Baseline)
@@ -139,25 +138,19 @@ pub fn aggregate(reports: &[Report], tasks: &BTreeMap<String, Task>) -> Leaderbo
             (median(&baselines), "baseline")
         };
 
-        // Human reference from per-driver means.
-        let humans: Vec<(f64, f64)> = by_agent
+        let goal_of = |x: f64| if max_score > 1e-9 { x / max_score } else { 0.0 };
+        let people_comparable = task.map(|t| t.reference.people_comparable).unwrap_or(false);
+
+        // People reference from per-person means, only where the task allows it.
+        let people_means: Vec<f64> = by_agent
             .values()
             .filter(|rs| rs[0].agent_class == AgentClass::Human)
-            .map(|rs| {
-                let s: Vec<f64> = rs.iter().map(|r| r.success.score).collect();
-                let e: Vec<f64> = rs.iter().map(|r| r.efficiency.path_efficiency).collect();
-                (mean(&s), mean(&e))
-            })
+            .map(|rs| mean(&rs.iter().map(|r| r.success.score).collect::<Vec<_>>()))
             .collect();
-        let human_reference = (!humans.is_empty()).then(|| {
-            let s: Vec<f64> = humans.iter().map(|h| h.0).collect();
-            let e: Vec<f64> = humans.iter().map(|h| h.1).collect();
-            HumanReference {
-                median: median(&s),
-                expert: percentile(&s, 0.9),
-                median_path_efficiency: median(&e),
-                n_drivers: humans.len(),
-            }
+        let people = (people_comparable && !people_means.is_empty()).then(|| PeopleReference {
+            median: median(&people_means),
+            expert: percentile(&people_means, 0.9),
+            n_people: people_means.len(),
         });
 
         let mut rows: Vec<AgentRow> = by_agent
@@ -181,27 +174,17 @@ pub fn aggregate(reports: &[Report], tasks: &BTreeMap<String, Task>) -> Leaderbo
                 let safety = 1.0 / (1.0 + mean(&viol));
                 let eff_m = mean(&eff);
 
-                let (hns, hns_ci, hns_expert, mbi) = match &human_reference {
-                    Some(h) if (h.median - floor).abs() > 1e-9 => {
-                        let norm = |x: f64| (x - floor) / (h.median - floor);
-                        let hns = norm(m);
-                        let hns_e = if (h.expert - floor).abs() > 1e-9 {
-                            Some((m - floor) / (h.expert - floor))
-                        } else {
-                            None
-                        };
-                        let hns_eff = if h.median_path_efficiency > 1e-9 {
-                            eff_m / h.median_path_efficiency
-                        } else {
-                            0.0
-                        };
-                        let mbi = W_SUCCESS * clip(hns)
-                            + W_EFFICIENCY * clip(hns_eff)
-                            + W_CONSISTENCY * consistency
-                            + W_SAFETY * safety;
-                        (Some(hns), Some([norm(ci.0), norm(ci.1)]), hns_e, Some(mbi))
+                let goal = goal_of(m);
+                let mbi = W_SUCCESS * goal
+                    + W_EFFICIENCY * eff_m.clamp(0.0, 1.0)
+                    + W_CONSISTENCY * consistency
+                    + W_SAFETY * safety;
+                let (vs_people, vs_people_ci) = match &people {
+                    Some(p) if (p.median - floor).abs() > 1e-9 => {
+                        let norm = |x: f64| (x - floor) / (p.median - floor);
+                        (Some(norm(m)), Some([norm(ci.0), norm(ci.1)]))
                     }
-                    _ => (None, None, None, None),
+                    _ => (None, None),
                 };
 
                 AgentRow {
@@ -216,17 +199,19 @@ pub fn aggregate(reports: &[Report], tasks: &BTreeMap<String, Task>) -> Leaderbo
                     success_worst: s.iter().cloned().fold(f64::INFINITY, f64::min),
                     success_best: s.iter().cloned().fold(f64::NEG_INFINITY, f64::max),
                     success_ci95: [ci.0, ci.1],
+                    goal,
+                    goal_ci95: [goal_of(ci.0), goal_of(ci.1)],
+                    goal_worst: goal_of(s.iter().cloned().fold(f64::INFINITY, f64::min)),
                     completion_rate: rs.iter().filter(|r| r.success.completed).count() as f64
                         / rs.len() as f64,
                     time_to_goal_mean_s: (!ttg.is_empty()).then(|| mean(&ttg)),
                     path_efficiency: eff_m,
                     violations_mean: mean(&viol),
-                    hns,
-                    hns_ci95: hns_ci,
-                    hns_expert,
                     consistency,
                     safety,
                     mbi,
+                    vs_people,
+                    vs_people_ci95: vs_people_ci,
                 }
             })
             .collect();
@@ -245,15 +230,15 @@ pub fn aggregate(reports: &[Report], tasks: &BTreeMap<String, Task>) -> Leaderbo
             kind: runs[0].task_kind.clone(),
             domain: task.map(|t| t.domain.clone()).unwrap_or_default(),
             n_runs: runs.len(),
-            floor,
-            floor_source: floor_source.to_string(),
             max_score,
-            human_reference,
+            chance: goal_of(floor),
+            chance_source: floor_source.to_string(),
+            people_comparable,
+            people,
             rows,
         });
     }
 
-    let overall = overall(&boards);
     Leaderboard {
         spec_version: crate::SPEC_VERSION.into(),
         scorer_version: crate::SCORER_VERSION.into(),
@@ -262,11 +247,9 @@ pub fn aggregate(reports: &[Report], tasks: &BTreeMap<String, Task>) -> Leaderbo
             efficiency: W_EFFICIENCY,
             consistency: W_CONSISTENCY,
             safety: W_SAFETY,
-            hns_clip: HNS_CLIP,
         },
         n_runs: reports.len(),
         tasks: boards,
-        overall,
     }
 }
 
@@ -282,44 +265,4 @@ fn assign_shared_ranks(rows: &mut [AgentRow]) {
         }
         r.rank = rank;
     }
-}
-
-fn overall(boards: &[TaskBoard]) -> Vec<OverallRow> {
-    let mut acc: BTreeMap<String, (String, AgentClass, Vec<f64>, Vec<f64>)> = BTreeMap::new();
-    for b in boards {
-        for r in &b.rows {
-            if let (Some(mbi), Some(hns)) = (r.mbi, r.hns) {
-                let e = acc.entry(r.agent_id.clone()).or_insert((
-                    r.agent_name.clone(),
-                    r.class,
-                    vec![],
-                    vec![],
-                ));
-                e.2.push(mbi);
-                e.3.push(hns);
-            }
-        }
-    }
-    let mut rows: Vec<OverallRow> = acc
-        .into_iter()
-        .map(|(id, (name, class, mbi, hns))| OverallRow {
-            rank: 0,
-            agent_id: id,
-            agent_name: name,
-            class,
-            n_tasks: mbi.len(),
-            mbi_mean: mean(&mbi),
-            hns_mean: mean(&hns),
-        })
-        .collect();
-    rows.sort_by(|a, b| {
-        b.mbi_mean
-            .partial_cmp(&a.mbi_mean)
-            .unwrap()
-            .then(a.agent_id.cmp(&b.agent_id))
-    });
-    for (i, r) in rows.iter_mut().enumerate() {
-        r.rank = i + 1;
-    }
-    rows
 }

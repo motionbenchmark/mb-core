@@ -13,7 +13,7 @@ python examples/thor-magni/thor_walks.py lhmp-thor-magni-challenge-extras/data o
 
 `thor_walks.py` chains the 8-second pieces back into continuous walks, cuts out every
 goal-to-goal walk, builds an experimental task for one route (`MB-THOR-WALK@0.0`), writes
-each walk as a tier-F trace, adds random-walk runs for the floor, and scores everything.
+each walk as a tier-F trace, adds random-walk runs for the chance level, and scores everything against the goal.
 
 ## What it found (goal 3 → goal 7, the most-walked route)
 
@@ -28,11 +28,11 @@ each walk as a tier-F trace, adds random-walk runs for the floor, and scores eve
 
 Four lessons for the benchmark:
 
-1. **Success alone cannot separate people on easy point-to-point jobs.** All 60 people
-   score 1.0 and 60 of 61 agents share rank 1. Time, path efficiency and consistency do
+1. **The goal alone cannot separate walkers on easy point-to-point jobs.** All 60 people
+   achieve 100% of the goal and 60 of 61 agents share rank 1. Time, path efficiency and consistency do
    the separating, the same ceiling effect the synthetic VEX AIM board shows.
 2. **The time limit should follow the people.** With 60 s, a random walk reaches the goal
-   40% of the time, which raises the floor. A limit of about three times the median human
+   40% of the time, so chance sits at 40% of the goal. A limit of about three times the median walking
    time (about 20 s here) would push chance success towards zero.
 3. **Path efficiency needs the arrival radius.** The oracle is measured centre to centre,
    but a walk ends on entering the 0.6 m radius, so many walks come out shorter than the

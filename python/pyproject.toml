@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "motionbench"
-description = "Open benchmark for goal-directed robots in confined spaces: score any run against human references"
+description = "Open benchmark for goal-directed agents in bounded spaces: score any run, by a person or a robot, against the task's goals"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.9"

@@ -1,8 +1,8 @@
-"""MotionBench: an open benchmark for goal-directed robots in confined spaces.
+"""MotionBench: an open benchmark for goal-directed agents in bounded spaces.
 
 Score any run - a student driving a VEX robot, a team's autonomous routine, an
-AI-written program, a robot vacuum - against human reference runs on the same
-task, using one trace format and one deterministic scorer (Rust core).
+AI-written program, a driver with robot assistance, a robot vacuum - against the
+task's goals, using one trace format and one deterministic scorer (Rust core).
 
     >>> import motionbench as mb
     >>> report = mb.score("runs/driver-01/MB-VEX-NAV@1.0/dev-01/t0")
@@ -64,5 +64,6 @@ def score_dir(root: PathLike, tasks_dir: Optional[PathLike] = None) -> tuple[lis
 
 
 def aggregate(reports: Iterable[dict[str, Any]], tasks_dir: Optional[PathLike] = None) -> dict[str, Any]:
-    """Build a human-normalized leaderboard (HNS, MBI, shared ranks) from reports."""
+    """Build per-task boards from reports: goal score, MBI, chance level, shared ranks, and a
+    comparison with people on tasks that allow one."""
     return json.loads(_core.aggregate(json.dumps(list(reports)), _opt(tasks_dir)))

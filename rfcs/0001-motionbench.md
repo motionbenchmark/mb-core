@@ -10,7 +10,13 @@
 | Author | Shekhar (23v) |
 | Discussion | GitHub Discussions, category "RFCs" |
 | Supersedes | — |
+| Superseded in part by | [RFC-0002](0002-goal-referenced-scoring.md): aggregation (§5) and its rationale |
 | License | CC BY 4.0 (this document); Apache-2.0 (code it describes) |
+
+> **Note (2026-10-23).** Scoring against the human median (HNS) is replaced in spec 0.2
+> by scoring against the task's goal, with a comparison to people kept only where a
+> person can do the same job with the same means. See RFC-0002. The rest of this RFC
+> stands.
 
 The key words MUST, MUST NOT, REQUIRED, SHOULD, SHOULD NOT and MAY are to be
 interpreted as described in RFC 2119.
@@ -27,8 +33,9 @@ an open-source community, and leave the door open to a foundation home later.
 ### Abstract
 
 MotionBench is an open benchmark, dataset and scoring library that measures how
-well goal-directed robots perform tasks inside bounded, confined spaces, and
-reports every result relative to human reference runs on the same task. It starts
+well agents complete goal-directed tasks inside bounded spaces: people, robots
+running team-written or AI-written code, and people assisted by robots, all scored
+against the same task goals. It starts
 with VEX robotics fields and generalizes to any arena-bounded robot: robot
 vacuums, lawn mowers, warehouse robots, classroom arms and simulated agents.
 
@@ -68,16 +75,18 @@ agents in confined spaces.
 ### Rationale
 
 **Why confined spaces.** A bounded arena with an explicit goal is closed enough
-that runs can be reproduced, a human can perform the same task as a reference,
-and participation needs only a phone and printed tags. Self-driving cars, road
+that runs can be reproduced, success can be measured from the end state, and
+participation needs only a phone and printed tags. Self-driving cars, road
 and sidewalk vehicles, and open-airspace drones are explicitly out of scope: they
 are open-world, life-safety problems with their own regulators and benchmarks,
 and mixing them in would dilute both the method and the message. See
 [MANIFESTO.md](../MANIFESTO.md) for the full scope test.
 
-**Why human-normalized.** Absolute scores mean nothing across tasks. "1.0 = the
-median human on this task" is understandable by a student, a parent, a researcher
-and a product reviewer alike.
+**Why goal-referenced.** Every task already defines what "done" means, so every run
+can be scored as the share of that goal it achieved, whoever or whatever ran it.
+Where a person can do the same job with the same means, a comparison with people adds
+context. (Spec 0.1 normalized everything to the human median; RFC-0002 explains why
+that changed.)
 
 **Why VEX first.** The VEX V5 programme has thousands of teams worldwide playing
 on an identical 12 ft x 12 ft field, and its matches already split into an
@@ -189,7 +198,7 @@ academic home; competition owners as optional partners for season suites.
 | **Agent** | Whatever produced the run, tagged with exactly one class: `human`, `human_auton`, `ai`, `hybrid`, `product`, `baseline`. |
 | **Trace** | One agent's run on one task and seed (`.mbtrace` directory). |
 | **Report** | The scorer's output for one trace. |
-| **Leaderboard** | Aggregation of reports, normalized against human runs. |
+| **Leaderboard** | Aggregation of reports per task, scored against the task's goal (spec 0.2, RFC-0002). |
 
 ### 2. Task format
 
@@ -246,6 +255,11 @@ events.
 **Process**: mean and p99 speed, hesitation time (speed < 2 cm/s), RMS jerk.
 
 ### 5. Aggregation
+
+> Superseded in spec 0.2 by [RFC-0002](0002-goal-referenced-scoring.md): the headline is the
+> goal score, chance is reported rather than subtracted, the people comparison below applies
+> only to tasks with `reference.people_comparable`, and there is no cross-task ranking. The
+> text below records spec 0.1.
 
 Per task and agent, over all trials and public seeds:
 

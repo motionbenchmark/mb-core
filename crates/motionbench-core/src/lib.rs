@@ -22,14 +22,14 @@ pub mod stats;
 pub mod task;
 pub mod trace;
 
-pub use aggregate::{aggregate, AgentRow, Leaderboard, OverallRow, TaskBoard};
+pub use aggregate::{aggregate, AgentRow, Leaderboard, PeopleReference, TaskBoard};
 pub use error::{Error, Result};
 pub use score::{score, Report};
 pub use task::{builtin_tasks, find_task, Goal, Task};
 pub use trace::{AgentClass, Manifest, Trace};
 
 /// Version of the MotionBench spec this crate implements (task, trace, report schemas).
-pub const SPEC_VERSION: &str = "0.1";
+pub const SPEC_VERSION: &str = "0.2";
 
 /// Version of this scorer. Reports record it so results can be traced to exact code.
 pub const SCORER_VERSION: &str = env!("CARGO_PKG_VERSION");

@@ -16,7 +16,7 @@
   "robot": { "radius_m": 0.04 },
   "budget": { "time_s": 45 },
   "goal": { "kind": "delivery" },
-  "reference": { "floor": 0 },
+  "reference": { "floor": 0, "people_comparable": true },
   "layouts": {
     "dev-01": {
       "start": { "x": 0.9144, "y": 0.12, "theta": 1.5708 },

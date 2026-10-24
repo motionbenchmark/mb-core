@@ -11,8 +11,9 @@ homography), robot found against a median empty-floor image, floor geometry from
 the floorboards' vanishing point and the back-wall line, scale from the robot's own
 size (35 cm diameter, 10 cm tall; focal length and camera height fitted to 405
 silhouettes). Floor the camera never saw is marked `not-in-view` and excluded;
-walls are `wall`. Heading comes from the direction of travel. No human baseline
-exists for this hallway yet, so there is no human-normalized score.
+walls are `wall`. Heading comes from the direction of travel. The score is the
+share of the visible floor covered, against the goal of covering all of it; there is
+no robot-versus-person comparison, because a person vacuuming uses different means.
 
 This is one clip from one home: a test of the method, not a review of any product.
 

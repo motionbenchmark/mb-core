@@ -1,34 +1,34 @@
 # The MotionBench Manifesto
 
-*Why we measure robots that work in confined spaces, and how we promise to do it.*
+*Why we measure how well agents complete goals in bounded spaces, and how we promise to do it.*
 
 ## The question
 
 A student drives a robot across a 12-foot field. A team's autonomous code does the
-same run. An AI writes a program that does it too. A robot vacuum cleans a living
-room; a person with a stick vacuum cleans the same room.
+same run. An AI writes a program that does it too. A driver tries again with an
+auto-align assist. A robot vacuum cleans a living room.
 
-**Which one did the job best, and by how much?**
+**How much of the job did each one get done, how well, and how reliably?**
 
 Today nobody can answer that with a number anyone else can check. Competitions
 score matches, not methods. Product claims are marketing. Research benchmarks
 mostly live in simulation. MotionBench exists to make that question answerable:
-openly, cheaply, and with people as the yardstick.
+openly, cheaply, and against the goal the task sets.
 
-## What we measure: robots in confined spaces
+## What we measure: goal-directed agents in bounded spaces
 
-MotionBench is for **goal-directed machines that move inside a bounded space**:
-a competition field, a room, a warehouse cell, a yard, a lab bench. A task belongs
-here when it passes the *confined-space test*:
+MotionBench is for **agents that move inside a bounded space towards a goal**: people,
+robots running team-written or AI-written code, people assisted by robots, and
+commercial machines. The space can be
+a competition field, a room, a warehouse cell, a yard or a lab bench. A task belongs
+here when it passes the *bounded-space test*:
 
 1. **Bounded arena.** The space has known edges and known geometry.
 2. **Explicit goal.** "Done" is a measurable function of the world state:
    waypoints reached, objects delivered, floor covered.
-3. **Human-doable.** A person can do the same task in the same space, so a human
-   reference run exists.
-4. **Repeatable in minutes.** A run is short, the arena can be reset, and five
+3. **Repeatable in minutes.** A run is short, the arena can be reset, and five
    trials are cheap.
-5. **Contained stakes.** Speeds and energies are low, and the people near the
+4. **Contained stakes.** Speeds and energies are low, and the people near the
    robot are the ones running the test.
 
 ### What we are not
@@ -40,16 +40,20 @@ stakes, regulators, and their own mature evaluation communities. We do not score
 them, we do not borrow their claims, and nothing on our leaderboard is a safety
 certification of any kind.
 
-The line is deliberate. Inside a confined space the world is closed enough that a
-result can be reproduced, a human can be measured on the same task, and a
+The line is deliberate. Inside a bounded space the world is closed enough that a
+result can be reproduced, success can be measured from the end state, and a
 fourteen-year-old with a phone can take part. That is what makes the benchmark
 honest, and it is what we refuse to dilute.
 
 ## What we believe
 
-- **People are the reference.** We report every result relative to real humans on
-  the same task (the human-normalized score), not against an abstract ideal.
-  "Superhuman" means something only when the humans were measured too.
+- **The goal is the reference.** Every run is scored as how much of the task's goal it
+  achieved, whoever or whatever ran it. A comparison with people is reported only
+  where a person can do exactly the same job with the same means, such as driving
+  the same robot. A robot vacuum is not compared with a person holding a stick
+  vacuum: the tools differ, so the comparison would measure equipment, not skill.
+- **Luck is shown, not hidden.** Every board shows what a robot wandering at random
+  achieves on the same task, so a score can be read against chance.
 - **Runs, not robots.** We score traces of what happened, never source code or
   hardware. Any machine that leaves a trace can be measured, so no vendor,
   league or language is privileged.
@@ -72,8 +76,9 @@ honest, and it is what we refuse to dilute.
    traces only, with guardian consent, and faces are never required.
 2. We will not imply endorsement by any competition, league or manufacturer that
    has not given it, and we will not reproduce anyone's game rules or field art.
-3. We will treat AI and human entries on the same footing: same tasks, same
-   seeds, same scorer, results always tagged by agent class.
+3. We will treat people, team-written code, AI-written code and assisted agents on the
+   same footing: same tasks, same seeds, same goals, same scorer, results always
+   tagged by agent class.
 4. We will change tasks and scoring only through public RFCs, and keep old
    versions scorable forever.
 5. We will lead with what helps teams improve, not with "AI beats kids" headlines.
@@ -82,13 +87,15 @@ honest, and it is what we refuse to dilute.
 
 We start with VEX robotics because thousands of teams already run the same robots
 on the same 12-foot field and already split every match into autonomous and
-human-driven periods. The same scorer then measures robot vacuums and mowers
-against people with vacuums and mowers, warehouse robots against human pickers,
-classroom arms against hands, and simulated AI agents against all of them.
+human-driven periods, so drivers and their code can be measured on the same robot.
+The same scorer then measures robot vacuums and mowers on floor and lawn covered,
+warehouse robots on picks delivered, classroom arms on objects sorted, and simulated
+AI agents on all of them.
 
-One question, asked the same way everywhere a machine moves through a bounded
-space towards a goal: **how does it compare with a person doing the same job?**
+One question, asked the same way everywhere an agent moves through a bounded space
+towards a goal: **how much of the job got done, how well, and how reliably?**
 
 ---
 
-*Adopted with RFC-0001. Changes to this document follow the RFC process.*
+*Adopted with RFC-0001; updated with RFC-0002 (goal-referenced scoring). Changes to this
+document follow the RFC process.*

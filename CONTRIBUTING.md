@@ -31,6 +31,6 @@ cd python && maturin develop --release && pytest tests
 ## Proposing a task
 
 Open an RFC using `rfcs/0000-template.md`. A task proposal must pass the
-confined-space test in [MANIFESTO.md](MANIFESTO.md), define public seeds,
-describe how human reference runs are collected, and include at least one
-reference trace.
+bounded-space test in [MANIFESTO.md](MANIFESTO.md), define public seeds, say how
+the goal is measured and whether a person can do the same job with the same means
+(`reference.people_comparable`), and include at least one reference trace.
