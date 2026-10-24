@@ -1,0 +1,59 @@
+{
+ "weights_default": [
+  0.5,
+  0.2,
+  0.15,
+  0.15
+ ],
+ "samples": 5000,
+ "tasks": {
+  "MB-COVER@0.1": {
+   "broad": {
+    "tau_median": 0.833,
+    "tau_p5": 0.333,
+    "top_agent_unchanged": 0.919
+   },
+   "local": {
+    "tau_median": 0.944,
+    "tau_p5": 0.889,
+    "top_agent_unchanged": 0.996
+   },
+   "goal_only": {
+    "tau": 0.833
+   },
+   "agents": 9
+  },
+  "MB-VEX-NAV@1.0": {
+   "broad": {
+    "tau_median": 0.953,
+    "tau_p5": 0.883,
+    "top_agent_unchanged": 1.0
+   },
+   "local": {
+    "tau_median": 0.988,
+    "tau_p5": 0.965,
+    "top_agent_unchanged": 1.0
+   },
+   "goal_only": {
+    "tau": 0.908
+   },
+   "agents": 19
+  },
+  "MB-VEX-PICK@1.0": {
+   "broad": {
+    "tau_median": 0.895,
+    "tau_p5": 0.743,
+    "top_agent_unchanged": 1.0
+   },
+   "local": {
+    "tau_median": 0.988,
+    "tau_p5": 0.906,
+    "top_agent_unchanged": 1.0
+   },
+   "goal_only": {
+    "tau": 0.812
+   },
+   "agents": 19
+  }
+ }
+}

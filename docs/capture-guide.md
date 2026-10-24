@@ -97,8 +97,9 @@ lowest point of its silhouette plus half its diameter. Without measurements the
 robot's own size is the ruler. Floor the camera never saw is marked `unobserved` and
 left out of the score.
 
-Expected accuracy (rendered test video with known positions): about 2 cm with a
-measured width and length, about 6 cm from the robot's size alone.
+Expected accuracy (rendered test video with known positions): about 3 cm median, 90% of
+frames within about 5 cm, with a measured floor or from the robot's size alone; about 8% of
+frames get no position. Not yet validated on real footage.
 
 ## Privacy
 

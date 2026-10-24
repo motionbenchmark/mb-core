@@ -11,6 +11,7 @@
 //!   needed. The index ranks agents within one task and is never averaged across
 //!   tasks.
 //! * People comparison (optional) = (S_agent − S_chance) / (S_people_median − S_chance),
+//!   reported only when S_people_median − S_chance ≥ 10% of the task's maximum,
 //!   computed only when the task declares `reference.people_comparable` (a person
 //!   can do exactly the same job with the same means, e.g. driving the same robot)
 //!   and the data contains people.
@@ -24,6 +25,9 @@ use crate::trace::AgentClass;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
+/// The people comparison is reported only when the median person beats chance by at least
+/// this share of the task's maximum score.
+pub const MIN_PEOPLE_MARGIN: f64 = 0.10;
 pub const W_SUCCESS: f64 = 0.5;
 pub const W_EFFICIENCY: f64 = 0.2;
 pub const W_CONSISTENCY: f64 = 0.15;
@@ -180,7 +184,8 @@ pub fn aggregate(reports: &[Report], tasks: &BTreeMap<String, Task>) -> Leaderbo
                     + W_CONSISTENCY * consistency
                     + W_SAFETY * safety;
                 let (vs_people, vs_people_ci) = match &people {
-                    Some(p) if (p.median - floor).abs() > 1e-9 => {
+                    // Only when people clearly beat chance: a denominator near zero makes the ratio unstable.
+                    Some(p) if p.median - floor >= MIN_PEOPLE_MARGIN * max_score => {
                         let norm = |x: f64| (x - floor) / (p.median - floor);
                         (Some(norm(m)), Some([norm(ci.0), norm(ci.1)]))
                     }

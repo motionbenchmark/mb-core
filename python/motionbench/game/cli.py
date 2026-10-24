@@ -57,7 +57,8 @@ def add_parser(sub) -> None:
     q.add_argument("--code", action="append", required=True, help="a routine (repeat to compare versions)")
     q.add_argument("--layout")
     q.add_argument("--runs", type=int, default=20)
-    q.add_argument("--driver-runs", type=int, default=12)
+    q.add_argument("--driver-runs", type=int, help="default: same as --runs, so every comparison is paired")
+    q.add_argument("--margin", type=float, default=0.5, help="equivalence margin in points")
     q.add_argument("--class-size", type=int, default=20)
     q.add_argument("--unseen", type=int, default=10, help="also play on this many generated layouts (0 = off)")
     q.add_argument("--unseen-seed", type=int, default=5000, help="seed for the generated layouts (keep it private for official verdicts)")
@@ -145,7 +146,7 @@ def run(a) -> int:
         from .verdict import print_verdict, verdict
 
         routines = {Path(c).name: Path(c).read_text() for c in a.code}
-        r = verdict(game, routines, layout=a.layout, runs=a.runs, driver_runs=a.driver_runs, class_size=a.class_size, unseen=a.unseen, unseen_seed=a.unseen_seed, out=a.out,
+        r = verdict(game, routines, layout=a.layout, runs=a.runs, driver_runs=a.driver_runs, class_size=a.class_size, unseen=a.unseen, unseen_seed=a.unseen_seed, margin=a.margin, out=a.out,
                     progress=None if a.json else (lambda m: print(m, file=sys.stderr)))
         print(json.dumps(r, indent=1)) if a.json else print_verdict(r)
         return 0

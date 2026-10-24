@@ -1,0 +1,2857 @@
+{
+  "spec_version": "0.2",
+  "scorer_version": "0.1.0",
+  "weights": {
+    "success": 0.5,
+    "efficiency": 0.2,
+    "consistency": 0.15,
+    "safety": 0.15
+  },
+  "n_runs": 570,
+  "tasks": [
+    {
+      "task": "MB-AIM-NAV@0.1",
+      "title": "Waypoint navigation for VEX AIM on a 6 x 4 ft table",
+      "kind": "waypoints",
+      "domain": "vex-aim",
+      "n_runs": 160,
+      "max_score": 5.0,
+      "chance": 0.0,
+      "chance_source": "baseline",
+      "people_comparable": true,
+      "people": {
+        "median": 3.8499999999999996,
+        "expert": 5.0,
+        "n_people": 10
+      },
+      "rows": [
+        {
+          "rank": 1,
+          "agent_id": "class-python-vision",
+          "agent_name": "Class code B (Python, AI Vision on tags and barrels)",
+          "class": "human_auton",
+          "n_trials": 10,
+          "success_mean": 5.0,
+          "success_median": 5.0,
+          "success_std": 0.0,
+          "success_worst": 5.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            5.0,
+            5.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 16.905,
+          "path_efficiency": 0.9040120565961125,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9808024113192225,
+          "vs_people": 1.298701298701299,
+          "vs_people_ci95": [
+            1.298701298701299,
+            1.298701298701299
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "llm-python-r3",
+          "agent_name": "LLM-written Python, round 3 (uses AI Vision)",
+          "class": "ai",
+          "n_trials": 10,
+          "success_mean": 5.0,
+          "success_median": 5.0,
+          "success_std": 0.0,
+          "success_worst": 5.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            5.0,
+            5.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 14.51,
+          "path_efficiency": 0.9231018761158527,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9846203752231706,
+          "vs_people": 1.298701298701299,
+          "vs_people_ci95": [
+            1.298701298701299,
+            1.298701298701299
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "student-07",
+          "agent_name": "Student 07 (One Stick controller)",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 5.0,
+          "success_median": 5.0,
+          "success_std": 0.0,
+          "success_worst": 5.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            5.0,
+            5.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 16.16,
+          "path_efficiency": 0.8271010175234315,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9654202035046864,
+          "vs_people": 1.298701298701299,
+          "vs_people_ci95": [
+            1.298701298701299,
+            1.298701298701299
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "student-08",
+          "agent_name": "Student 08 (One Stick controller)",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 5.0,
+          "success_median": 5.0,
+          "success_std": 0.0,
+          "success_worst": 5.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            5.0,
+            5.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 17.3,
+          "path_efficiency": 0.8080696988819414,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9616139397763883,
+          "vs_people": 1.298701298701299,
+          "vs_people_ci95": [
+            1.298701298701299,
+            1.298701298701299
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "student-assist",
+          "agent_name": "Student 04 with AI Vision auto-aim",
+          "class": "hybrid",
+          "n_trials": 10,
+          "success_mean": 5.0,
+          "success_median": 5.0,
+          "success_std": 0.0,
+          "success_worst": 5.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            5.0,
+            5.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 16.155,
+          "path_efficiency": 0.8471515193211119,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9694303038642225,
+          "vs_people": 1.298701298701299,
+          "vs_people_ci95": [
+            1.298701298701299,
+            1.298701298701299
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "student-01",
+          "agent_name": "Student 01 (One Stick controller)",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 4.9,
+          "success_median": 5.0,
+          "success_std": 0.3162277660168379,
+          "success_worst": 4.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            4.7,
+            5.0
+          ],
+          "goal": 0.9800000000000001,
+          "goal_ci95": [
+            0.9400000000000001,
+            1.0
+          ],
+          "goal_worst": 0.8,
+          "completion_rate": 0.9,
+          "time_to_goal_mean_s": 18.788888888888888,
+          "path_efficiency": 0.7860827293070762,
+          "violations_mean": 0.0,
+          "consistency": 0.9354637212210535,
+          "safety": 1.0,
+          "mbi": 0.9375361040445733,
+          "vs_people": 1.272727272727273,
+          "vs_people_ci95": [
+            1.220779220779221,
+            1.298701298701299
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "student-03",
+          "agent_name": "Student 03 (One Stick controller)",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 4.8,
+          "success_median": 5.0,
+          "success_std": 0.42163702135578385,
+          "success_worst": 4.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            4.6,
+            5.0
+          ],
+          "goal": 0.96,
+          "goal_ci95": [
+            0.9199999999999999,
+            1.0
+          ],
+          "goal_worst": 0.8,
+          "completion_rate": 0.8,
+          "time_to_goal_mean_s": 18.26875,
+          "path_efficiency": 0.7841992147438607,
+          "violations_mean": 0.0,
+          "consistency": 0.9121589538842116,
+          "safety": 1.0,
+          "mbi": 0.9236636860314039,
+          "vs_people": 1.2467532467532467,
+          "vs_people_ci95": [
+            1.1948051948051948,
+            1.298701298701299
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "class-blocks",
+          "agent_name": "Class code A (Blocks, gyro and encoders)",
+          "class": "human_auton",
+          "n_trials": 10,
+          "success_mean": 4.7,
+          "success_median": 5.0,
+          "success_std": 0.48304589153964794,
+          "success_worst": 4.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            4.4,
+            5.0
+          ],
+          "goal": 0.9400000000000001,
+          "goal_ci95": [
+            0.8800000000000001,
+            1.0
+          ],
+          "goal_worst": 0.8,
+          "completion_rate": 0.7,
+          "time_to_goal_mean_s": 15.207142857142856,
+          "path_efficiency": 0.928264299473091,
+          "violations_mean": 0.0,
+          "consistency": 0.8972242783958195,
+          "safety": 1.0,
+          "mbi": 0.9402365016539912,
+          "vs_people": 1.220779220779221,
+          "vs_people_ci95": [
+            1.142857142857143,
+            1.298701298701299
+          ]
+        },
+        {
+          "rank": 9,
+          "agent_id": "student-09",
+          "agent_name": "Student 09 (One Stick controller)",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 4.1,
+          "success_median": 4.0,
+          "success_std": 0.3162277660168379,
+          "success_worst": 4.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            4.0,
+            4.3
+          ],
+          "goal": 0.82,
+          "goal_ci95": [
+            0.8,
+            0.86
+          ],
+          "goal_worst": 0.8,
+          "completion_rate": 0.1,
+          "time_to_goal_mean_s": 18.65,
+          "path_efficiency": 0.7467625181666655,
+          "violations_mean": 0.0,
+          "consistency": 0.922871276581259,
+          "safety": 1.0,
+          "mbi": 0.847783195120522,
+          "vs_people": 1.0649350649350648,
+          "vs_people_ci95": [
+            1.038961038961039,
+            1.116883116883117
+          ]
+        },
+        {
+          "rank": 10,
+          "agent_id": "student-02",
+          "agent_name": "Student 02 (One Stick controller)",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 3.6,
+          "success_median": 4.0,
+          "success_std": 0.5163977794943223,
+          "success_worst": 3.0,
+          "success_best": 4.0,
+          "success_ci95": [
+            3.3,
+            3.9
+          ],
+          "goal": 0.72,
+          "goal_ci95": [
+            0.6599999999999999,
+            0.78
+          ],
+          "goal_worst": 0.6,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.7153339138948634,
+          "violations_mean": 0.0,
+          "consistency": 0.8565561723626882,
+          "safety": 1.0,
+          "mbi": 0.7815502086333759,
+          "vs_people": 0.9350649350649352,
+          "vs_people_ci95": [
+            0.8571428571428572,
+            1.012987012987013
+          ]
+        },
+        {
+          "rank": 10,
+          "agent_id": "student-05",
+          "agent_name": "Student 05 (One Stick controller)",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 3.3,
+          "success_median": 3.0,
+          "success_std": 0.48304589153964794,
+          "success_worst": 3.0,
+          "success_best": 4.0,
+          "success_ci95": [
+            3.0,
+            3.6
+          ],
+          "goal": 0.6599999999999999,
+          "goal_ci95": [
+            0.6,
+            0.72
+          ],
+          "goal_worst": 0.6,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.6996865077211124,
+          "violations_mean": 0.0,
+          "consistency": 0.8536224571091976,
+          "safety": 1.0,
+          "mbi": 0.7479806701106021,
+          "vs_people": 0.8571428571428572,
+          "vs_people_ci95": [
+            0.7792207792207793,
+            0.9350649350649352
+          ]
+        },
+        {
+          "rank": 10,
+          "agent_id": "student-04",
+          "agent_name": "Student 04 (One Stick controller)",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 3.0,
+          "success_median": 3.0,
+          "success_std": 0.4714045207910317,
+          "success_worst": 2.0,
+          "success_best": 4.0,
+          "success_ci95": [
+            2.7,
+            3.3
+          ],
+          "goal": 0.6,
+          "goal_ci95": [
+            0.54,
+            0.6599999999999999
+          ],
+          "goal_worst": 0.4,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.6609349527572566,
+          "violations_mean": 0.0,
+          "consistency": 0.8428651597363228,
+          "safety": 1.0,
+          "mbi": 0.7086167645118997,
+          "vs_people": 0.7792207792207793,
+          "vs_people_ci95": [
+            0.7012987012987014,
+            0.8571428571428572
+          ]
+        },
+        {
+          "rank": 13,
+          "agent_id": "student-06",
+          "agent_name": "Student 06 (One Stick controller)",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 2.9,
+          "success_median": 3.0,
+          "success_std": 0.31622776601683794,
+          "success_worst": 2.0,
+          "success_best": 3.0,
+          "success_ci95": [
+            2.7,
+            3.0
+          ],
+          "goal": 0.58,
+          "goal_ci95": [
+            0.54,
+            0.6
+          ],
+          "goal_worst": 0.4,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.6406687867769014,
+          "violations_mean": 0.0,
+          "consistency": 0.8909559427528145,
+          "safety": 1.0,
+          "mbi": 0.7017771487683024,
+          "vs_people": 0.7532467532467533,
+          "vs_people_ci95": [
+            0.7012987012987014,
+            0.7792207792207793
+          ]
+        },
+        {
+          "rank": 13,
+          "agent_id": "student-10",
+          "agent_name": "Student 10 (One Stick controller)",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 2.8,
+          "success_median": 3.0,
+          "success_std": 0.42163702135578385,
+          "success_worst": 2.0,
+          "success_best": 3.0,
+          "success_ci95": [
+            2.5,
+            3.0
+          ],
+          "goal": 0.5599999999999999,
+          "goal_ci95": [
+            0.5,
+            0.6
+          ],
+          "goal_worst": 0.4,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.647290953350794,
+          "violations_mean": 0.0,
+          "consistency": 0.8494153495157915,
+          "safety": 1.0,
+          "mbi": 0.6868704930975275,
+          "vs_people": 0.7272727272727273,
+          "vs_people_ci95": [
+            0.6493506493506495,
+            0.7792207792207793
+          ]
+        },
+        {
+          "rank": 15,
+          "agent_id": "llm-python-r1",
+          "agent_name": "LLM-written Python, round 1",
+          "class": "ai",
+          "n_trials": 10,
+          "success_mean": 1.7,
+          "success_median": 1.0,
+          "success_std": 0.9486832980505138,
+          "success_worst": 1.0,
+          "success_best": 3.0,
+          "success_ci95": [
+            1.2,
+            2.3
+          ],
+          "goal": 0.33999999999999997,
+          "goal_ci95": [
+            0.24,
+            0.45999999999999996
+          ],
+          "goal_worst": 0.2,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.9501253441796564,
+          "violations_mean": 0.0,
+          "consistency": 0.44195100114675656,
+          "safety": 1.0,
+          "mbi": 0.5763177190079447,
+          "vs_people": 0.4415584415584416,
+          "vs_people_ci95": [
+            0.3116883116883117,
+            0.5974025974025974
+          ]
+        },
+        {
+          "rank": 16,
+          "agent_id": "random-walk",
+          "agent_name": "Random walk (floor)",
+          "class": "baseline",
+          "n_trials": 10,
+          "success_mean": 0.0,
+          "success_median": 0.0,
+          "success_std": 0.0,
+          "success_worst": 0.0,
+          "success_best": 0.0,
+          "success_ci95": [
+            0.0,
+            0.0
+          ],
+          "goal": 0.0,
+          "goal_ci95": [
+            0.0,
+            0.0
+          ],
+          "goal_worst": 0.0,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.0,
+          "violations_mean": 0.2,
+          "consistency": 0.0,
+          "safety": 0.8333333333333334,
+          "mbi": 0.125,
+          "vs_people": 0.0,
+          "vs_people_ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "task": "MB-AIM-SORT@0.1",
+      "title": "Sort barrels by colour with VEX AIM",
+      "kind": "delivery",
+      "domain": "vex-aim",
+      "n_runs": 80,
+      "max_score": 6.0,
+      "chance": 0.0,
+      "chance_source": "baseline",
+      "people_comparable": true,
+      "people": {
+        "median": 4.699999999999999,
+        "expert": 6.0,
+        "n_people": 10
+      },
+      "rows": [
+        {
+          "rank": 1,
+          "agent_id": "class-python-vision",
+          "agent_name": "Class code B (Python, AI Vision on tags and barrels)",
+          "class": "human_auton",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 42.23,
+          "path_efficiency": 0.9395111032451915,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9879022206490383,
+          "vs_people": 1.2765957446808514,
+          "vs_people_ci95": [
+            1.2765957446808514,
+            1.2765957446808514
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "llm-python-r3",
+          "agent_name": "LLM-written Python, round 3 (uses AI Vision)",
+          "class": "ai",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 36.57000000000001,
+          "path_efficiency": 0.936476255150045,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.987295251030009,
+          "vs_people": 1.2765957446808514,
+          "vs_people_ci95": [
+            1.2765957446808514,
+            1.2765957446808514
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "student-07",
+          "agent_name": "Student 07 (One Stick controller)",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 38.56,
+          "path_efficiency": 0.8909238075325654,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9781847615065131,
+          "vs_people": 1.2765957446808514,
+          "vs_people_ci95": [
+            1.2765957446808514,
+            1.2765957446808514
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "student-08",
+          "agent_name": "Student 08 (One Stick controller)",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 41.2,
+          "path_efficiency": 0.8552028588313044,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9710405717662609,
+          "vs_people": 1.2765957446808514,
+          "vs_people_ci95": [
+            1.2765957446808514,
+            1.2765957446808514
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "student-assist",
+          "agent_name": "Student 04 with AI Vision auto-aim",
+          "class": "hybrid",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 40.21999999999999,
+          "path_efficiency": 0.8894506776844754,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9778901355368952,
+          "vs_people": 1.2765957446808514,
+          "vs_people_ci95": [
+            1.2765957446808514,
+            1.2765957446808514
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "student-01",
+          "agent_name": "Student 01 (One Stick controller)",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 5.6,
+          "success_median": 6.0,
+          "success_std": 0.5477225575051662,
+          "success_worst": 5.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            5.2,
+            6.0
+          ],
+          "goal": 0.9333333333333332,
+          "goal_ci95": [
+            0.8666666666666667,
+            1.0
+          ],
+          "goal_worst": 0.8333333333333334,
+          "completion_rate": 0.6,
+          "time_to_goal_mean_s": 41.016666666666666,
+          "path_efficiency": 0.8394397930408044,
+          "violations_mean": 0.0,
+          "consistency": 0.902192400445506,
+          "safety": 1.0,
+          "mbi": 0.9198834853416534,
+          "vs_people": 1.1914893617021278,
+          "vs_people_ci95": [
+            1.1063829787234045,
+            1.2765957446808514
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "student-03",
+          "agent_name": "Student 03 (One Stick controller)",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 5.6,
+          "success_median": 6.0,
+          "success_std": 0.5477225575051662,
+          "success_worst": 5.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            5.2,
+            6.0
+          ],
+          "goal": 0.9333333333333332,
+          "goal_ci95": [
+            0.8666666666666667,
+            1.0
+          ],
+          "goal_worst": 0.8333333333333334,
+          "completion_rate": 0.6,
+          "time_to_goal_mean_s": 42.36666666666667,
+          "path_efficiency": 0.8425591171149138,
+          "violations_mean": 0.0,
+          "consistency": 0.902192400445506,
+          "safety": 1.0,
+          "mbi": 0.9205073501564752,
+          "vs_people": 1.1914893617021278,
+          "vs_people_ci95": [
+            1.1063829787234045,
+            1.2765957446808514
+          ]
+        },
+        {
+          "rank": 8,
+          "agent_id": "student-09",
+          "agent_name": "Student 09 (One Stick controller)",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 4.8,
+          "success_median": 5.0,
+          "success_std": 0.4472135954999579,
+          "success_worst": 4.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            4.4,
+            5.0
+          ],
+          "goal": 0.7999999999999999,
+          "goal_ci95": [
+            0.7333333333333334,
+            0.8333333333333334
+          ],
+          "goal_worst": 0.6666666666666666,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.7840536088526816,
+          "violations_mean": 0.0,
+          "consistency": 0.9068305009375087,
+          "safety": 1.0,
+          "mbi": 0.8428352969111625,
+          "vs_people": 1.021276595744681,
+          "vs_people_ci95": [
+            0.9361702127659577,
+            1.0638297872340428
+          ]
+        },
+        {
+          "rank": 8,
+          "agent_id": "student-02",
+          "agent_name": "Student 02 (One Stick controller)",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 4.6,
+          "success_median": 5.0,
+          "success_std": 0.5477225575051662,
+          "success_worst": 4.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            4.2,
+            5.0
+          ],
+          "goal": 0.7666666666666666,
+          "goal_ci95": [
+            0.7000000000000001,
+            0.8333333333333334
+          ],
+          "goal_worst": 0.6666666666666666,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.8082010861552538,
+          "violations_mean": 0.0,
+          "consistency": 0.8809298788032247,
+          "safety": 1.0,
+          "mbi": 0.8271130323848678,
+          "vs_people": 0.9787234042553192,
+          "vs_people_ci95": [
+            0.8936170212765959,
+            1.0638297872340428
+          ]
+        },
+        {
+          "rank": 8,
+          "agent_id": "student-05",
+          "agent_name": "Student 05 (One Stick controller)",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 4.2,
+          "success_median": 4.0,
+          "success_std": 0.4472135954999579,
+          "success_worst": 4.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            4.0,
+            4.6
+          ],
+          "goal": 0.7000000000000001,
+          "goal_ci95": [
+            0.6666666666666666,
+            0.7666666666666666
+          ],
+          "goal_worst": 0.6666666666666666,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.796908228149832,
+          "violations_mean": 0.0,
+          "consistency": 0.89352057250001,
+          "safety": 1.0,
+          "mbi": 0.793409731504968,
+          "vs_people": 0.8936170212765959,
+          "vs_people_ci95": [
+            0.8510638297872342,
+            0.9787234042553192
+          ]
+        },
+        {
+          "rank": 11,
+          "agent_id": "student-04",
+          "agent_name": "Student 04 (One Stick controller)",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 3.4,
+          "success_median": 4.0,
+          "success_std": 0.8944271909999159,
+          "success_worst": 2.0,
+          "success_best": 4.0,
+          "success_ci95": [
+            2.6,
+            4.0
+          ],
+          "goal": 0.5666666666666667,
+          "goal_ci95": [
+            0.43333333333333335,
+            0.6666666666666666
+          ],
+          "goal_worst": 0.3333333333333333,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.6194883438475672,
+          "violations_mean": 0.0,
+          "consistency": 0.7369331791176719,
+          "safety": 1.0,
+          "mbi": 0.6677709789704976,
+          "vs_people": 0.723404255319149,
+          "vs_people_ci95": [
+            0.5531914893617023,
+            0.8510638297872342
+          ]
+        },
+        {
+          "rank": 11,
+          "agent_id": "student-06",
+          "agent_name": "Student 06 (One Stick controller)",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 3.2,
+          "success_median": 3.0,
+          "success_std": 0.8366600265340756,
+          "success_worst": 2.0,
+          "success_best": 4.0,
+          "success_ci95": [
+            2.6,
+            3.8
+          ],
+          "goal": 0.5333333333333333,
+          "goal_ci95": [
+            0.43333333333333335,
+            0.6333333333333333
+          ],
+          "goal_worst": 0.3333333333333333,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.6682433968389976,
+          "violations_mean": 0.0,
+          "consistency": 0.7385437417081013,
+          "safety": 1.0,
+          "mbi": 0.6610969072906814,
+          "vs_people": 0.6808510638297873,
+          "vs_people_ci95": [
+            0.5531914893617023,
+            0.8085106382978724
+          ]
+        },
+        {
+          "rank": 11,
+          "agent_id": "student-10",
+          "agent_name": "Student 10 (One Stick controller)",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 3.2,
+          "success_median": 4.0,
+          "success_std": 1.0954451150103321,
+          "success_worst": 2.0,
+          "success_best": 4.0,
+          "success_ci95": [
+            2.4,
+            4.0
+          ],
+          "goal": 0.5333333333333333,
+          "goal_ci95": [
+            0.39999999999999997,
+            0.6666666666666666
+          ],
+          "goal_worst": 0.3333333333333333,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.5966843685174056,
+          "violations_mean": 0.0,
+          "consistency": 0.6576734015592712,
+          "safety": 1.0,
+          "mbi": 0.6346545506040384,
+          "vs_people": 0.6808510638297873,
+          "vs_people_ci95": [
+            0.5106382978723405,
+            0.8510638297872342
+          ]
+        },
+        {
+          "rank": 11,
+          "agent_id": "class-blocks",
+          "agent_name": "Class code A (Blocks, gyro and encoders)",
+          "class": "human_auton",
+          "n_trials": 5,
+          "success_mean": 2.6,
+          "success_median": 3.0,
+          "success_std": 0.5477225575051661,
+          "success_worst": 2.0,
+          "success_best": 3.0,
+          "success_ci95": [
+            2.2,
+            3.0
+          ],
+          "goal": 0.43333333333333335,
+          "goal_ci95": [
+            0.3666666666666667,
+            0.5
+          ],
+          "goal_worst": 0.3333333333333333,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.8459269149012425,
+          "violations_mean": 0.0,
+          "consistency": 0.7893374778826284,
+          "safety": 1.0,
+          "mbi": 0.6542526713293095,
+          "vs_people": 0.5531914893617023,
+          "vs_people_ci95": [
+            0.46808510638297884,
+            0.6382978723404257
+          ]
+        },
+        {
+          "rank": 15,
+          "agent_id": "llm-python-r1",
+          "agent_name": "LLM-written Python, round 1",
+          "class": "ai",
+          "n_trials": 5,
+          "success_mean": 1.4,
+          "success_median": 1.0,
+          "success_std": 0.5477225575051661,
+          "success_worst": 1.0,
+          "success_best": 2.0,
+          "success_ci95": [
+            1.0,
+            1.8
+          ],
+          "goal": 0.2333333333333333,
+          "goal_ci95": [
+            0.16666666666666666,
+            0.3
+          ],
+          "goal_worst": 0.16666666666666666,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.9485574153389035,
+          "violations_mean": 0.0,
+          "consistency": 0.6087696017820242,
+          "safety": 1.0,
+          "mbi": 0.547693590001751,
+          "vs_people": 0.29787234042553196,
+          "vs_people_ci95": [
+            0.21276595744680854,
+            0.3829787234042554
+          ]
+        },
+        {
+          "rank": 16,
+          "agent_id": "random-walk",
+          "agent_name": "Random walk (floor)",
+          "class": "baseline",
+          "n_trials": 5,
+          "success_mean": 0.0,
+          "success_median": 0.0,
+          "success_std": 0.0,
+          "success_worst": 0.0,
+          "success_best": 0.0,
+          "success_ci95": [
+            0.0,
+            0.0
+          ],
+          "goal": 0.0,
+          "goal_ci95": [
+            0.0,
+            0.0
+          ],
+          "goal_worst": 0.0,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.0,
+          "violations_mean": 0.0,
+          "consistency": 0.0,
+          "safety": 1.0,
+          "mbi": 0.15,
+          "vs_people": 0.0,
+          "vs_people_ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "task": "MB-COVER@0.1",
+      "title": "Room floor coverage",
+      "kind": "coverage",
+      "domain": "indoor-floor",
+      "n_runs": 30,
+      "max_score": 100.0,
+      "chance": 0.4921383647798742,
+      "chance_source": "baseline",
+      "people_comparable": false,
+      "people": null,
+      "rows": [
+        {
+          "rank": 1,
+          "agent_id": "vac-systematic",
+          "agent_name": "Robot vacuum, systematic (lane-planning)",
+          "class": "product",
+          "n_trials": 3,
+          "success_mean": 94.7037404832837,
+          "success_median": 94.68718967229395,
+          "success_std": 0.05167989075138747,
+          "success_worst": 94.66236345580934,
+          "success_best": 94.76166832174776,
+          "success_ci95": [
+            94.66236345580934,
+            94.76166832174776
+          ],
+          "goal": 0.9470374048328369,
+          "goal_ci95": [
+            0.9466236345580934,
+            0.9476166832174776
+          ],
+          "goal_worst": 0.9466236345580934,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 173.26666666666665,
+          "path_efficiency": 0.6376743335295906,
+          "violations_mean": 0.3333333333333333,
+          "consistency": 0.9994542993709894,
+          "safety": 0.75,
+          "mbi": 0.8634717140279851,
+          "vs_people": null,
+          "vs_people_ci95": null
+        },
+        {
+          "rank": 2,
+          "agent_id": "person-03",
+          "agent_name": "Person 03 with stick vacuum",
+          "class": "human",
+          "n_trials": 3,
+          "success_mean": 90.97980801059252,
+          "success_median": 90.61569016881828,
+          "success_std": 1.3772025198751885,
+          "success_worst": 89.82125124131083,
+          "success_best": 92.50248262164847,
+          "success_ci95": [
+            89.82125124131083,
+            92.50248262164847
+          ],
+          "goal": 0.9097980801059252,
+          "goal_ci95": [
+            0.8982125124131083,
+            0.9250248262164846
+          ],
+          "goal_worst": 0.8982125124131083,
+          "completion_rate": 0.6666666666666666,
+          "time_to_goal_mean_s": 85.25,
+          "path_efficiency": 0.7767002653310396,
+          "violations_mean": 2.0,
+          "consistency": 0.984862547525767,
+          "safety": 0.3333333333333333,
+          "mbi": 0.8079684752480356,
+          "vs_people": null,
+          "vs_people_ci95": null
+        },
+        {
+          "rank": 2,
+          "agent_id": "llm-cover-r3",
+          "agent_name": "LLM-written coverage planner, round 3",
+          "class": "ai",
+          "n_trials": 3,
+          "success_mean": 89.74677259185701,
+          "success_median": 89.74677259185701,
+          "success_std": 0.09930486593842859,
+          "success_worst": 89.64746772591857,
+          "success_best": 89.84607745779543,
+          "success_ci95": [
+            89.64746772591859,
+            89.84607745779543
+          ],
+          "goal": 0.89746772591857,
+          "goal_ci95": [
+            0.8964746772591858,
+            0.8984607745779543
+          ],
+          "goal_worst": 0.8964746772591857,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.7649353144088064,
+          "violations_mean": 0.0,
+          "consistency": 0.9988934993084371,
+          "safety": 1.0,
+          "mbi": 0.9015549507373118,
+          "vs_people": null,
+          "vs_people_ci95": null
+        },
+        {
+          "rank": 4,
+          "agent_id": "person-02",
+          "agent_name": "Person 02 with stick vacuum",
+          "class": "human",
+          "n_trials": 3,
+          "success_mean": 88.09996689837801,
+          "success_median": 87.73584905660378,
+          "success_std": 0.9243668684975602,
+          "success_worst": 87.41310824230388,
+          "success_best": 89.15094339622641,
+          "success_ci95": [
+            87.41310824230386,
+            89.15094339622641
+          ],
+          "goal": 0.8809996689837801,
+          "goal_ci95": [
+            0.8741310824230386,
+            0.8915094339622641
+          ],
+          "goal_worst": 0.8741310824230388,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.8059335254909016,
+          "violations_mean": 2.6666666666666665,
+          "consistency": 0.9895077501043354,
+          "safety": 0.27272727272727276,
+          "mbi": 0.7910217930148116,
+          "vs_people": null,
+          "vs_people_ci95": null
+        },
+        {
+          "rank": 4,
+          "agent_id": "person-01",
+          "agent_name": "Person 01 with stick vacuum",
+          "class": "human",
+          "n_trials": 3,
+          "success_mean": 87.20622310493214,
+          "success_median": 86.46971201588877,
+          "success_std": 1.8162771298704539,
+          "success_worst": 85.8738828202582,
+          "success_best": 89.27507447864946,
+          "success_ci95": [
+            85.8738828202582,
+            89.27507447864946
+          ],
+          "goal": 0.8720622310493213,
+          "goal_ci95": [
+            0.8587388282025821,
+            0.8927507447864946
+          ],
+          "goal_worst": 0.8587388282025821,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.7361956971301185,
+          "violations_mean": 1.6666666666666667,
+          "consistency": 0.9791726201960955,
+          "safety": 0.37499999999999994,
+          "mbi": 0.7863961479800987,
+          "vs_people": null,
+          "vs_people_ci95": null
+        },
+        {
+          "rank": 4,
+          "agent_id": "person-05",
+          "agent_name": "Person 05 with stick vacuum",
+          "class": "human",
+          "n_trials": 3,
+          "success_mean": 86.59384309831182,
+          "success_median": 86.2462760675273,
+          "success_std": 2.920221639033296,
+          "success_worst": 83.86295928500496,
+          "success_best": 89.67229394240319,
+          "success_ci95": [
+            83.86295928500496,
+            89.67229394240319
+          ],
+          "goal": 0.8659384309831182,
+          "goal_ci95": [
+            0.8386295928500496,
+            0.8967229394240319
+          ],
+          "goal_worst": 0.8386295928500496,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.8031451632959058,
+          "violations_mean": 5.333333333333333,
+          "consistency": 0.9662767982740077,
+          "safety": 0.15789473684210528,
+          "mbi": 0.7622239784181571,
+          "vs_people": null,
+          "vs_people_ci95": null
+        },
+        {
+          "rank": 7,
+          "agent_id": "person-06",
+          "agent_name": "Person 06 with stick vacuum",
+          "class": "human",
+          "n_trials": 3,
+          "success_mean": 83.15127441244623,
+          "success_median": 83.88778550148957,
+          "success_std": 2.2878316001847674,
+          "success_worst": 80.58589870903674,
+          "success_best": 84.98013902681232,
+          "success_ci95": [
+            80.58589870903674,
+            84.98013902681232
+          ],
+          "goal": 0.8315127441244623,
+          "goal_ci95": [
+            0.8058589870903674,
+            0.8498013902681233
+          ],
+          "goal_worst": 0.8058589870903674,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.7654240189825589,
+          "violations_mean": 2.0,
+          "consistency": 0.9724859105726187,
+          "safety": 0.3333333333333333,
+          "mbi": 0.7647140624446358,
+          "vs_people": null,
+          "vs_people_ci95": null
+        },
+        {
+          "rank": 7,
+          "agent_id": "person-04",
+          "agent_name": "Person 04 with stick vacuum",
+          "class": "human",
+          "n_trials": 3,
+          "success_mean": 81.05759682224429,
+          "success_median": 80.98311817279047,
+          "success_std": 1.5033703929694835,
+          "success_worst": 79.59285004965243,
+          "success_best": 82.59682224428997,
+          "success_ci95": [
+            79.59285004965243,
+            82.59682224428997
+          ],
+          "goal": 0.8105759682224429,
+          "goal_ci95": [
+            0.7959285004965243,
+            0.8259682224428997
+          ],
+          "goal_worst": 0.7959285004965243,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.7665489900773248,
+          "violations_mean": 2.0,
+          "consistency": 0.9814530598992922,
+          "safety": 0.3333333333333333,
+          "mbi": 0.7558157411115802,
+          "vs_people": null,
+          "vs_people_ci95": null
+        },
+        {
+          "rank": 9,
+          "agent_id": "vac-bump",
+          "agent_name": "Robot vacuum, bump-and-turn",
+          "class": "product",
+          "n_trials": 3,
+          "success_mean": 58.97881496193313,
+          "success_median": 58.58987090367428,
+          "success_std": 1.466709113645594,
+          "success_worst": 57.745779543197614,
+          "success_best": 60.60079443892751,
+          "success_ci95": [
+            57.745779543197614,
+            60.600794438927515
+          ],
+          "goal": 0.5897881496193313,
+          "goal_ci95": [
+            0.5774577954319762,
+            0.6060079443892752
+          ],
+          "goal_worst": 0.5774577954319762,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.4426224626344171,
+          "violations_mean": 32.333333333333336,
+          "consistency": 0.9751315940377531,
+          "safety": 0.03,
+          "mbi": 0.534188306442212,
+          "vs_people": null,
+          "vs_people_ci95": null
+        },
+        {
+          "rank": 10,
+          "agent_id": "random-walk",
+          "agent_name": "Random walk (floor)",
+          "class": "baseline",
+          "n_trials": 3,
+          "success_mean": 49.21383647798742,
+          "success_median": 48.53525322740814,
+          "success_std": 4.334954089309662,
+          "success_worst": 45.25819265143992,
+          "success_best": 53.8480635551142,
+          "success_ci95": [
+            45.25819265143992,
+            53.8480635551142
+          ],
+          "goal": 0.4921383647798742,
+          "goal_ci95": [
+            0.4525819265143992,
+            0.538480635551142
+          ],
+          "goal_worst": 0.4525819265143992,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.30795012747852873,
+          "violations_mean": 7.666666666666667,
+          "consistency": 0.9119159488561999,
+          "safety": 0.11538461538461536,
+          "mbi": 0.4617542925217651,
+          "vs_people": null,
+          "vs_people_ci95": null
+        }
+      ]
+    },
+    {
+      "task": "MB-VEX-NAV@1.0",
+      "title": "Waypoint navigation on a 12 ft field",
+      "kind": "waypoints",
+      "domain": "vex",
+      "n_runs": 200,
+      "max_score": 6.0,
+      "chance": 0.0,
+      "chance_source": "baseline",
+      "people_comparable": true,
+      "people": {
+        "median": 5.5,
+        "expert": 6.0,
+        "n_people": 12
+      },
+      "rows": [
+        {
+          "rank": 1,
+          "agent_id": "driver-06",
+          "agent_name": "Driver 06",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 15.125,
+          "path_efficiency": 0.8017954981550972,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9603590996310195,
+          "vs_people": 1.0909090909090908,
+          "vs_people_ci95": [
+            1.0909090909090908,
+            1.0909090909090908
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-10",
+          "agent_name": "Driver 10",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 15.694999999999999,
+          "path_efficiency": 0.7996309349275874,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9599261869855176,
+          "vs_people": 1.0909090909090908,
+          "vs_people_ci95": [
+            1.0909090909090908,
+            1.0909090909090908
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-12",
+          "agent_name": "Driver 12",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 14.790000000000001,
+          "path_efficiency": 0.8069676936449394,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9613935387289879,
+          "vs_people": 1.0909090909090908,
+          "vs_people_ci95": [
+            1.0909090909090908,
+            1.0909090909090908
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-assist",
+          "agent_name": "Driver 05 with auto-align",
+          "class": "hybrid",
+          "n_trials": 10,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 13.190000000000001,
+          "path_efficiency": 0.8660199022356967,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9732039804471394,
+          "vs_people": 1.0909090909090908,
+          "vs_people_ci95": [
+            1.0909090909090908,
+            1.0909090909090908
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "llm-auton-r10",
+          "agent_name": "LLM-written auton, round 10",
+          "class": "ai",
+          "n_trials": 10,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 10.985000000000001,
+          "path_efficiency": 0.9442287960878988,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9888457592175798,
+          "vs_people": 1.0909090909090908,
+          "vs_people_ci95": [
+            1.0909090909090908,
+            1.0909090909090908
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "llm-auton-r3",
+          "agent_name": "LLM-written auton, round 3",
+          "class": "ai",
+          "n_trials": 10,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 11.709999999999999,
+          "path_efficiency": 0.9268097919456653,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9853619583891331,
+          "vs_people": 1.0909090909090908,
+          "vs_people_ci95": [
+            1.0909090909090908,
+            1.0909090909090908
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "team-auton-a",
+          "agent_name": "Team auton A (odometry + GPS correction)",
+          "class": "human_auton",
+          "n_trials": 10,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 12.749999999999998,
+          "path_efficiency": 0.9373433608276038,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9874686721655208,
+          "vs_people": 1.0909090909090908,
+          "vs_people_ci95": [
+            1.0909090909090908,
+            1.0909090909090908
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-11",
+          "agent_name": "Driver 11",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 5.8,
+          "success_median": 6.0,
+          "success_std": 0.42163702135578385,
+          "success_worst": 5.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            5.5,
+            6.0
+          ],
+          "goal": 0.9666666666666667,
+          "goal_ci95": [
+            0.9166666666666666,
+            1.0
+          ],
+          "goal_worst": 0.8333333333333334,
+          "completion_rate": 0.8,
+          "time_to_goal_mean_s": 17.79375,
+          "path_efficiency": 0.7478905503973339,
+          "violations_mean": 0.0,
+          "consistency": 0.9273039618352097,
+          "safety": 1.0,
+          "mbi": 0.9220070376880817,
+          "vs_people": 1.0545454545454545,
+          "vs_people_ci95": [
+            1.0,
+            1.0909090909090908
+          ]
+        },
+        {
+          "rank": 9,
+          "agent_id": "driver-02",
+          "agent_name": "Driver 02",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 5.7,
+          "success_median": 6.0,
+          "success_std": 0.48304589153964794,
+          "success_worst": 5.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            5.4,
+            5.9
+          ],
+          "goal": 0.9500000000000001,
+          "goal_ci95": [
+            0.9,
+            0.9833333333333334
+          ],
+          "goal_worst": 0.8333333333333334,
+          "completion_rate": 0.7,
+          "time_to_goal_mean_s": 18.485714285714288,
+          "path_efficiency": 0.7398442152005518,
+          "violations_mean": 0.0,
+          "consistency": 0.9152551067474302,
+          "safety": 1.0,
+          "mbi": 0.9102571090522249,
+          "vs_people": 1.0363636363636364,
+          "vs_people_ci95": [
+            0.9818181818181819,
+            1.0727272727272728
+          ]
+        },
+        {
+          "rank": 9,
+          "agent_id": "driver-09",
+          "agent_name": "Driver 09",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 5.7,
+          "success_median": 6.0,
+          "success_std": 0.48304589153964794,
+          "success_worst": 5.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            5.4,
+            6.0
+          ],
+          "goal": 0.9500000000000001,
+          "goal_ci95": [
+            0.9,
+            1.0
+          ],
+          "goal_worst": 0.8333333333333334,
+          "completion_rate": 0.7,
+          "time_to_goal_mean_s": 16.95,
+          "path_efficiency": 0.749931637871026,
+          "violations_mean": 0.0,
+          "consistency": 0.9152551067474302,
+          "safety": 1.0,
+          "mbi": 0.9122745935863198,
+          "vs_people": 1.0363636363636364,
+          "vs_people_ci95": [
+            0.9818181818181819,
+            1.0909090909090908
+          ]
+        },
+        {
+          "rank": 9,
+          "agent_id": "driver-05",
+          "agent_name": "Driver 05",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 5.3,
+          "success_median": 5.0,
+          "success_std": 0.48304589153964794,
+          "success_worst": 5.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            5.0975,
+            5.6
+          ],
+          "goal": 0.8833333333333333,
+          "goal_ci95": [
+            0.8495833333333334,
+            0.9333333333333332
+          ],
+          "goal_worst": 0.8333333333333334,
+          "completion_rate": 0.3,
+          "time_to_goal_mean_s": 18.53333333333333,
+          "path_efficiency": 0.7073299682348159,
+          "violations_mean": 0.0,
+          "consistency": 0.9088592657472362,
+          "safety": 1.0,
+          "mbi": 0.8694615501757154,
+          "vs_people": 0.9636363636363636,
+          "vs_people_ci95": [
+            0.9268181818181819,
+            1.018181818181818
+          ]
+        },
+        {
+          "rank": 9,
+          "agent_id": "driver-04",
+          "agent_name": "Driver 04",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 5.1,
+          "success_median": 5.0,
+          "success_std": 0.5676462121975466,
+          "success_worst": 4.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            4.8,
+            5.4
+          ],
+          "goal": 0.85,
+          "goal_ci95": [
+            0.7999999999999999,
+            0.9
+          ],
+          "goal_worst": 0.6666666666666666,
+          "completion_rate": 0.2,
+          "time_to_goal_mean_s": 19.725,
+          "path_efficiency": 0.697974923867949,
+          "violations_mean": 0.1,
+          "consistency": 0.888696821137736,
+          "safety": 0.9090909090909091,
+          "mbi": 0.8342631443078866,
+          "vs_people": 0.9272727272727272,
+          "vs_people_ci95": [
+            0.8727272727272727,
+            0.9818181818181819
+          ]
+        },
+        {
+          "rank": 9,
+          "agent_id": "driver-07",
+          "agent_name": "Driver 07",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 5.0,
+          "success_median": 5.0,
+          "success_std": 0.6666666666666666,
+          "success_worst": 4.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            4.6,
+            5.4
+          ],
+          "goal": 0.8333333333333334,
+          "goal_ci95": [
+            0.7666666666666666,
+            0.9
+          ],
+          "goal_worst": 0.6666666666666666,
+          "completion_rate": 0.2,
+          "time_to_goal_mean_s": 19.725,
+          "path_efficiency": 0.6833072223344416,
+          "violations_mean": 0.0,
+          "consistency": 0.8666666666666667,
+          "safety": 1.0,
+          "mbi": 0.8333281111335551,
+          "vs_people": 0.9090909090909091,
+          "vs_people_ci95": [
+            0.8363636363636363,
+            0.9818181818181819
+          ]
+        },
+        {
+          "rank": 9,
+          "agent_id": "team-auton-b",
+          "agent_name": "Team auton B (odometry only)",
+          "class": "human_auton",
+          "n_trials": 10,
+          "success_mean": 4.9,
+          "success_median": 6.0,
+          "success_std": 1.7288403306519922,
+          "success_worst": 1.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            3.8,
+            5.8
+          ],
+          "goal": 0.8166666666666668,
+          "goal_ci95": [
+            0.6333333333333333,
+            0.9666666666666667
+          ],
+          "goal_worst": 0.16666666666666666,
+          "completion_rate": 0.6,
+          "time_to_goal_mean_s": 11.816666666666668,
+          "path_efficiency": 0.9459108995377192,
+          "violations_mean": 0.0,
+          "consistency": 0.6471754427240832,
+          "safety": 1.0,
+          "mbi": 0.8445918296494898,
+          "vs_people": 0.890909090909091,
+          "vs_people_ci95": [
+            0.6909090909090909,
+            1.0545454545454545
+          ]
+        },
+        {
+          "rank": 15,
+          "agent_id": "driver-01",
+          "agent_name": "Driver 01",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 4.2,
+          "success_median": 4.0,
+          "success_std": 0.6324555320336759,
+          "success_worst": 3.0,
+          "success_best": 5.0,
+          "success_ci95": [
+            3.8,
+            4.5
+          ],
+          "goal": 0.7000000000000001,
+          "goal_ci95": [
+            0.6333333333333333,
+            0.75
+          ],
+          "goal_worst": 0.5,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.6411818274971319,
+          "violations_mean": 0.0,
+          "consistency": 0.8494153495157915,
+          "safety": 1.0,
+          "mbi": 0.7556486679267951,
+          "vs_people": 0.7636363636363637,
+          "vs_people_ci95": [
+            0.6909090909090909,
+            0.8181818181818182
+          ]
+        },
+        {
+          "rank": 15,
+          "agent_id": "driver-08",
+          "agent_name": "Driver 08",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 3.7,
+          "success_median": 4.0,
+          "success_std": 0.48304589153964794,
+          "success_worst": 3.0,
+          "success_best": 4.0,
+          "success_ci95": [
+            3.4,
+            4.0
+          ],
+          "goal": 0.6166666666666667,
+          "goal_ci95": [
+            0.5666666666666667,
+            0.6666666666666666
+          ],
+          "goal_worst": 0.5,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.6062645236446831,
+          "violations_mean": 0.1,
+          "consistency": 0.8694470563406357,
+          "safety": 0.9090909090909091,
+          "mbi": 0.6963669328770017,
+          "vs_people": 0.6727272727272727,
+          "vs_people_ci95": [
+            0.6181818181818182,
+            0.7272727272727273
+          ]
+        },
+        {
+          "rank": 17,
+          "agent_id": "driver-03",
+          "agent_name": "Driver 03",
+          "class": "human",
+          "n_trials": 10,
+          "success_mean": 3.3,
+          "success_median": 3.0,
+          "success_std": 0.48304589153964794,
+          "success_worst": 3.0,
+          "success_best": 4.0,
+          "success_ci95": [
+            3.1,
+            3.6
+          ],
+          "goal": 0.5499999999999999,
+          "goal_ci95": [
+            0.5166666666666667,
+            0.6
+          ],
+          "goal_worst": 0.5,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.5671318464085666,
+          "violations_mean": 0.1,
+          "consistency": 0.8536224571091976,
+          "safety": 0.9090909090909091,
+          "mbi": 0.6528333742117293,
+          "vs_people": 0.6,
+          "vs_people_ci95": [
+            0.5636363636363636,
+            0.6545454545454545
+          ]
+        },
+        {
+          "rank": 17,
+          "agent_id": "llm-auton-r1",
+          "agent_name": "LLM-written auton, round 1",
+          "class": "ai",
+          "n_trials": 10,
+          "success_mean": 2.1,
+          "success_median": 1.5,
+          "success_std": 2.183269719175042,
+          "success_worst": 0.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            0.9,
+            3.4
+          ],
+          "goal": 0.35000000000000003,
+          "goal_ci95": [
+            0.15,
+            0.5666666666666667
+          ],
+          "goal_worst": 0.0,
+          "completion_rate": 0.1,
+          "time_to_goal_mean_s": 11.05,
+          "path_efficiency": 0.6600298062395507,
+          "violations_mean": 0.3,
+          "consistency": 0.0,
+          "safety": 0.7692307692307692,
+          "mbi": 0.4223905766325255,
+          "vs_people": 0.38181818181818183,
+          "vs_people_ci95": [
+            0.16363636363636364,
+            0.6181818181818182
+          ]
+        },
+        {
+          "rank": 19,
+          "agent_id": "team-auton-c",
+          "agent_name": "Team auton C (timed, open loop)",
+          "class": "human_auton",
+          "n_trials": 10,
+          "success_mean": 1.2,
+          "success_median": 1.0,
+          "success_std": 1.2292725943057181,
+          "success_worst": 0.0,
+          "success_best": 4.0,
+          "success_ci95": [
+            0.5975000000000001,
+            2.0
+          ],
+          "goal": 0.19999999999999998,
+          "goal_ci95": [
+            0.09958333333333336,
+            0.3333333333333333
+          ],
+          "goal_worst": 0.0,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.6631272705811034,
+          "violations_mean": 0.2,
+          "consistency": 0.0,
+          "safety": 0.8333333333333334,
+          "mbi": 0.3576254541162207,
+          "vs_people": 0.21818181818181817,
+          "vs_people_ci95": [
+            0.10863636363636366,
+            0.36363636363636365
+          ]
+        },
+        {
+          "rank": 20,
+          "agent_id": "random-walk",
+          "agent_name": "Random walk (floor)",
+          "class": "baseline",
+          "n_trials": 10,
+          "success_mean": 0.0,
+          "success_median": 0.0,
+          "success_std": 0.0,
+          "success_worst": 0.0,
+          "success_best": 0.0,
+          "success_ci95": [
+            0.0,
+            0.0
+          ],
+          "goal": 0.0,
+          "goal_ci95": [
+            0.0,
+            0.0
+          ],
+          "goal_worst": 0.0,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.0,
+          "violations_mean": 0.5,
+          "consistency": 0.0,
+          "safety": 0.6666666666666666,
+          "mbi": 0.09999999999999999,
+          "vs_people": 0.0,
+          "vs_people_ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "task": "MB-VEX-PICK@1.0",
+      "title": "Collect and deliver on a 12 ft field",
+      "kind": "delivery",
+      "domain": "vex",
+      "n_runs": 100,
+      "max_score": 6.0,
+      "chance": 0.0,
+      "chance_source": "baseline",
+      "people_comparable": true,
+      "people": {
+        "median": 5.699999999999999,
+        "expert": 6.0,
+        "n_people": 12
+      },
+      "rows": [
+        {
+          "rank": 1,
+          "agent_id": "driver-02",
+          "agent_name": "Driver 02",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 46.18,
+          "path_efficiency": 0.8102123416845206,
+          "violations_mean": 0.2,
+          "consistency": 1.0,
+          "safety": 0.8333333333333334,
+          "mbi": 0.9370424683369042,
+          "vs_people": 1.0526315789473686,
+          "vs_people_ci95": [
+            1.0526315789473686,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-10",
+          "agent_name": "Driver 10",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 37.95,
+          "path_efficiency": 0.8816763520117474,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9763352704023496,
+          "vs_people": 1.0526315789473686,
+          "vs_people_ci95": [
+            1.0526315789473686,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-12",
+          "agent_name": "Driver 12",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 37.14,
+          "path_efficiency": 0.8888047708038643,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9777609541607729,
+          "vs_people": 1.0526315789473686,
+          "vs_people_ci95": [
+            1.0526315789473686,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-assist",
+          "agent_name": "Driver 05 with auto-align",
+          "class": "hybrid",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 40.94,
+          "path_efficiency": 0.8844645144186958,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9768929028837392,
+          "vs_people": 1.0526315789473686,
+          "vs_people_ci95": [
+            1.0526315789473686,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "llm-auton-r10",
+          "agent_name": "LLM-written auton, round 10",
+          "class": "ai",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 37.31,
+          "path_efficiency": 0.9374234621663134,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9874846924332628,
+          "vs_people": 1.0526315789473686,
+          "vs_people_ci95": [
+            1.0526315789473686,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "llm-auton-r3",
+          "agent_name": "LLM-written auton, round 3",
+          "class": "ai",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 38.36,
+          "path_efficiency": 0.9319618894814401,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9863923778962881,
+          "vs_people": 1.0526315789473686,
+          "vs_people_ci95": [
+            1.0526315789473686,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "team-auton-a",
+          "agent_name": "Team auton A (odometry + GPS correction)",
+          "class": "human_auton",
+          "n_trials": 5,
+          "success_mean": 6.0,
+          "success_median": 6.0,
+          "success_std": 0.0,
+          "success_worst": 6.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            6.0,
+            6.0
+          ],
+          "goal": 1.0,
+          "goal_ci95": [
+            1.0,
+            1.0
+          ],
+          "goal_worst": 1.0,
+          "completion_rate": 1.0,
+          "time_to_goal_mean_s": 42.95,
+          "path_efficiency": 0.9157324540488669,
+          "violations_mean": 0.0,
+          "consistency": 1.0,
+          "safety": 1.0,
+          "mbi": 0.9831464908097735,
+          "vs_people": 1.0526315789473686,
+          "vs_people_ci95": [
+            1.0526315789473686,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-04",
+          "agent_name": "Driver 04",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 5.8,
+          "success_median": 6.0,
+          "success_std": 0.4472135954999579,
+          "success_worst": 5.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            5.4,
+            6.0
+          ],
+          "goal": 0.9666666666666667,
+          "goal_ci95": [
+            0.9,
+            1.0
+          ],
+          "goal_worst": 0.8333333333333334,
+          "completion_rate": 0.8,
+          "time_to_goal_mean_s": 45.7,
+          "path_efficiency": 0.8000124236690918,
+          "violations_mean": 0.4,
+          "consistency": 0.922894207672421,
+          "safety": 0.7142857142857143,
+          "mbi": 0.8889128063608719,
+          "vs_people": 1.0175438596491229,
+          "vs_people_ci95": [
+            0.9473684210526317,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-06",
+          "agent_name": "Driver 06",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 5.8,
+          "success_median": 6.0,
+          "success_std": 0.44721359549995787,
+          "success_worst": 5.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            5.4,
+            6.0
+          ],
+          "goal": 0.9666666666666667,
+          "goal_ci95": [
+            0.9,
+            1.0
+          ],
+          "goal_worst": 0.8333333333333334,
+          "completion_rate": 0.8,
+          "time_to_goal_mean_s": 37.4875,
+          "path_efficiency": 0.8442733270056415,
+          "violations_mean": 0.0,
+          "consistency": 0.922894207672421,
+          "safety": 1.0,
+          "mbi": 0.9406221298853248,
+          "vs_people": 1.0175438596491229,
+          "vs_people_ci95": [
+            0.9473684210526317,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-09",
+          "agent_name": "Driver 09",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 5.8,
+          "success_median": 6.0,
+          "success_std": 0.44721359549995787,
+          "success_worst": 5.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            5.4,
+            6.0
+          ],
+          "goal": 0.9666666666666667,
+          "goal_ci95": [
+            0.9,
+            1.0
+          ],
+          "goal_worst": 0.8333333333333334,
+          "completion_rate": 0.8,
+          "time_to_goal_mean_s": 43.025000000000006,
+          "path_efficiency": 0.8017637634844241,
+          "violations_mean": 0.4,
+          "consistency": 0.922894207672421,
+          "safety": 0.7142857142857143,
+          "mbi": 0.8892630743239384,
+          "vs_people": 1.0175438596491229,
+          "vs_people_ci95": [
+            0.9473684210526317,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-01",
+          "agent_name": "Driver 01",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 5.6,
+          "success_median": 6.0,
+          "success_std": 0.5477225575051661,
+          "success_worst": 5.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            5.2,
+            6.0
+          ],
+          "goal": 0.9333333333333332,
+          "goal_ci95": [
+            0.8666666666666667,
+            1.0
+          ],
+          "goal_worst": 0.8333333333333334,
+          "completion_rate": 0.6,
+          "time_to_goal_mean_s": 50.63333333333333,
+          "path_efficiency": 0.7461622950690395,
+          "violations_mean": 0.0,
+          "consistency": 0.9021924004455061,
+          "safety": 1.0,
+          "mbi": 0.9012279857473005,
+          "vs_people": 0.9824561403508772,
+          "vs_people_ci95": [
+            0.9122807017543861,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-05",
+          "agent_name": "Driver 05",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 5.6,
+          "success_median": 6.0,
+          "success_std": 0.5477225575051662,
+          "success_worst": 5.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            5.2,
+            6.0
+          ],
+          "goal": 0.9333333333333332,
+          "goal_ci95": [
+            0.8666666666666667,
+            1.0
+          ],
+          "goal_worst": 0.8333333333333334,
+          "completion_rate": 0.6,
+          "time_to_goal_mean_s": 44.98333333333333,
+          "path_efficiency": 0.7830113259790344,
+          "violations_mean": 0.0,
+          "consistency": 0.902192400445506,
+          "safety": 1.0,
+          "mbi": 0.9085977919292995,
+          "vs_people": 0.9824561403508772,
+          "vs_people_ci95": [
+            0.9122807017543861,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 1,
+          "agent_id": "driver-11",
+          "agent_name": "Driver 11",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 5.6,
+          "success_median": 6.0,
+          "success_std": 0.8944271909999157,
+          "success_worst": 4.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            4.8,
+            6.0
+          ],
+          "goal": 0.9333333333333332,
+          "goal_ci95": [
+            0.7999999999999999,
+            1.0
+          ],
+          "goal_worst": 0.6666666666666666,
+          "completion_rate": 0.8,
+          "time_to_goal_mean_s": 41.2875,
+          "path_efficiency": 0.7940470395873704,
+          "violations_mean": 0.0,
+          "consistency": 0.840280858750015,
+          "safety": 1.0,
+          "mbi": 0.901518203396643,
+          "vs_people": 0.9824561403508772,
+          "vs_people_ci95": [
+            0.8421052631578948,
+            1.0526315789473686
+          ]
+        },
+        {
+          "rank": 14,
+          "agent_id": "driver-07",
+          "agent_name": "Driver 07",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 5.2,
+          "success_median": 5.0,
+          "success_std": 0.8366600265340756,
+          "success_worst": 4.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            4.6,
+            5.8
+          ],
+          "goal": 0.8666666666666667,
+          "goal_ci95": [
+            0.7666666666666666,
+            0.9666666666666667
+          ],
+          "goal_worst": 0.6666666666666666,
+          "completion_rate": 0.4,
+          "time_to_goal_mean_s": 49.125,
+          "path_efficiency": 0.6995925584536018,
+          "violations_mean": 0.0,
+          "consistency": 0.8391038410511393,
+          "safety": 1.0,
+          "mbi": 0.8491174211817246,
+          "vs_people": 0.9122807017543861,
+          "vs_people_ci95": [
+            0.8070175438596492,
+            1.0175438596491229
+          ]
+        },
+        {
+          "rank": 14,
+          "agent_id": "driver-03",
+          "agent_name": "Driver 03",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 5.0,
+          "success_median": 5.0,
+          "success_std": 0.7071067811865476,
+          "success_worst": 4.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            4.4,
+            5.6
+          ],
+          "goal": 0.8333333333333334,
+          "goal_ci95": [
+            0.7333333333333334,
+            0.9333333333333332
+          ],
+          "goal_worst": 0.6666666666666666,
+          "completion_rate": 0.2,
+          "time_to_goal_mean_s": 58.6,
+          "path_efficiency": 0.6615526607989913,
+          "violations_mean": 0.0,
+          "consistency": 0.8585786437626906,
+          "safety": 1.0,
+          "mbi": 0.8277639953908685,
+          "vs_people": 0.8771929824561404,
+          "vs_people_ci95": [
+            0.7719298245614037,
+            0.9824561403508772
+          ]
+        },
+        {
+          "rank": 14,
+          "agent_id": "driver-08",
+          "agent_name": "Driver 08",
+          "class": "human",
+          "n_trials": 5,
+          "success_mean": 5.0,
+          "success_median": 5.0,
+          "success_std": 1.0,
+          "success_worst": 4.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            4.2,
+            5.8
+          ],
+          "goal": 0.8333333333333334,
+          "goal_ci95": [
+            0.7000000000000001,
+            0.9666666666666667
+          ],
+          "goal_worst": 0.6666666666666666,
+          "completion_rate": 0.4,
+          "time_to_goal_mean_s": 56.224999999999994,
+          "path_efficiency": 0.6221303100509774,
+          "violations_mean": 0.2,
+          "consistency": 0.8,
+          "safety": 0.8333333333333334,
+          "mbi": 0.7860927286768622,
+          "vs_people": 0.8771929824561404,
+          "vs_people_ci95": [
+            0.736842105263158,
+            1.0175438596491229
+          ]
+        },
+        {
+          "rank": 14,
+          "agent_id": "team-auton-b",
+          "agent_name": "Team auton B (odometry only)",
+          "class": "human_auton",
+          "n_trials": 5,
+          "success_mean": 4.4,
+          "success_median": 4.0,
+          "success_std": 1.1401754250991378,
+          "success_worst": 3.0,
+          "success_best": 6.0,
+          "success_ci95": [
+            3.6,
+            5.4
+          ],
+          "goal": 0.7333333333333334,
+          "goal_ci95": [
+            0.6,
+            0.9
+          ],
+          "goal_worst": 0.5,
+          "completion_rate": 0.2,
+          "time_to_goal_mean_s": 40.4,
+          "path_efficiency": 0.9164023510817951,
+          "violations_mean": 0.0,
+          "consistency": 0.7408692215683779,
+          "safety": 1.0,
+          "mbi": 0.8110775201182825,
+          "vs_people": 0.7719298245614037,
+          "vs_people_ci95": [
+            0.6315789473684211,
+            0.9473684210526317
+          ]
+        },
+        {
+          "rank": 18,
+          "agent_id": "team-auton-c",
+          "agent_name": "Team auton C (timed, open loop)",
+          "class": "human_auton",
+          "n_trials": 5,
+          "success_mean": 2.2,
+          "success_median": 2.0,
+          "success_std": 0.4472135954999579,
+          "success_worst": 2.0,
+          "success_best": 3.0,
+          "success_ci95": [
+            2.0,
+            2.6
+          ],
+          "goal": 0.3666666666666667,
+          "goal_ci95": [
+            0.3333333333333333,
+            0.43333333333333335
+          ],
+          "goal_worst": 0.3333333333333333,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.7983111414949138,
+          "violations_mean": 0.0,
+          "consistency": 0.7967210929545646,
+          "safety": 1.0,
+          "mbi": 0.6125037255755008,
+          "vs_people": 0.38596491228070184,
+          "vs_people_ci95": [
+            0.3508771929824562,
+            0.45614035087719307
+          ]
+        },
+        {
+          "rank": 18,
+          "agent_id": "llm-auton-r1",
+          "agent_name": "LLM-written auton, round 1",
+          "class": "ai",
+          "n_trials": 5,
+          "success_mean": 1.8,
+          "success_median": 2.0,
+          "success_std": 1.0954451150103324,
+          "success_worst": 0.0,
+          "success_best": 3.0,
+          "success_ci95": [
+            0.8,
+            2.6
+          ],
+          "goal": 0.3,
+          "goal_ci95": [
+            0.13333333333333333,
+            0.43333333333333335
+          ],
+          "goal_worst": 0.0,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.4944820531642625,
+          "violations_mean": 0.2,
+          "consistency": 0.3914193805498154,
+          "safety": 0.8333333333333334,
+          "mbi": 0.4326093177153248,
+          "vs_people": 0.31578947368421056,
+          "vs_people_ci95": [
+            0.14035087719298248,
+            0.45614035087719307
+          ]
+        },
+        {
+          "rank": 20,
+          "agent_id": "random-walk",
+          "agent_name": "Random walk (floor)",
+          "class": "baseline",
+          "n_trials": 5,
+          "success_mean": 0.0,
+          "success_median": 0.0,
+          "success_std": 0.0,
+          "success_worst": 0.0,
+          "success_best": 0.0,
+          "success_ci95": [
+            0.0,
+            0.0
+          ],
+          "goal": 0.0,
+          "goal_ci95": [
+            0.0,
+            0.0
+          ],
+          "goal_worst": 0.0,
+          "completion_rate": 0.0,
+          "time_to_goal_mean_s": null,
+          "path_efficiency": 0.0,
+          "violations_mean": 1.0,
+          "consistency": 0.0,
+          "safety": 0.5,
+          "mbi": 0.075,
+          "vs_people": 0.0,
+          "vs_people_ci95": [
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    }
+  ]
+}

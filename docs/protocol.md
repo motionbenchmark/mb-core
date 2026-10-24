@@ -80,8 +80,12 @@ Ranks are shared while ranges overlap (RFC-0001). Scores are never averaged acro
 - **Scorer.** The same trace and task always give the same report (tested on every
   change).
 - **Capture.** On rendered test video, the tag-free converter places the robot within
-  about 2 cm with a tape-measured floor and about 6 cm from the robot's size alone; with
-  printed tags, under 1 cm.
+  about 3 cm median (90% within about 5 cm), whether scale comes from a tape-measured floor
+  or from the robot's size, with about 8% of frames left without a position; with printed
+  tags, about 1 cm median and no frames missed. Real-world validation is planned
+  (`paper/analysis/capture_accuracy.py` reproduces these numbers).
+- **Determinism is not accuracy.** The scorer repeating itself exactly says nothing about
+  whether the trace, the task or the scoring rules are right; those are checked separately.
 - **Simulation.** Every simulated run is reproducible from its seed.
 - Real-world run-to-run spread is reported per agent (the range on its mean); a study of
   repeated sessions with the same robot is part of the first pilots.
