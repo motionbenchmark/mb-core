@@ -56,9 +56,48 @@ class Game:
     def layout(self, name: Optional[str] = None) -> tuple[str, dict]:
         lays = self.raw["layouts"]
         name = name or next(iter(lays))
+        if name.startswith("gen-") and name not in lays:
+            return name, self.generate_layout(int(name[4:]))
         if name not in lays:
-            raise ValueError(f"unknown layout {name!r} (have: {', '.join(lays)})")
+            raise ValueError(f"unknown layout {name!r} (have: {', '.join(lays)}, or gen-<number> for a generated one)")
         return name, lays[name]
+
+    def generate_layout(self, seed: int) -> dict:
+        """A fresh layout drawn from ``layout_rules``: the same start, the same objects, new places.
+
+        Public layouts can be learned by heart; generated ones test whether a routine
+        (or a driver) copes with a field it hasn't seen. Official verdicts use seeds that
+        are not published."""
+        import numpy as np
+
+        rules = self.raw.get("layout_rules")
+        if not rules:
+            raise ValueError(f"{self.key} has no layout_rules, so layouts can't be generated")
+        rng = np.random.default_rng([seed, 7919])
+        F = self.field
+        start = dict(self.raw["layouts"][rules.get("start_from", next(iter(self.raw["layouts"])))]["start"])
+        margin, spacing = rules.get("margin_m", 0.08), rules.get("min_spacing_m", 0.15)
+        clear, pad = rules.get("clear_of_start_m", 0.25), rules.get("clear_of_zones_m", 0.05)
+        objs: list[dict] = []
+        for kind, count in rules["objects"].items():
+            for k in range(int(count)):
+                for _ in range(2000):
+                    x = float(rng.uniform(margin, F["width_m"] - margin))
+                    y = float(rng.uniform(margin, F["height_m"] - margin))
+                    if math.hypot(x - start["x"], y - start["y"]) < clear:
+                        continue
+                    if any(z["x"] - pad <= x <= z["x"] + z["w"] + pad and z["y"] - pad <= y <= z["y"] + z["h"] + pad
+                           for z in F.get("zones", {}).values()):
+                        continue
+                    if any(o["x"] - pad <= x <= o["x"] + o["w"] + pad and o["y"] - pad <= y <= o["y"] + o["h"] + pad
+                           for o in F.get("obstacles", [])):
+                        continue
+                    if any(math.hypot(x - o["x"], y - o["y"]) < spacing for o in objs):
+                        continue
+                    break
+                prefix = kind.split("-")[-1][0]
+                objs.append({"id": f"{prefix}{k + 1}", "kind": kind, "x": round(x, 3), "y": round(y, 3)})
+        return {"start": start, "objects": objs, "generated": {"seed": seed}}
 
     def object_kind(self, kind: str) -> dict:
         return self.raw["objects"][kind]

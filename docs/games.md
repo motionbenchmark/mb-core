@@ -123,6 +123,25 @@ points. Two things the simulation found that a real run would also show: the
 tag-homing routine wastes time searching for the tag, and routines that drop
 every barrel on the same spot pick up the one already there.
 
+### Unseen layouts
+
+A routine can learn the public layout by heart. So the verdict also plays on 10
+generated layouts (same start, barrels placed at random away from the zones, the
+start and each other); official verdicts keep that seed private. On dev-01's
+routines:
+
+| routine | public layout | unseen layouts | change | vs typical student, unseen |
+|---|---|---|---|---|
+| `deadreckon_v1.py` | 1.7 | 0.7 | -1.1 | worse |
+| `vision_v2.py` | 2.5 | 2.4 | -0.1 | worse (-0.5) |
+| `vision_tags_v3.py` | 2.2 | 1.9 | -0.3 | worse |
+| `planner_v4.py` | 4.0 | 2.8 | -1.2 | level (can't tell) |
+
+The typical simulated student scores 2.9 on the unseen layouts. The best routine on
+the public layout owes most of its lead to knowing where the barrels are: on fields it
+hasn't seen, its advantage over the typical student disappears, while the routine that
+looks for barrels barely changes. That is exactly what a public-only verdict would miss.
+
 One more finding: at AIM's top speed of 200 mm/s, sorting all six barrels in 45
 seconds is out of reach. The best runs score 4 or 5. Either the task's time
 limit should be longer, or "how many in 45 s" is the measure.
