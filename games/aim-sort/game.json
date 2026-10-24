@@ -1,0 +1,68 @@
+{
+  "format": "motionbench-game",
+  "format_version": "0.1",
+  "id": "AIM-SORT",
+  "version": "0.1",
+  "title": "VEX AIM barrel sorting",
+  "platform": "vex-aim",
+  "description": "One VEX AIM robot sorts six barrels (three orange, three blue) into the zone of their own colour at either end of a 6 ft x 4 ft table, in 45 seconds. A barrel scores 1 point when it comes to rest with its centre inside the zone of its colour and the robot is not touching it.",
+  "source": {
+    "created": "2026-10-24",
+    "inferred_from": ["team description: AIM robot, sorting game", "MotionBench task MB-AIM-SORT@0.1"],
+    "notes": "Not an official VEX game. Layouts match the MotionBench task, so every run is also scored by the standard scorer."
+  },
+  "motionbench_task": "MB-AIM-SORT@0.1",
+  "field": {
+    "width_m": 1.8288,
+    "height_m": 1.2192,
+    "obstacles": [],
+    "zones": {
+      "orange": {"x": 0.0, "y": 0.3596, "w": 0.30, "h": 0.50, "colour": "orange"},
+      "blue": {"x": 1.5288, "y": 0.3596, "w": 0.30, "h": 0.50, "colour": "blue"}
+    },
+    "tags": [
+      {"id": 1, "x": 0.0, "y": 0.6096, "facing": "east", "note": "behind the orange zone"},
+      {"id": 2, "x": 1.8288, "y": 0.6096, "facing": "west", "note": "behind the blue zone"},
+      {"id": 0, "x": 0.9144, "y": 0.0, "facing": "north", "note": "middle of the near wall"},
+      {"id": 3, "x": 0.9144, "y": 1.2192, "facing": "south", "note": "middle of the far wall"}
+    ]
+  },
+  "objects": {
+    "barrel-orange": {"shape": "barrel", "radius_m": 0.022, "height_m": 0.05, "colour": "orange"},
+    "barrel-blue": {"shape": "barrel", "radius_m": 0.022, "height_m": 0.05, "colour": "blue"}
+  },
+  "layouts": {
+    "dev-01": {
+      "start": {"x": 0.9144, "y": 0.12, "heading_deg": 0},
+      "objects": [
+        {"id": "o1", "kind": "barrel-orange", "x": 1.30, "y": 0.25},
+        {"id": "o2", "kind": "barrel-orange", "x": 0.60, "y": 0.95},
+        {"id": "o3", "kind": "barrel-orange", "x": 1.15, "y": 0.70},
+        {"id": "b1", "kind": "barrel-blue", "x": 0.55, "y": 0.30},
+        {"id": "b2", "kind": "barrel-blue", "x": 1.05, "y": 1.05},
+        {"id": "b3", "kind": "barrel-blue", "x": 0.75, "y": 0.62}
+      ]
+    },
+    "dev-02": {
+      "start": {"x": 0.9144, "y": 1.10, "heading_deg": 180},
+      "objects": [
+        {"id": "o1", "kind": "barrel-orange", "x": 1.40, "y": 0.95},
+        {"id": "o2", "kind": "barrel-orange", "x": 0.95, "y": 0.35},
+        {"id": "o3", "kind": "barrel-orange", "x": 1.25, "y": 0.20},
+        {"id": "b1", "kind": "barrel-blue", "x": 0.45, "y": 1.00},
+        {"id": "b2", "kind": "barrel-blue", "x": 0.70, "y": 0.25},
+        {"id": "b3", "kind": "barrel-blue", "x": 0.60, "y": 0.70}
+      ]
+    }
+  },
+  "match": {"time_s": 45, "mode": "skills", "robots": 1},
+  "scoring": {
+    "rules": [
+      {"object": "barrel-orange", "zone": "orange", "points": 1},
+      {"object": "barrel-blue", "zone": "blue", "points": 1}
+    ],
+    "counts_when": "at rest after the match, centre inside the zone, not touching the robot",
+    "tiebreak": "time when the last scoring object was placed (lower is better)"
+  },
+  "api_frame": "VEXcode AIM: the robot starts at x=0, y=0, heading 0; y points the way the robot faces at the start, x to its right, headings clockwise in degrees, distances in mm."
+}

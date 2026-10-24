@@ -13,6 +13,7 @@
     motionbench render RUN.mbtrace -o run.avi     # synthetic camera footage of a trace
     motionbench viz DATA_DIR -o explorer.html     # interactive explorer + independent checks
     motionbench match synth|render|report|track|eval ...   # multi-robot matches (see `motionbench match -h`)
+    motionbench game create|simulate|verdict|render ...    # games: code vs simulated drivers (see `motionbench game -h`)
 """
 
 from __future__ import annotations
@@ -124,9 +125,11 @@ def main(argv=None) -> int:
     p.add_argument("--fps", type=float, default=30.0)
     p.add_argument("-o", "--out", default="run.avi")
 
+    from .game.cli import add_parser as _game_parser
     from .match.cli import add_parser as _match_parser
 
     _match_parser(sub)
+    _game_parser(sub)
 
     a = ap.parse_args(argv)
     try:
@@ -134,6 +137,10 @@ def main(argv=None) -> int:
             from .match.cli import run as _match_run
 
             return _match_run(a)
+        if a.cmd == "game":
+            from .game.cli import run as _game_run
+
+            return _game_run(a)
         if a.cmd == "tasks":
             for t in mb.tasks(a.tasks_dir):
                 key = f"{t['id']}@{t['version']}"
