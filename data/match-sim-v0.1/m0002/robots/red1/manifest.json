@@ -1,0 +1,24 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-MATCH-FIELD@0.1",
+  "seed": "m0002-red1",
+  "agent": {
+    "id": "team-29918B",
+    "class": "human",
+    "name": "29918B (red)",
+    "meta": {
+      "alliance": "red",
+      "robot": "red1",
+      "auton": "human_auton for 0-15 s",
+      "synthetic": true
+    }
+  },
+  "trial": 0,
+  "tier": "S",
+  "capture": "sim",
+  "notes": "Synthetic match robot (motionbench match synth).",
+  "files": {
+    "poses.csv": "35bbd5d45e0749bec6935fdc469e6fc5f5e22f8bf587e8e6f506fd693ce9e1cf",
+    "events.csv": "b8122cbe87aead1d0bec8371c00d574a3b99c49924a0cada8761235994946557"
+  }
+}

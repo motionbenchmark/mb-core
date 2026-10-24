@@ -1,0 +1,24 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-MATCH-FIELD@0.1",
+  "seed": "m0005-red1",
+  "agent": {
+    "id": "team-67109A",
+    "class": "human",
+    "name": "67109A (red)",
+    "meta": {
+      "alliance": "red",
+      "robot": "red1",
+      "auton": "human_auton for 0-15 s",
+      "synthetic": true
+    }
+  },
+  "trial": 0,
+  "tier": "S",
+  "capture": "sim",
+  "notes": "Synthetic match robot (motionbench match synth).",
+  "files": {
+    "poses.csv": "7280e24d7c6f671798d7a19298a3bba4a8a057e30e08e8798b20d3b38d9b3781",
+    "events.csv": "a2282968f216273720298663026cf22b44aa331d7650f0c367dd79a8cad95f4f"
+  }
+}

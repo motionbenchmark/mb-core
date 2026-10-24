@@ -1,0 +1,24 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-MATCH-FIELD@0.1",
+  "seed": "m0005-blue1",
+  "agent": {
+    "id": "team-80812B",
+    "class": "human",
+    "name": "80812B (blue)",
+    "meta": {
+      "alliance": "blue",
+      "robot": "blue1",
+      "auton": "human_auton for 0-15 s",
+      "synthetic": true
+    }
+  },
+  "trial": 0,
+  "tier": "S",
+  "capture": "sim",
+  "notes": "Synthetic match robot (motionbench match synth).",
+  "files": {
+    "poses.csv": "1912ca455a701af9eee237ea14388cbba6eb34df7a690ed85ef04ddd9dcb7260",
+    "events.csv": "d47311c0d8982ace32ab50b6eb43ebc77d5f8be95e7124570f8b59e850197ee8"
+  }
+}

@@ -1,0 +1,654 @@
+{
+ "format": "motionbench-match",
+ "version": "0.1",
+ "match_id": "m0003",
+ "synthetic": true,
+ "seed": 3,
+ "periods": [
+  {
+   "name": "auton",
+   "start_s": 0.0,
+   "end_s": 15.0
+  },
+  {
+   "name": "pause",
+   "start_s": 15.0,
+   "end_s": 18.0
+  },
+  {
+   "name": "driver",
+   "start_s": 18.0,
+   "end_s": 123.0
+  }
+ ],
+ "field": {
+  "size_m": 3.566,
+  "obstacles": [
+   {
+    "x": 1.188,
+    "y": 0.53,
+    "w": 1.19,
+    "h": 0.14,
+    "label": "long-goal-near"
+   },
+   {
+    "x": 1.188,
+    "y": 2.896,
+    "w": 1.19,
+    "h": 0.14,
+    "label": "long-goal-far"
+   },
+   {
+    "x": 1.623,
+    "y": 1.623,
+    "w": 0.32,
+    "h": 0.32,
+    "label": "centre-goal"
+   }
+  ],
+  "zones": {
+   "park-red": {
+    "x": 0.0,
+    "y": 1.4429999999999998,
+    "w": 0.42,
+    "h": 0.68,
+    "label": "park-red"
+   },
+   "park-blue": {
+    "x": 3.146,
+    "y": 1.4429999999999998,
+    "w": 0.42,
+    "h": 0.68,
+    "label": "park-blue"
+   },
+   "centre-mat": {
+    "x": 0.8915,
+    "y": 0.8915,
+    "w": 1.783,
+    "h": 1.783,
+    "label": "centre-mat"
+   },
+   "red-half": {
+    "x": 0,
+    "y": 0,
+    "w": 1.783,
+    "h": 3.566,
+    "label": "red-half"
+   },
+   "blue-half": {
+    "x": 1.783,
+    "y": 0,
+    "w": 1.783,
+    "h": 3.566,
+    "label": "blue-half"
+   }
+  },
+  "goals": {
+   "long-near-left": {
+    "approach": [
+     0.8579999999999999,
+     0.6
+    ],
+    "heading": 0.0,
+    "n_slots": 15
+   },
+   "long-near-right": {
+    "approach": [
+     2.708,
+     0.6
+    ],
+    "heading": 3.141592653589793,
+    "n_slots": 15
+   },
+   "long-far-left": {
+    "approach": [
+     0.8579999999999999,
+     2.9659999999999997
+    ],
+    "heading": 0.0,
+    "n_slots": 15
+   },
+   "long-far-right": {
+    "approach": [
+     2.708,
+     2.9659999999999997
+    ],
+    "heading": 3.141592653589793,
+    "n_slots": 15
+   },
+   "centre-nl": {
+    "approach": [
+     1.48601515190165,
+     1.48601515190165
+    ],
+    "heading": 0.7853981633974483,
+    "n_slots": 7
+   },
+   "centre-nr": {
+    "approach": [
+     2.07998484809835,
+     1.48601515190165
+    ],
+    "heading": 2.356194490192345,
+    "n_slots": 7
+   },
+   "centre-fl": {
+    "approach": [
+     1.48601515190165,
+     2.07998484809835
+    ],
+    "heading": -0.7853981633974483,
+    "n_slots": 7
+   },
+   "centre-fr": {
+    "approach": [
+     2.07998484809835,
+     2.07998484809835
+    ],
+    "heading": -2.356194490192345,
+    "n_slots": 7
+   }
+  },
+  "loaders": {
+   "red-near": [
+    0.06,
+    0.62
+   ],
+   "red-far": [
+    0.06,
+    2.9459999999999997
+   ],
+   "blue-near": [
+    3.506,
+    0.62
+   ],
+   "blue-far": [
+    3.506,
+    2.9459999999999997
+   ]
+  },
+  "bars": [
+   {
+    "name": "near",
+    "x0": 1.188,
+    "x1": 2.378,
+    "y": 0.6,
+    "z": 0.3,
+    "depth": 0.12
+   },
+   {
+    "name": "far",
+    "x0": 1.188,
+    "x1": 2.378,
+    "y": 2.9659999999999997,
+    "z": 0.3,
+    "depth": 0.12
+   }
+  ]
+ },
+ "robots": [
+  {
+   "id": "red1",
+   "alliance": "red",
+   "team": "23757Y",
+   "size_m": [
+    0.413,
+    0.424,
+    0.405
+   ],
+   "chassis": "red-metal",
+   "accent": "white",
+   "profile": {
+    "v_max": 1.221,
+    "accel": 3.583,
+    "turn": 6.416,
+    "capacity": 5,
+    "intake_s": 0.157,
+    "aggression": 0.25,
+    "loader_pref": 0.057,
+    "parks": true,
+    "noise": 0.051,
+    "hesitate": 0.087
+   },
+   "trace": "robots/red1"
+  },
+  {
+   "id": "red2",
+   "alliance": "red",
+   "team": "8656B",
+   "size_m": [
+    0.425,
+    0.449,
+    0.285
+   ],
+   "chassis": "purple",
+   "accent": "purple",
+   "profile": {
+    "v_max": 1.363,
+    "accel": 4.121,
+    "turn": 7.285,
+    "capacity": 7,
+    "intake_s": 0.12,
+    "aggression": 0.1,
+    "loader_pref": 0.487,
+    "parks": true,
+    "noise": 0.045,
+    "hesitate": 0.136
+   },
+   "trace": "robots/red2"
+  },
+  {
+   "id": "blue1",
+   "alliance": "blue",
+   "team": "18025B",
+   "size_m": [
+    0.436,
+    0.421,
+    0.421
+   ],
+   "chassis": "grey",
+   "accent": "green",
+   "profile": {
+    "v_max": 1.431,
+    "accel": 2.727,
+    "turn": 7.142,
+    "capacity": 6,
+    "intake_s": 0.334,
+    "aggression": 0.45,
+    "loader_pref": 0.315,
+    "parks": true,
+    "noise": 0.044,
+    "hesitate": 0.116
+   },
+   "trace": "robots/blue1"
+  },
+  {
+   "id": "blue2",
+   "alliance": "blue",
+   "team": "81166B",
+   "size_m": [
+    0.391,
+    0.382,
+    0.428
+   ],
+   "chassis": "red-metal",
+   "accent": "none",
+   "profile": {
+    "v_max": 1.662,
+    "accel": 4.55,
+    "turn": 6.214,
+    "capacity": 7,
+    "intake_s": 0.322,
+    "aggression": 0.45,
+    "loader_pref": 0.051,
+    "parks": false,
+    "noise": 0.052,
+    "hesitate": 0.082
+   },
+   "trace": "robots/blue2"
+  }
+ ],
+ "blocks": [
+  {
+   "id": "b00",
+   "colour": "red"
+  },
+  {
+   "id": "b01",
+   "colour": "red"
+  },
+  {
+   "id": "b02",
+   "colour": "blue"
+  },
+  {
+   "id": "b03",
+   "colour": "blue"
+  },
+  {
+   "id": "b04",
+   "colour": "red"
+  },
+  {
+   "id": "b05",
+   "colour": "red"
+  },
+  {
+   "id": "b06",
+   "colour": "blue"
+  },
+  {
+   "id": "b07",
+   "colour": "blue"
+  },
+  {
+   "id": "b08",
+   "colour": "red"
+  },
+  {
+   "id": "b09",
+   "colour": "blue"
+  },
+  {
+   "id": "b10",
+   "colour": "blue"
+  },
+  {
+   "id": "b11",
+   "colour": "red"
+  },
+  {
+   "id": "b12",
+   "colour": "red"
+  },
+  {
+   "id": "b13",
+   "colour": "blue"
+  },
+  {
+   "id": "b14",
+   "colour": "blue"
+  },
+  {
+   "id": "b15",
+   "colour": "red"
+  },
+  {
+   "id": "b16",
+   "colour": "blue"
+  },
+  {
+   "id": "b17",
+   "colour": "blue"
+  },
+  {
+   "id": "b18",
+   "colour": "blue"
+  },
+  {
+   "id": "b19",
+   "colour": "blue"
+  },
+  {
+   "id": "b20",
+   "colour": "blue"
+  },
+  {
+   "id": "b21",
+   "colour": "blue"
+  },
+  {
+   "id": "b22",
+   "colour": "red"
+  },
+  {
+   "id": "b23",
+   "colour": "red"
+  },
+  {
+   "id": "b24",
+   "colour": "red"
+  },
+  {
+   "id": "b25",
+   "colour": "red"
+  },
+  {
+   "id": "b26",
+   "colour": "red"
+  },
+  {
+   "id": "b27",
+   "colour": "red"
+  },
+  {
+   "id": "b28",
+   "colour": "blue"
+  },
+  {
+   "id": "b29",
+   "colour": "red"
+  },
+  {
+   "id": "b30",
+   "colour": "blue"
+  },
+  {
+   "id": "b31",
+   "colour": "red"
+  },
+  {
+   "id": "b32",
+   "colour": "blue"
+  },
+  {
+   "id": "b33",
+   "colour": "red"
+  },
+  {
+   "id": "b34",
+   "colour": "blue"
+  },
+  {
+   "id": "b35",
+   "colour": "red"
+  },
+  {
+   "id": "b36",
+   "colour": "blue"
+  },
+  {
+   "id": "b37",
+   "colour": "red"
+  },
+  {
+   "id": "b38",
+   "colour": "blue"
+  },
+  {
+   "id": "b39",
+   "colour": "red"
+  },
+  {
+   "id": "b40",
+   "colour": "red"
+  },
+  {
+   "id": "b41",
+   "colour": "blue"
+  },
+  {
+   "id": "b42",
+   "colour": "red"
+  },
+  {
+   "id": "b43",
+   "colour": "blue"
+  },
+  {
+   "id": "b44",
+   "colour": "red"
+  },
+  {
+   "id": "b45",
+   "colour": "blue"
+  },
+  {
+   "id": "b46",
+   "colour": "red"
+  },
+  {
+   "id": "b47",
+   "colour": "blue"
+  },
+  {
+   "id": "b48",
+   "colour": "red"
+  },
+  {
+   "id": "b49",
+   "colour": "blue"
+  },
+  {
+   "id": "b50",
+   "colour": "red"
+  },
+  {
+   "id": "b51",
+   "colour": "blue"
+  },
+  {
+   "id": "b52",
+   "colour": "blue"
+  },
+  {
+   "id": "b53",
+   "colour": "blue"
+  },
+  {
+   "id": "b54",
+   "colour": "red"
+  },
+  {
+   "id": "b55",
+   "colour": "red"
+  },
+  {
+   "id": "b56",
+   "colour": "red"
+  },
+  {
+   "id": "b57",
+   "colour": "red"
+  },
+  {
+   "id": "b58",
+   "colour": "blue"
+  },
+  {
+   "id": "b59",
+   "colour": "blue"
+  },
+  {
+   "id": "b60",
+   "colour": "red"
+  },
+  {
+   "id": "b61",
+   "colour": "red"
+  },
+  {
+   "id": "b62",
+   "colour": "red"
+  },
+  {
+   "id": "b63",
+   "colour": "blue"
+  },
+  {
+   "id": "b64",
+   "colour": "blue"
+  },
+  {
+   "id": "b65",
+   "colour": "blue"
+  },
+  {
+   "id": "b66",
+   "colour": "blue"
+  },
+  {
+   "id": "b67",
+   "colour": "red"
+  },
+  {
+   "id": "b68",
+   "colour": "red"
+  },
+  {
+   "id": "b69",
+   "colour": "red"
+  },
+  {
+   "id": "b70",
+   "colour": "red"
+  },
+  {
+   "id": "b71",
+   "colour": "blue"
+  },
+  {
+   "id": "b72",
+   "colour": "blue"
+  },
+  {
+   "id": "b73",
+   "colour": "blue"
+  },
+  {
+   "id": "b74",
+   "colour": "blue"
+  },
+  {
+   "id": "b75",
+   "colour": "blue"
+  },
+  {
+   "id": "b76",
+   "colour": "red"
+  },
+  {
+   "id": "b77",
+   "colour": "red"
+  },
+  {
+   "id": "b78",
+   "colour": "red"
+  },
+  {
+   "id": "b79",
+   "colour": "red"
+  },
+  {
+   "id": "b80",
+   "colour": "blue"
+  },
+  {
+   "id": "b81",
+   "colour": "red"
+  }
+ ],
+ "parked": [
+  "blue1",
+  "red2"
+ ],
+ "camera": {
+  "note": "Fitted to a real event broadcast: a fixed camera high above the near wall (only these numbers are kept).",
+  "frame_size": [
+   1020,
+   696
+  ],
+  "f_px": 1138.7,
+  "camera_height_m": 3.72,
+  "tilt_deg": 43.7,
+  "floor_corners_px": [
+   [
+    200,
+    125
+   ],
+   [
+    800,
+    125
+   ],
+   [
+    984,
+    656
+   ],
+   [
+    15,
+    659
+   ]
+  ],
+  "field_m": 3.566
+ }
+}
