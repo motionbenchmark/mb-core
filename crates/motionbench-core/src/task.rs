@@ -91,12 +91,17 @@ impl Goal {
     }
 }
 
-/// Reference points for normalization. Human references are computed from human
-/// runs in the dataset at aggregation time; only the floor is fixed per task.
+/// Reference points. Every run is scored against the task's goal; these add context.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Reference {
+    /// Chance level in task units, used when the data has no baseline runs.
     #[serde(default)]
     pub floor: f64,
+    /// True when a person can do exactly the same job with the same means (for example
+    /// driving the same robot on the same field), so a comparison with people is fair.
+    /// False when the means differ (a robot vacuum and a person with a stick vacuum).
+    #[serde(default)]
+    pub people_comparable: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]

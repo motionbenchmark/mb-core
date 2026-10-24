@@ -258,8 +258,8 @@ html.embed header.top { display: none; }
   </section>
   <section class="card" aria-label="Score distribution">
     <h2 id="striptitle">Every run on this task</h2>
-    <div class="scroll"><svg id="strip" width="100%" role="img" aria-label="Success score of every run by agent"></svg></div>
-    <p class="hint">One dot per run. The dashed line is the median of human agents' averages. Click a dot to open that run.</p>
+    <div class="scroll"><svg id="strip" width="100%" role="img" aria-label="Share of the goal achieved by every run, by agent"></svg></div>
+    <p class="hint" id="striphint">One dot per run, placed by how much of the goal it achieved. Click a dot to open that run.</p>
   </section>
 </div>
 
@@ -591,26 +591,33 @@ function renderStrip() {
     .sort((a, b) => b.mean - a.mean);
   const L = 190, P = 360, R = 16, rowH = 18, top = 8;
   const max = rs[0] ? rs[0].rep.success.max_score : 1;
-  const x = (v) => L + (v / max) * P;
+  const x = (v) => L + (v / max) * P; // task units, drawn as a share of the goal
   const H = top + agents.length * rowH + 28;
   svg.setAttribute("viewBox", `0 0 ${L + P + R} ${H}`); svg.setAttribute("height", String(H));
-  const humans = agents.filter((a) => a.cls === "human").map((a) => a.mean).sort((a, b) => a - b);
-  const med = humans.length ? (humans.length % 2 ? humans[(humans.length - 1) / 2] : (humans[humans.length / 2 - 1] + humans[humans.length / 2]) / 2) : null;
+  const medianOf = (v) => { v = [...v].sort((a, b) => a - b); return v.length ? (v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2) : null; };
+  // chance: what a random walk achieves; people: shown only where the task says a person
+  // can do exactly the same job with the same means
+  const chance = medianOf(agents.filter((a) => a.cls === "baseline").map((a) => a.mean));
+  const peopleOk = !!(task.reference && task.reference.people_comparable);
+  const med = peopleOk ? medianOf(agents.filter((a) => a.cls === "human").map((a) => a.mean)) : null;
   let s = "";
-  const ticks = task.goal.kind === "coverage" ? [0, 25, 50, 75, 100] : Array.from({ length: Math.round(max) + 1 }, (_, i) => i);
-  for (const v of ticks) { s += `<line x1="${x(v)}" x2="${x(v)}" y1="${top - 4}" y2="${H - 24}" stroke="var(--grid)"/><text x="${x(v)}" y="${H - 8}" text-anchor="middle" font-size="11">${task.goal.kind === "coverage" ? v + "%" : v}</text>`; }
-  if (med !== null) s += `<line x1="${x(med)}" x2="${x(med)}" y1="${top - 4}" y2="${H - 24}" stroke="var(--ink)" stroke-dasharray="4 3"/>`;
+  for (const f of [0, 0.25, 0.5, 0.75, 1]) { const v = f * max; s += `<line x1="${x(v)}" x2="${x(v)}" y1="${top - 4}" y2="${H - 24}" stroke="var(--grid)"/><text x="${x(v)}" y="${H - 8}" text-anchor="middle" font-size="11">${Math.round(f * 100)}%</text>`; }
+  if (chance !== null) s += `<line x1="${x(chance)}" x2="${x(chance)}" y1="${top - 4}" y2="${H - 24}" stroke="var(--c-baseline)" stroke-dasharray="2 3"><title>Chance (random walk)</title></line>`;
+  if (med !== null) s += `<line x1="${x(med)}" x2="${x(med)}" y1="${top - 4}" y2="${H - 24}" stroke="var(--ink)" stroke-dasharray="4 3"><title>Median person</title></line>`;
   agents.forEach((a, i) => {
     const y = top + i * rowH + rowH / 2;
     const sel = a.id === S.agent;
     s += `<text x="${L - 10}" y="${y + 4}" text-anchor="end" font-size="11.5" style="fill:var(--${sel ? "ink" : "ink-2"});font-weight:${sel ? 700 : 400}">${esc(a.name.length > 30 ? a.name.slice(0, 29) + "…" : a.name)}</text>`;
     rs.filter((r) => r.rep.agent_id === a.id).forEach((r, j) => {
       const jitter = ((j % 5) - 2) * 2.2;
-      s += `<circle cx="${x(r.rep.success.score)}" cy="${y + jitter}" r="${sel && r.rep.trial === S.trial && r.rep.seed === S.seed ? 5.5 : 3.6}" fill="var(--c-${r.cls})" stroke="var(--panel)" stroke-width="1.2" data-run="${D.runs.indexOf(r)}" style="cursor:pointer"><title>${esc(r.rep.agent_name)}, ${esc(r.rep.seed)} trial ${esc(r.rep.trial)}: ${r.rep.success.score.toFixed(task.goal.kind === "coverage" ? 1 : 0)}</title></circle>`;
+      s += `<circle cx="${x(r.rep.success.score)}" cy="${y + jitter}" r="${sel && r.rep.trial === S.trial && r.rep.seed === S.seed ? 5.5 : 3.6}" fill="var(--c-${r.cls})" stroke="var(--panel)" stroke-width="1.2" data-run="${D.runs.indexOf(r)}" style="cursor:pointer"><title>${esc(r.rep.agent_name)}, ${esc(r.rep.seed)} trial ${esc(r.rep.trial)}: ${Math.round((r.rep.success.score / max) * 100)}% of the goal</title></circle>`;
     });
   });
   svg.innerHTML = s;
   $("striptitle").textContent = `Every run on ${S.task}`;
+  $("striphint").textContent = "One dot per run, placed by how much of the goal it achieved. The grey dotted line is chance (a random walk)."
+    + (med !== null ? " The dark dashed line is the median person: on this task people do the same job with the same robot." : "")
+    + " Click a dot to open that run.";
 }
 $("strip").addEventListener("click", (e) => { const c = e.target.closest("[data-run]"); if (c) selectRun(D.runs[Number(c.dataset.run)]); });
 

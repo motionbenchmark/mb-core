@@ -12,7 +12,7 @@ The script
   2. cuts out every walk from one goal point to another,
   3. writes an experimental task (MB-THOR-WALK@0.0) for the chosen route,
   4. converts each walk into a MotionBench trace (tier F, capture "mocap"),
-  5. adds random-walk runs for the floor, and scores and aggregates everything.
+  5. adds random-walk runs for the chance level, and scores everything against the goal.
 
 Outputs in OUT: tasks/, traces/, reports.json, board.json, walks.csv.
 Replay them (the task is custom, so use the Python call, which takes a tasks folder):
@@ -189,7 +189,7 @@ def main():
     t = board["tasks"][0]
     print(f"{len(walks)} goal-to-goal walks found; {len(route)} on goal {a.frm} -> {a.to}; {len(errors)} scoring errors")
     print(f"completed {len(times)}/{len(humans)}; median time {np.median(times):.1f} s; "
-          f"median path efficiency {np.median(effs):.2f}; floor {t['floor']:.2f}")
+          f"median path efficiency {np.median(effs):.2f}; chance {t['chance']:.0%} of the goal")
     print(f"{sum(r['rank'] == 1 for r in t['rows'])} of {len(t['rows'])} agents share rank 1")
 
 

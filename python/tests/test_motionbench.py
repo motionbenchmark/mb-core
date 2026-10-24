@@ -60,18 +60,24 @@ def test_synth_is_deterministic(tmp_path):
         assert f.read_bytes() == (b / f.relative_to(a)).read_bytes()
 
 
-def test_aggregate_produces_human_normalized_board(dataset):
+def test_aggregate_scores_every_agent_against_the_goal(dataset):
     reports, errors = mb.score_dir(dataset)
     # one trace was tampered with in another test that may have run first
     assert len(reports) + len(errors) == 20 * 2 + 10
     lb = mb.aggregate(reports)
+    assert lb["spec_version"] == "0.2"
+    assert "overall" not in lb  # no ranking across different tasks
     nav = next(b for b in lb["tasks"] if b["task"] == "MB-VEX-NAV@1.0")
-    assert nav["human_reference"]["n_drivers"] >= 11
+    assert all(0.0 <= r["goal"] <= 1.0 for r in nav["rows"])
     walk = next(r for r in nav["rows"] if r["agent_id"] == "random-walk")
-    assert walk["hns"] == pytest.approx(0.0)
+    assert walk["goal"] == pytest.approx(0.0)
+    # drivers and code share the robot, so people are a fair comparison here
+    assert nav["people_comparable"] and nav["people"]["n_people"] >= 11
     cover = next(b for b in lb["tasks"] if b["task"] == "MB-COVER@0.1")
-    assert cover["floor_source"] == "baseline"
-    assert lb["overall"][0]["rank"] == 1
+    assert cover["chance_source"] == "baseline" and cover["chance"] > 0.3
+    # a robot vacuum and a person with a stick vacuum use different means
+    assert not cover["people_comparable"] and cover["people"] is None
+    assert all(r["vs_people"] is None for r in cover["rows"])
 
 
 cv2 = pytest.importorskip("cv2")

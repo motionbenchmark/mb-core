@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use MotionBench, please cite it as below."
-title: "MotionBench: an open benchmark for goal-directed robots in confined spaces"
+title: "MotionBench: an open benchmark for goal-directed agents in bounded spaces"
 type: software
 authors:
   - name: "The MotionBench Authors"
@@ -12,6 +12,6 @@ url: "https://motionbench.org"
 keywords:
   - robotics
   - benchmark
-  - human-normalized evaluation
+  - goal-referenced evaluation
   - VEX robotics
   - robot vacuum

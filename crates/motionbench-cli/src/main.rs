@@ -4,7 +4,7 @@ use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-/// MotionBench: score goal-directed robot runs in confined spaces against human references.
+/// MotionBench: score how well any agent, person or robot, completes a task's goals in a bounded space.
 #[derive(Parser)]
 #[command(name = "mb", version, about)]
 struct Cli {

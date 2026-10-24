@@ -13,3 +13,4 @@ weights, governance — go through a public Request for Comments.
 | RFC | Title | Status |
 | --- | --- | --- |
 | [0001](0001-motionbench.md) | MotionBench project proposal and core specification v0.1 | Draft |
+| [0002](0002-goal-referenced-scoring.md) | Goal-referenced scoring (spec v0.2) | Draft |

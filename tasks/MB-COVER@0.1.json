@@ -3,7 +3,7 @@
   "version": "0.1",
   "title": "Room floor coverage",
   "domain": "indoor-floor",
-  "description": "Sweep the free floor of a 4 m x 3 m room with a sofa and a table, using a 30 cm cleaning tool, within 180 seconds. Scored on the percentage of free floor area swept. Applies equally to a robot vacuum and to a person with a stick vacuum tracked by the same overhead camera.",
+  "description": "Sweep the free floor of a 4 m x 3 m room with a sofa and a table, using a 30 cm cleaning tool, within 180 seconds. Scored on the percentage of free floor area swept. The goal is the whole free floor; a robot vacuum, a coverage planner or a person with a stick vacuum can be scored against it. People use different means here, so the task makes no robot-versus-person comparison.",
   "arena": {
     "width_m": 4.0,
     "height_m": 3.0,
@@ -16,7 +16,7 @@
   "robot": { "radius_m": 0.17 },
   "budget": { "time_s": 180 },
   "goal": { "kind": "coverage", "cell_m": 0.05, "tool_width_m": 0.30 },
-  "reference": { "floor": 0 },
+  "reference": { "floor": 0, "people_comparable": false },
   "layouts": {
     "dev-01": { "start": { "x": 0.30, "y": 0.30, "theta": 0 } },
     "dev-02": { "start": { "x": 3.70, "y": 0.30, "theta": 1.5708 } }

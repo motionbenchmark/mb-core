@@ -42,8 +42,9 @@ except ImportError:  # mcp 1.x
 server = _Server(
     "motionbench",
     instructions=(
-        "Tools for MotionBench, an open benchmark that scores robots moving in confined spaces "
-        "(VEX fields, rooms, hallways) against people doing the same job. To score a phone video "
+        "Tools for MotionBench, an open benchmark that scores how much of a task's goal a run "
+        "achieves in a bounded space (VEX fields, rooms, hallways), whether a person, robot code, "
+        "AI-written code or an assisted driver ran it. To score a phone video "
         "without tags: inspect_video -> ask the user to open the calibration page and tap the floor "
         "corners (or read corners off the picture) -> make_calibration -> convert_video -> show the "
         "score -> submit_run only after the user agrees and confirms they may share the footage."

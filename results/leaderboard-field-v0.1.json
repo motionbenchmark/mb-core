@@ -1,12 +1,11 @@
 {
-  "spec_version": "0.1",
+  "spec_version": "0.2",
   "scorer_version": "0.1.0",
   "weights": {
     "success": 0.5,
     "efficiency": 0.2,
     "consistency": 0.15,
-    "safety": 0.15,
-    "hns_clip": 2.0
+    "safety": 0.15
   },
   "n_runs": 1,
   "tasks": [
@@ -16,10 +15,11 @@
       "kind": "coverage",
       "domain": "indoor-floor",
       "n_runs": 1,
-      "floor": 0.0,
-      "floor_source": "task",
       "max_score": 100.0,
-      "human_reference": null,
+      "chance": 0.0,
+      "chance_source": "task",
+      "people_comparable": false,
+      "people": null,
       "rows": [
         {
           "rank": 1,
@@ -36,19 +36,23 @@
             85.00772797527047,
             85.00772797527047
           ],
+          "goal": 0.8500772797527048,
+          "goal_ci95": [
+            0.8500772797527048,
+            0.8500772797527048
+          ],
+          "goal_worst": 0.8500772797527048,
           "completion_rate": 0.0,
           "time_to_goal_mean_s": null,
           "path_efficiency": 0.49334920582786,
           "violations_mean": 37.0,
-          "hns": null,
-          "hns_ci95": null,
-          "hns_expert": null,
           "consistency": 1.0,
           "safety": 0.02631578947368421,
-          "mbi": null
+          "mbi": 0.677655849462977,
+          "vs_people": null,
+          "vs_people_ci95": null
         }
       ]
     }
-  ],
-  "overall": []
+  ]
 }

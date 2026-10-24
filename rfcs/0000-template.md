@@ -22,7 +22,8 @@ confined-space test in MANIFESTO.md?
 ## Detailed design
 
 Normative text (MUST / SHOULD / MAY). For new tasks: arena, goal, budget,
-public seeds, how a human reference run is collected, and a reference trace.
+public seeds, how the goal is measured, whether a person can do the same job with the
+same means (`reference.people_comparable`), and a reference trace.
 
 ## Compatibility
 

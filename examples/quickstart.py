@@ -17,10 +17,14 @@ with tempfile.TemporaryDirectory() as d:
     board = mb.aggregate(reports)
 
 nav = board["tasks"][0]
-ref = nav["human_reference"]
-print(f"\n{nav['task']}: human median {ref['median']:.1f} of {nav['max_score']:.0f} waypoints ({ref['n_drivers']} drivers)\n")
-print(f"{'rank':>4}  {'agent':<42} {'class':<12} {'mean':>5} {'worst':>5} {'HNS':>5} {'MBI':>5}")
+print(f"\n{nav['task']}: every agent scored against the goal ({nav['max_score']:.0f} waypoints)")
+if nav["people"]:
+    p = nav["people"]
+    print(f"Drivers and code use the same robot here, so we also compare with people: "
+          f"median driver {p['median']:.1f} of {nav['max_score']:.0f} ({p['n_people']} drivers)")
+print(f"\n{'rank':>4}  {'agent':<42} {'class':<12} {'goal':>5} {'worst':>5} {'index':>5} {'vs ppl':>6}")
 for r in nav["rows"]:
-    print(f"{r['rank']:>4}  {r['agent_name']:<42} {r['class']:<12} {r['success_mean']:>5.1f} "
-          f"{r['success_worst']:>5.1f} {r['hns']:>5.2f} {r['mbi']:>5.2f}")
+    vs = f"{r['vs_people']:>6.2f}" if r["vs_people"] is not None else f"{'':>6}"
+    print(f"{r['rank']:>4}  {r['agent_name']:<42} {r['class']:<12} {r['goal']:>5.0%} "
+          f"{r['goal_worst']:>5.0%} {r['mbi']:>5.2f} {vs}")
 print("\nSynthetic agents only - this illustrates the method, not real performance.")
