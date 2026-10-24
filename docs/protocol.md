@@ -34,8 +34,11 @@ Draft, open for comment (GitHub Discussions, category "Protocol").
   Agents with fewer runs are shown, unranked.
 - Runs are **consecutive attempts**: every attempt in a session is reported, including
   failures. Picking the best attempts is not allowed.
-- Simulated verdicts on games use 20 runs per routine, 12 per driver character and a
-  simulated class of 20 drivers with 3 runs each (`motionbench game verdict` defaults).
+- Simulated verdicts on games use 20 paired runs per routine and per driver character
+  (same seeds: same layouts and robot imperfections), on the public layout and on 10
+  unseen layouts; the typical simulated driver is the median of a simulated class of 20
+  (`motionbench game verdict` defaults). Outcomes are better / worse (95% range excludes
+  zero), equivalent (range within ±0.5 points) or no difference found.
 
 ## 4. Layouts
 
