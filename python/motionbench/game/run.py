@@ -83,7 +83,7 @@ def write_run(res: RunResult, out: "str | Path", game: Game, *, agent_class: Opt
     out.mkdir(parents=True, exist_ok=True)
     cls = agent_class or ("human" if res.agent_kind == "driver" else "human_auton")
     task = game.raw.get("motionbench_task")
-    if task:
+    if task and not res.layout.startswith("gen-"):  # generated layouts aren't in the task file
         trace = write_trace(out / "trace", task=task, seed=res.layout, agent_id=_slug(res.agent), agent_class=cls,
                             agent_name=res.agent_name, poses=res.poses, events=res.events, trial=res.seed, tier="S", capture="sim",
                             world_final={"objects": [{"id": o["id"], "x": o["x"], "y": o["y"]} for o in res.objects]},

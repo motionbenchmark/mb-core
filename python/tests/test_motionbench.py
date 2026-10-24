@@ -341,6 +341,17 @@ def test_game_definition_validates_and_scores():
     assert s["points"] == 1
 
 
+def test_generated_layouts_are_new_valid_and_repeatable():
+    from motionbench.game import Game
+
+    g = Game.load(GAME_DIR)
+    a, b = g.layout("gen-11")[1], g.layout("gen-11")[1]
+    assert a == b and a["objects"] != g.layout("dev-01")[1]["objects"]
+    assert len(a["objects"]) == 6 and a["start"] == g.layout("dev-01")[1]["start"]
+    for o in a["objects"]:
+        assert not g.zone_of(o["x"], o["y"])  # nothing starts already sorted
+
+
 def test_vexcode_aim_emulator_moves_like_the_api(tmp_path):
     from motionbench.game import Game, simulate
 
@@ -380,7 +391,9 @@ def test_game_verdict_compares_code_with_drivers():
     g = Game.load(GAME_DIR)
     code = (GAME_DIR / "routines" / "planner_v4.py").read_text()
     r = verdict(g, {"v4.py": code}, layout="dev-01", runs=4, driver_runs=3, class_size=4, class_runs=1,
-                drivers=[CHARACTERS[0], CHARACTERS[-1]])
+                drivers=[CHARACTERS[0], CHARACTERS[-1]], unseen=2)
+    u = r["unseen"]["comparisons"]["v4.py"]
+    assert u["change_from_public"]["verdict"] in ("better", "can't tell", "worse") and r["unseen"]["layouts"] == 2
     comp = r["comparisons"]["v4.py"]
     assert set(comp["vs"]) == {"median student", "Rookie Riley", "Pro Priya"}
     assert comp["vs"]["Rookie Riley"]["verdict"] in ("better", "can't tell", "worse")
