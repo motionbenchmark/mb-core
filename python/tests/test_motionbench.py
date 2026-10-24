@@ -2,6 +2,7 @@ import json
 import math
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 import motionbench as mb
@@ -196,3 +197,100 @@ def test_calibration_page_is_self_contained(tmp_path):
     assert "far-left" in html and "data:image/jpeg;base64," in html and "calib.json" in html
     assert "http://" not in html and "https://" not in html  # works offline, sends nothing anywhere
     assert (tmp_path / "bg.png").exists()
+
+
+# ----------------------------------------------------------------------------- multi-robot matches
+@pytest.fixture(scope="module")
+def match_dir(tmp_path_factory):
+    from motionbench.match import simulate, write_match
+
+    return write_match(simulate(3), tmp_path_factory.mktemp("match") / "m0003")
+
+
+def test_match_sim_is_deterministic_and_complete(match_dir):
+    from motionbench.match import MatchData, simulate
+
+    a, b = simulate(3), simulate(3)
+    for rid in a.poses:
+        assert (a.poses[rid] == b.poses[rid]).all()
+    m = MatchData(match_dir)
+    assert sorted(r["id"] for r in m.robots) == ["blue1", "blue2", "red1", "red2"]
+    assert m.meta["synthetic"] is True
+    F = m.meta["field"]["size_m"]
+    for p in m.poses.values():
+        assert p[-1, 0] == pytest.approx(123.0, abs=0.06)
+        assert (p[:, 1:3] > 0).all() and (p[:, 1:3] < F).all()
+        # auton: each robot stays on its own half
+    for r in m.robots:
+        p = m.poses[r["id"]]
+        auton = p[p[:, 0] < 15]
+        assert ((auton[:, 1] < F / 2) if r["alliance"] == "red" else (auton[:, 1] > F / 2)).all()
+        # nothing moves during the pause
+        pause = p[(p[:, 0] > 15.3) & (p[:, 0] < 18)]
+        assert np.ptp(pause[:, 1]) < 0.03
+    # every robot trace is a valid .mbtrace the standard scorer accepts
+    r = mb.score(match_dir / "robots" / "red1", tasks_dir=match_dir / "tasks")
+    assert r["coverage"]["covered_pct"] > 5
+
+
+def test_match_report_counts_contacts_and_periods(match_dir):
+    from motionbench.match.report import report
+
+    r = report(match_dir)
+    assert set(r["robots"]) == {"red1", "red2", "blue1", "blue2"}
+    for rr in r["robots"].values():
+        assert set(rr["periods"]) == {"auton", "driver"}
+        assert rr["periods"]["auton"]["opponent_half_pct"] == 0.0
+        assert rr["match"]["distance_m"] > 5
+    assert sum(p["contacts"] for p in r["pairs"]) > 0
+    assert r["alliances"]["red"]["deliveries"] > 0
+
+
+def _oracle(match_dir, path, swap_after=None, drop=0.0):
+    import csv as _csv
+
+    from motionbench.match import MatchData
+
+    m = MatchData(match_dir)
+    rng = np.random.default_rng(1)
+    with open(path, "w", newline="") as f:
+        w = _csv.writer(f)
+        w.writerow(["t_s", "track_id", "x_m", "y_m", "alliance"])
+        for t in np.arange(0, 123, 0.2):
+            for k, r in enumerate(m.robots):
+                if rng.random() < drop:
+                    continue
+                tid = k
+                if swap_after is not None and t > swap_after and k < 2:
+                    tid = 1 - k
+                x, y, _ = m.pose(r["id"], t)
+                w.writerow([round(float(t), 3), tid, x, y, r["alliance"]])
+    return path
+
+
+def test_match_eval_scores_identities(match_dir, tmp_path):
+    from motionbench.match.eval import evaluate
+
+    perfect = evaluate(match_dir, str(_oracle(match_dir, tmp_path / "a.csv")))
+    assert perfect["overall"]["recall"] == 1.0 and perfect["overall"]["precision"] == 1.0
+    assert perfect["overall"]["median_error_m"] < 1e-3 and perfect["overall"]["id_switches"] == 0
+    assert perfect["idf1"] == 1.0 and perfect["alliance_accuracy"] == 1.0
+    swapped = evaluate(match_dir, str(_oracle(match_dir, tmp_path / "b.csv", swap_after=60, drop=0.1)))
+    assert swapped["overall"]["id_switches"] == 2
+    assert 0.85 < swapped["overall"]["recall"] < 0.95
+    assert swapped["idf1"] < 0.85
+
+
+def test_match_render_and_baseline_tracker(match_dir, tmp_path):
+    from motionbench.match.eval import evaluate
+    from motionbench.match.render import render_match
+    from motionbench.match.track import track_match
+
+    # 40 s is enough for the empty-field median to lose the robots
+    info = render_match(match_dir, tmp_path / "clip.mp4", fps=3, start_s=20, end_s=60, width=680, seed=1)
+    assert info["frames"] == 121 and Path(info["gt"]).exists()
+    out = track_match(info["video"], str(tmp_path / "tracks.csv"), fps=3, match_start_s=-20)
+    assert out["tracks"] >= 4
+    r = evaluate(match_dir, str(tmp_path / "tracks.csv"), t_range=(21, 60))
+    assert r["overall"]["recall"] > 0.8
+    assert r["overall"]["median_error_m"] < 0.12

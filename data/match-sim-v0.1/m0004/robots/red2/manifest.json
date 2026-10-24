@@ -1,0 +1,24 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-MATCH-FIELD@0.1",
+  "seed": "m0004-red2",
+  "agent": {
+    "id": "team-94308Y",
+    "class": "human",
+    "name": "94308Y (red)",
+    "meta": {
+      "alliance": "red",
+      "robot": "red2",
+      "auton": "human_auton for 0-15 s",
+      "synthetic": true
+    }
+  },
+  "trial": 0,
+  "tier": "S",
+  "capture": "sim",
+  "notes": "Synthetic match robot (motionbench match synth).",
+  "files": {
+    "poses.csv": "31d635b93cc6b2118b71c1a93f666c5ddd2bdb23efacfc571d98fe8d55f96b33",
+    "events.csv": "79ca573ae0bcff41273fb147ca53f01d326ed0e2ff470bd840e114c60bf30194"
+  }
+}

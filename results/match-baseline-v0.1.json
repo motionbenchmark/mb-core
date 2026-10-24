@@ -1,0 +1,246 @@
+{
+ "benchmark": "match-sim-v0.1 tracking",
+ "synthetic": true,
+ "tracker": "motionbench match track (baseline)",
+ "settings": {
+  "render": "motionbench match render MATCH --fps 10 --seed N (N = match number)",
+  "track": "--fps 10",
+  "eval": "gate 0.45 m, pause excluded"
+ },
+ "matches": {
+  "m0001": {
+   "match_id": "m0001",
+   "tracks": "baseline tracks (regenerate with motionbench match track)",
+   "gate_m": 0.45,
+   "frames_evaluated": 1199,
+   "overall": {
+    "robot_frames": 4796,
+    "recall": 0.9708,
+    "id_switches": 25,
+    "median_error_m": 0.0801,
+    "mean_error_m": 0.099,
+    "p90_error_m": 0.1771,
+    "precision": 0.986,
+    "false_track_frames": 66,
+    "mota": 0.9518
+   },
+   "idf1": 0.6514,
+   "alliance_accuracy": 0.6838,
+   "periods": {
+    "auton": {
+     "robot_frames": 592,
+     "recall": 1.0,
+     "id_switches": 0,
+     "median_error_m": 0.0646,
+     "mean_error_m": 0.0714,
+     "p90_error_m": 0.1183,
+     "precision": 1.0,
+     "false_track_frames": 0,
+     "mota": 1.0
+    },
+    "driver": {
+     "robot_frames": 4200,
+     "recall": 0.9667,
+     "id_switches": 25,
+     "median_error_m": 0.0858,
+     "mean_error_m": 0.1031,
+     "p90_error_m": 0.1839,
+     "precision": 0.984,
+     "false_track_frames": 66,
+     "mota": 0.945
+    }
+   },
+   "robots": {
+    "red1": {
+     "robot_frames": 1199,
+     "recall": 1.0,
+     "id_switches": 5,
+     "median_error_m": 0.0607,
+     "mean_error_m": 0.065,
+     "p90_error_m": 0.1096
+    },
+    "red2": {
+     "robot_frames": 1199,
+     "recall": 0.96,
+     "id_switches": 12,
+     "median_error_m": 0.1504,
+     "mean_error_m": 0.1393,
+     "p90_error_m": 0.2253
+    },
+    "blue1": {
+     "robot_frames": 1199,
+     "recall": 0.975,
+     "id_switches": 2,
+     "median_error_m": 0.0836,
+     "mean_error_m": 0.0974,
+     "p90_error_m": 0.1656
+    },
+    "blue2": {
+     "robot_frames": 1199,
+     "recall": 0.9483,
+     "id_switches": 6,
+     "median_error_m": 0.0757,
+     "mean_error_m": 0.096,
+     "p90_error_m": 0.2118
+    }
+   },
+   "track_ids": 8
+  },
+  "m0002": {
+   "match_id": "m0002",
+   "tracks": "baseline tracks (regenerate with motionbench match track)",
+   "gate_m": 0.45,
+   "frames_evaluated": 1199,
+   "overall": {
+    "robot_frames": 4796,
+    "recall": 0.8978,
+    "id_switches": 29,
+    "median_error_m": 0.0891,
+    "mean_error_m": 0.1098,
+    "p90_error_m": 0.1924,
+    "precision": 0.9601,
+    "false_track_frames": 179,
+    "mota": 0.8545
+   },
+   "idf1": 0.6568,
+   "alliance_accuracy": 0.9062,
+   "periods": {
+    "auton": {
+     "robot_frames": 592,
+     "recall": 0.9476,
+     "id_switches": 1,
+     "median_error_m": 0.089,
+     "mean_error_m": 0.1035,
+     "p90_error_m": 0.1705,
+     "precision": 0.9791,
+     "false_track_frames": 12,
+     "mota": 0.9257
+    },
+    "driver": {
+     "robot_frames": 4200,
+     "recall": 0.8907,
+     "id_switches": 28,
+     "median_error_m": 0.0893,
+     "mean_error_m": 0.1107,
+     "p90_error_m": 0.1966,
+     "precision": 0.9573,
+     "false_track_frames": 167,
+     "mota": 0.8443
+    }
+   },
+   "robots": {
+    "red1": {
+     "robot_frames": 1199,
+     "recall": 0.98,
+     "id_switches": 7,
+     "median_error_m": 0.057,
+     "mean_error_m": 0.079,
+     "p90_error_m": 0.1255
+    },
+    "red2": {
+     "robot_frames": 1199,
+     "recall": 1.0,
+     "id_switches": 1,
+     "median_error_m": 0.1198,
+     "mean_error_m": 0.1284,
+     "p90_error_m": 0.1818
+    },
+    "blue1": {
+     "robot_frames": 1199,
+     "recall": 0.9992,
+     "id_switches": 9,
+     "median_error_m": 0.0719,
+     "mean_error_m": 0.0833,
+     "p90_error_m": 0.1179
+    },
+    "blue2": {
+     "robot_frames": 1199,
+     "recall": 0.6122,
+     "id_switches": 12,
+     "median_error_m": 0.1522,
+     "mean_error_m": 0.1718,
+     "p90_error_m": 0.2998
+    }
+   },
+   "track_ids": 11
+  },
+  "m0003": {
+   "match_id": "m0003",
+   "tracks": "baseline tracks (regenerate with motionbench match track)",
+   "gate_m": 0.45,
+   "frames_evaluated": 1199,
+   "overall": {
+    "robot_frames": 4796,
+    "recall": 0.901,
+    "id_switches": 44,
+    "median_error_m": 0.0703,
+    "mean_error_m": 0.0901,
+    "p90_error_m": 0.1576,
+    "precision": 0.9408,
+    "false_track_frames": 272,
+    "mota": 0.8351
+   },
+   "idf1": 0.4833,
+   "alliance_accuracy": 0.6172,
+   "periods": {
+    "auton": {
+     "robot_frames": 592,
+     "recall": 0.8953,
+     "id_switches": 2,
+     "median_error_m": 0.0722,
+     "mean_error_m": 0.086,
+     "p90_error_m": 0.1365,
+     "precision": 0.9654,
+     "false_track_frames": 19,
+     "mota": 0.8598
+    },
+    "driver": {
+     "robot_frames": 4200,
+     "recall": 0.9017,
+     "id_switches": 42,
+     "median_error_m": 0.0701,
+     "mean_error_m": 0.0907,
+     "p90_error_m": 0.1621,
+     "precision": 0.9374,
+     "false_track_frames": 253,
+     "mota": 0.8314
+    }
+   },
+   "robots": {
+    "red1": {
+     "robot_frames": 1199,
+     "recall": 0.9967,
+     "id_switches": 6,
+     "median_error_m": 0.072,
+     "mean_error_m": 0.0836,
+     "p90_error_m": 0.1308
+    },
+    "red2": {
+     "robot_frames": 1199,
+     "recall": 0.9975,
+     "id_switches": 8,
+     "median_error_m": 0.0687,
+     "mean_error_m": 0.0791,
+     "p90_error_m": 0.1293
+    },
+    "blue1": {
+     "robot_frames": 1199,
+     "recall": 0.623,
+     "id_switches": 19,
+     "median_error_m": 0.1155,
+     "mean_error_m": 0.1611,
+     "p90_error_m": 0.3725
+    },
+    "blue2": {
+     "robot_frames": 1199,
+     "recall": 0.9867,
+     "id_switches": 11,
+     "median_error_m": 0.0494,
+     "mean_error_m": 0.063,
+     "p90_error_m": 0.1202
+    }
+   },
+   "track_ids": 18
+  }
+ }
+}

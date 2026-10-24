@@ -1,0 +1,80 @@
+{
+ "id": "MB-MATCH-FIELD",
+ "version": "0.1",
+ "title": "Four-robot match on a VEX V5 field (per-robot view)",
+ "domain": "vex-v5",
+ "description": "One robot's path through a 2 v 2 match: 15 s autonomous, a short pause, 105 s driver control. Scored as field coverage so every robot's trace can be checked with the standard scorer; match metrics (contacts, zones, periods) come from `motionbench match report`.",
+ "arena": {
+  "width_m": 3.566,
+  "height_m": 3.566,
+  "obstacles": [
+   {
+    "x": 1.188,
+    "y": 0.53,
+    "w": 1.19,
+    "h": 0.14,
+    "label": "long-goal-near"
+   },
+   {
+    "x": 1.188,
+    "y": 2.896,
+    "w": 1.19,
+    "h": 0.14,
+    "label": "long-goal-far"
+   },
+   {
+    "x": 1.623,
+    "y": 1.623,
+    "w": 0.32,
+    "h": 0.32,
+    "label": "centre-goal"
+   }
+  ],
+  "zones": {}
+ },
+ "robot": {
+  "radius_m": 0.229,
+  "contact_tolerance_m": 0.06
+ },
+ "budget": {
+  "time_s": 123.0
+ },
+ "goal": {
+  "kind": "coverage",
+  "cell_m": 0.1,
+  "tool_width_m": 0.4
+ },
+ "reference": {
+  "floor": 0
+ },
+ "layouts": {
+  "m0003-red1": {
+   "start": {
+    "x": 0.3283,
+    "y": 0.8254,
+    "theta": 0.0499
+   }
+  },
+  "m0003-red2": {
+   "start": {
+    "x": 0.3364,
+    "y": 2.534,
+    "theta": -0.0144
+   }
+  },
+  "m0003-blue1": {
+   "start": {
+    "x": 3.216,
+    "y": 2.654,
+    "theta": 3.0227
+   }
+  },
+  "m0003-blue2": {
+   "start": {
+    "x": 3.2167,
+    "y": 0.9854,
+    "theta": -3.089
+   }
+  }
+ }
+}

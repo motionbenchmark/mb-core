@@ -12,6 +12,7 @@
     motionbench track run.mov --untagged --calib calib.json -o out/   # no tags needed
     motionbench render RUN.mbtrace -o run.avi     # synthetic camera footage of a trace
     motionbench viz DATA_DIR -o explorer.html     # interactive explorer + independent checks
+    motionbench match synth|render|report|track|eval ...   # multi-robot matches (see `motionbench match -h`)
 """
 
 from __future__ import annotations
@@ -119,8 +120,16 @@ def main(argv=None) -> int:
     p.add_argument("--fps", type=float, default=30.0)
     p.add_argument("-o", "--out", default="run.avi")
 
+    from .match.cli import add_parser as _match_parser
+
+    _match_parser(sub)
+
     a = ap.parse_args(argv)
     try:
+        if a.cmd == "match":
+            from .match.cli import run as _match_run
+
+            return _match_run(a)
         if a.cmd == "tasks":
             for t in mb.tasks(a.tasks_dir):
                 key = f"{t['id']}@{t['version']}"

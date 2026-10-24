@@ -121,6 +121,20 @@ score and submit a run to the project site for review.
 
 Onboard logging for VEX V5 (PROS): [integrations/vex/pros](integrations/vex/pros).
 
+### Multi-robot matches
+
+Four robots, two alliances, one fixed broadcast camera: simulate matches with full
+ground truth, render them as event-style footage, report each robot by period, and
+benchmark trackers against the ground truth. See [docs/match.md](docs/match.md).
+
+```bash
+motionbench match synth -o data/match-sim-v0.1 --seeds 1-5     # synthetic matches (traces + events)
+motionbench match render data/match-sim-v0.1/m0001 -o m0001.mp4  # broadcast-style video + m0001.gt.csv
+motionbench match report data/match-sim-v0.1/m0001 --png paths.png
+motionbench match track m0001.mp4 -o tracks.csv                  # baseline tracker, no tags
+motionbench match eval data/match-sim-v0.1/m0001 tracks.csv      # recall, error, ID switches, IDF1
+```
+
 ## Tasks (v0.1)
 
 | Task | Domain | Goal | Budget | Public seeds |
@@ -186,9 +200,11 @@ crates/motionbench-core   Rust scorer (tasks, traces, scoring, statistics, aggre
 crates/motionbench-cli    `mb` command
 python/                   PyO3 bindings + motionbench Python package
   motionbench/synth.py      synthetic dataset generator
-  motionbench/tracker/      AprilTag overhead-camera tracker, renderer, tag sheets
+  motionbench/tracker/      AprilTag and tag-free trackers, renderer, tag sheets
+  motionbench/match/        multi-robot matches: simulator, broadcast renderer, report, tracker, benchmark
 tasks/                    task specs (ID@VERSION.json)
 data/synthetic-v0.1/      570 synthetic traces (CC BY 4.0)
+data/match-sim-v0.1/      5 synthetic 2 v 2 matches with ground truth (CC BY 4.0)
 results/                  leaderboards and per-run reports
 integrations/vex/pros/    onboard pose logger for VEX V5 (PROS)
 rfcs/                     RFC process and RFC-0001

@@ -1,0 +1,24 @@
+{
+  "spec_version": "0.1",
+  "task": "MB-MATCH-FIELD@0.1",
+  "seed": "m0004-blue2",
+  "agent": {
+    "id": "team-51181C",
+    "class": "human",
+    "name": "51181C (blue)",
+    "meta": {
+      "alliance": "blue",
+      "robot": "blue2",
+      "auton": "human_auton for 0-15 s",
+      "synthetic": true
+    }
+  },
+  "trial": 0,
+  "tier": "S",
+  "capture": "sim",
+  "notes": "Synthetic match robot (motionbench match synth).",
+  "files": {
+    "poses.csv": "9ae89f1eac1728fa9c2ce6a2c2a63f2d6aa917ca784b52d1a3aa31dea6ed853a",
+    "events.csv": "ebd26e595b168ab24f8da99cfb3d5ac9aa94cb434b1b87f8e9416201fc0d02c4"
+  }
+}
