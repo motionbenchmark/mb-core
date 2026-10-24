@@ -1,15 +1,16 @@
 //! # motionbench-core
 //!
 //! Deterministic scoring for MotionBench, an open benchmark for goal-directed
-//! robots operating in **bounded, confined spaces** (competition fields, rooms,
-//! warehouse cells, yards).
+//! agents (people, robots running team-written or AI-written code, and people
+//! assisted by robots) in **bounded spaces** (competition fields, rooms,
+//! warehouse cells, yards), each scored against the task's goal.
 //!
 //! The model is simple:
 //!
 //! * a [`Task`] = arena + goal + constraints + budget, with seeded layouts;
 //! * a [`Trace`] = one agent's run on one task: poses, events, final world state;
 //! * [`score`] turns `(task, trace)` into a [`Report`];
-//! * [`aggregate`] turns many reports into a human-normalized [`Leaderboard`].
+//! * [`aggregate`] turns many reports into per-task boards scored against each task's goal ([`Leaderboard`]).
 //!
 //! Every binding (Python, WASM, …) calls into this crate so that a run scores
 //! identically everywhere.
