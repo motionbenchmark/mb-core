@@ -85,6 +85,10 @@ def main(argv=None) -> int:
     p.add_argument("--png", help="also save the empty-floor picture")
     p.add_argument("--width", type=int, default=540, help="working width in pixels (default 540)")
     p.add_argument("--robot-diameter", type=float, default=0.35)
+    p.add_argument("--start", type=float, default=0.0, help="ignore the video before this time (s), e.g. a broadcast intro")
+    p.add_argument("--end", type=float, help="ignore the video after this time (s)")
+    p.add_argument("--field", type=float, nargs=2, metavar=("WIDTH_M", "LENGTH_M"), help="pre-fill the measured floor size")
+    p.add_argument("--vex-field", action="store_true", help="pre-fill a VEX V5 field (3.566 x 3.566 m inside the walls)")
 
     p = sub.add_parser("track", help="track a video into a .mbtrace (tags, or --untagged with a calib.json)")
     p.add_argument("video")
@@ -165,8 +169,12 @@ def main(argv=None) -> int:
         elif a.cmd == "calibrate":
             from .tracker.calibrate import write_calibration_page
 
-            out = write_calibration_page(a.video, a.out, width=a.width, png=a.png,
-                                         defaults={"robot_diameter_m": a.robot_diameter})
+            defaults = {"robot_diameter_m": a.robot_diameter}
+            size = (3.566, 3.566) if a.vex_field else a.field
+            if size:
+                defaults.update(measured_width_m=size[0], measured_length_m=size[1])
+            out = write_calibration_page(a.video, a.out, width=a.width, png=a.png, defaults=defaults,
+                                         start_s=a.start, end_s=a.end)
             print(f"wrote {out}: open it, tap the floor corners, and download calib.json")
         elif a.cmd == "track" and a.untagged:
             from .tracker.untagged import Calibration, track_untagged

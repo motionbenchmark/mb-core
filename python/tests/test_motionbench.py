@@ -294,3 +294,33 @@ def test_match_render_and_baseline_tracker(match_dir, tmp_path):
     r = evaluate(match_dir, str(tmp_path / "tracks.csv"), t_range=(21, 60))
     assert r["overall"]["recall"] > 0.8
     assert r["overall"]["median_error_m"] < 0.12
+
+
+def test_match_camera_from_calib_and_from_tracks(match_dir, tmp_path):
+    from motionbench.match import BROADCAST_CAMERA
+    from motionbench.match.io import camera_from_calib, match_from_tracks
+    from motionbench.match.report import report
+
+    calib = tmp_path / "calib.json"
+    calib.write_text(json.dumps({"frame_size": BROADCAST_CAMERA["frame_size"], "floor_corners_px": BROADCAST_CAMERA["floor_corners_px"],
+                                 "measured_width_m": 3.566, "measured_length_m": 3.566}))
+    cam = camera_from_calib(calib)
+    assert cam["f_px"] == pytest.approx(BROADCAST_CAMERA["f_px"], rel=0.01)
+    assert cam["camera_height_m"] == pytest.approx(BROADCAST_CAMERA["camera_height_m"], rel=0.01)
+    # a track that breaks for half a second is stitched back into one robot
+    src = _oracle(match_dir, tmp_path / "t.csv")
+    lines = open(src).read().splitlines()
+    out = [lines[0]]
+    for ln in lines[1:]:
+        t, tid, *rest = ln.split(",")
+        if tid == "0" and 50 < float(t) < 50.5:
+            continue
+        if tid == "0" and float(t) >= 50.5:
+            tid = "9"
+        out.append(",".join([t, tid, *rest]))
+    (tmp_path / "broken.csv").write_text("\n".join(out) + "\n")
+    d = match_from_tracks(tmp_path / "broken.csv", tmp_path / "tracked")
+    meta = json.loads((d / "match.json").read_text())
+    assert sorted(r["id"] for r in meta["robots"]) == ["blue1", "blue2", "red1", "red2"]
+    assert any(r["tracks"] == ["0", "9"] for r in meta["robots"])
+    assert report(d)["robots"]["red1"]["match"]["distance_m"] > 5

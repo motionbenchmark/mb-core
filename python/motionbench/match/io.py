@@ -14,6 +14,7 @@ A block's position at any time is its last ``objects.csv`` row; while it is
 from __future__ import annotations
 
 import csv
+import math
 import json
 from pathlib import Path
 from typing import Optional
@@ -34,6 +35,27 @@ BROADCAST_CAMERA = {
     "floor_corners_px": [[200, 125], [800, 125], [984, 656], [15, 659]],
     "field_m": FIELD_M,
 }
+
+
+def camera_from_calib(calib) -> dict:
+    """A match camera from a tap-to-calibrate ``calib.json`` (``motionbench calibrate --vex-field``):
+    the four field corners plus the field's measured size give focal length and height."""
+    from ..tracker.untagged import Calibration, fit_camera
+
+    if not isinstance(calib, Calibration):
+        calib = Calibration.load(calib)
+    if not (calib.measured_width_m and calib.measured_length_m):
+        raise ValueError("calib.json needs the field's measured width and length (use --vex-field or --field)")
+    cam, info = fit_camera(calib, [], tuple(calib.frame_size))
+    return {
+        "note": "Fitted from calib.json (four field corners and the measured field size).",
+        "frame_size": list(calib.frame_size),
+        "f_px": float(cam.f),
+        "camera_height_m": float(cam.h),
+        "tilt_deg": round(cam.tilt_deg(), 2),
+        "floor_corners_px": [list(map(float, p)) for p in calib.floor_corners_px],
+        "field_m": float(calib.measured_width_m),
+    }
 
 
 def match_task(res: MatchResult, match_id: str) -> dict:
@@ -133,3 +155,81 @@ class MatchData:
                 x, y, _ = self.pose(ref, t)
             out.append({"id": oid, "colour": self.colours.get(oid, "red"), "state": state, "x": x, "y": y, "z": z, "ref": ref})
         return out
+
+
+def match_from_tracks(tracks_csv: "str | Path", out: "str | Path", *, camera: Optional[dict] = None, n_robots: int = 4,
+                      match_id: str = "tracked", names: Optional[dict] = None, duration_s: Optional[float] = None) -> Path:
+    """Turn tracker output into a match folder that ``motionbench match report`` reads.
+
+    Broken tracks are stitched: a track that starts within 3 s and 1 m of where another
+    ended (and does not disagree on alliance) continues it. The ``n_robots`` longest
+    chains become robots, named red1/red2/blue1/blue2 by their alliance where it is known
+    (else r1, r2, ...), or by ``names`` ({track_id or robot: name}).
+    """
+    from .field import default_field
+
+    rows: dict[str, list] = {}
+    ally: dict[str, str] = {}
+    with open(tracks_csv) as f:
+        for r in csv.DictReader(f):
+            rows.setdefault(r["track_id"], []).append((float(r["t_s"]), float(r["x_m"]), float(r["y_m"]), float(r.get("observed") or 1)))
+            if r.get("alliance"):
+                ally[r["track_id"]] = r["alliance"]
+    segs = []
+    for tid, v in rows.items():
+        a = np.array(sorted(v))
+        seen = np.nonzero(a[:, 3] > 0)[0]
+        if len(seen) >= 3:  # drop the coasted tail after the tracker last saw it
+            segs.append((tid, a[: seen[-1] + 1, :3]))
+    segs.sort(key=lambda s: s[1][0, 0])
+    chains: list[dict] = []
+    for tid, p in segs:
+        best, bd = None, 1e9
+        for c in chains:
+            gap = p[0, 0] - c["p"][-1, 0]
+            d = math.hypot(p[0, 1] - c["p"][-1, 1], p[0, 2] - c["p"][-1, 2])
+            a, b = ally.get(tid), c["alliance"]
+            close = gap <= 1.0 and d <= 0.5  # picked up where it was lost: continuity beats a colour guess
+            if 0 <= gap <= 3.0 and d <= 1.0 and (close or not (a and b and a != b)) and gap + d < bd:
+                best, bd = c, gap + d
+        if best is None:
+            chains.append({"ids": [tid], "p": p, "alliance": ally.get(tid), "votes": {ally[tid]: len(p)} if ally.get(tid) else {}})
+        else:
+            best["ids"].append(tid)
+            best["p"] = np.vstack([best["p"], p])
+            if ally.get(tid):
+                best["votes"][ally[tid]] = best["votes"].get(ally[tid], 0) + len(p)
+                best["alliance"] = max(best["votes"], key=best["votes"].get)
+    chains.sort(key=lambda c: -(c["p"][-1, 0] - c["p"][0, 0]))
+    chains = chains[:n_robots]
+    count = {"red": 0, "blue": 0}
+    fld = default_field()
+    F = fld.size_m
+    t_end = duration_s or max(c["p"][-1, 0] for c in chains)
+    out = Path(out)
+    robots = []
+    for k, c in enumerate(chains):
+        a = c["alliance"]
+        if a in count and count[a] < n_robots // 2:
+            count[a] += 1
+            rid = f"{a}{count[a]}"
+        else:
+            rid, a = f"r{k + 1}", a or "unknown"
+        nm = (names or {}).get(rid) or next(((names or {}).get(i) for i in c["ids"] if (names or {}).get(i)), None)
+        p = c["p"]
+        # regular 10 Hz poses; heading from travel direction
+        ts = np.arange(max(0.0, p[0, 0]), min(t_end, p[-1, 0]) + 1e-9, 0.1)
+        xs, ys = np.interp(ts, p[:, 0], p[:, 1]), np.interp(ts, p[:, 0], p[:, 2])
+        th = np.unwrap(np.arctan2(np.gradient(ys), np.gradient(xs)))
+        poses = np.c_[ts, np.clip(xs, 0, F), np.clip(ys, 0, F), th]
+        write_trace(out / "robots" / rid, task=f"{TASK_ID}@{TASK_VERSION}", seed=f"{match_id}-{rid}", agent_id=nm or rid,
+                    agent_class="human", agent_name=nm or rid, poses=poses.tolist(), tier="F", capture="video",
+                    agent_meta={"alliance": a, "tracks": c["ids"]}, notes="Tracked from match video (motionbench match track).",
+                    decimals=4)
+        robots.append({"id": rid, "alliance": a, "team": nm or "", "trace": f"robots/{rid}", "tracks": c["ids"],
+                       "size_m": [0.457, 0.457, 0.35], "chassis": "grey", "accent": "none"})
+    meta = {"format": "motionbench-match", "version": "0.1", "match_id": match_id, "synthetic": False, "seed": 0,
+            "periods": [{"name": n, "start_s": a_, "end_s": b} for n, a_, b in PERIODS], "field": fld.to_dict(),
+            "robots": robots, "blocks": [], "camera": camera or BROADCAST_CAMERA, "source": str(tracks_csv)}
+    (out / "match.json").write_text(json.dumps(meta, indent=1))
+    return out

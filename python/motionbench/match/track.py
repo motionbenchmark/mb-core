@@ -122,7 +122,7 @@ class Track:
     @property
     def alliance(self) -> Optional[str]:
         r, b = self.colour["red"], self.colour["blue"]
-        if r + b < 30:
+        if r + b < 5:
             return None
         return "red" if r > b else "blue"
 
@@ -216,8 +216,11 @@ def track_match(video: str, out_csv: str, *, camera: Optional[dict] = None, fps:
             tr = live[i]
             tr.update(x, y, t)
             r, b = votes[j]
-            tr.colour["red"] += r
-            tr.colour["blue"] += b
+            # one vote per frame, so a pile of same-coloured blocks can't outweigh many frames of plates
+            if r > max(8.0, 1.5 * b):
+                tr.colour["red"] += 1
+            elif b > max(8.0, 1.5 * r):
+                tr.colour["blue"] += 1
         for i, tr in enumerate(live):
             if i not in used_t:
                 tr.miss_s += 1.0 / fps
