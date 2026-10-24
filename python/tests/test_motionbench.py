@@ -384,17 +384,30 @@ def test_game_runs_agree_with_the_standard_scorer(tmp_path):
     assert d.points >= 2 and d.agent_kind == "driver"
 
 
+def test_paired_bootstrap_and_outcomes():
+    from motionbench.game.verdict import outcome, paired_ci
+
+    rng = np.random.default_rng(0)
+    d, lo, hi = paired_ci([3, 3, 4, 4], [2, 2, 3, 3], None, rng)
+    assert d == 1 and lo == 1 and hi == 1  # identical paired differences: no spread
+    d, lo, hi = paired_ci([3, 4, 3, 4], [3, 3, 4, 4], [0, 0, 1, 1], rng)
+    assert lo <= d <= hi
+    assert outcome(0.1, 0.9, 0.5) == "better" and outcome(-0.9, -0.1, 0.5) == "worse"
+    assert outcome(-0.3, 0.4, 0.5) == "equivalent" and outcome(-0.8, 0.4, 0.5) == "no difference found"
+
+
 def test_game_verdict_compares_code_with_drivers():
     from motionbench.game import CHARACTERS, Game
     from motionbench.game.verdict import verdict
 
     g = Game.load(GAME_DIR)
     code = (GAME_DIR / "routines" / "planner_v4.py").read_text()
-    r = verdict(g, {"v4.py": code}, layout="dev-01", runs=4, driver_runs=3, class_size=4, class_runs=1,
+    r = verdict(g, {"v4.py": code}, layout="dev-01", runs=4, class_size=4, class_runs=1,
                 drivers=[CHARACTERS[0], CHARACTERS[-1]], unseen=2)
-    u = r["unseen"]["comparisons"]["v4.py"]
-    assert u["change_from_public"]["verdict"] in ("better", "can't tell", "worse") and r["unseen"]["layouts"] == 2
     comp = r["comparisons"]["v4.py"]
-    assert set(comp["vs"]) == {"median student", "Rookie Riley", "Pro Priya"}
-    assert comp["vs"]["Rookie Riley"]["verdict"] in ("better", "can't tell", "worse")
+    pub = r["public"]["comparisons"]["v4.py"]
+    assert set(pub) == {"typical student", "Rookie Riley", "Pro Priya"}
+    assert pub["Rookie Riley"]["verdict"] in ("better", "worse", "equivalent", "no difference found")
+    assert r["unseen"]["change_from_public"]["v4.py"]["verdict"] in ("better", "worse", "equivalent", "no difference found")
+    assert r["design"]["paired"] and r["design"]["unseen_layouts"] == 2
     assert r["simulated"] is True and comp["headline"]

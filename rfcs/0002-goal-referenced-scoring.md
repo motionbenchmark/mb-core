@@ -93,7 +93,9 @@ field. When the flag is true **and** the data contains `human` agents, the board
 - `people`: `median` and `expert` (90th percentile) of per-person mean success, and
   `n_people`;
 - per agent, `vs_people = (S_agent − S_chance) / (S_people_median − S_chance)` in task units,
-  with `vs_people_ci95`. This is the spec 0.1 HNS, renamed.
+  with `vs_people_ci95`. This is the spec 0.1 HNS, renamed. It is reported only when
+  `S_people_median − S_chance` is at least 10% of the task's maximum score; a denominator
+  near zero would make the ratio unstable, so otherwise `vs_people` is null.
 
 When the flag is false or absent, `people` and `vs_people` MUST be null, and presentations
 SHOULD NOT draw a robot-versus-person comparison. People may still be agents on such a

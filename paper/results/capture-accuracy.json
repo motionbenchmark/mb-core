@@ -1,0 +1,109 @@
+{
+ "note": "Synthetic rendered video only; real-world validation is planned.",
+ "seeds": [
+  0,
+  1,
+  2
+ ],
+ "conditions": {
+  "tags": {
+   "runs": [
+    {
+     "frames_tracked": 31,
+     "frames_expected": 31,
+     "failure_rate": 0.0,
+     "median_m": 0.0117,
+     "p90_m": 0.0154,
+     "max_m": 0.0181
+    },
+    {
+     "frames_tracked": 31,
+     "frames_expected": 31,
+     "failure_rate": 0.0,
+     "median_m": 0.0118,
+     "p90_m": 0.0153,
+     "max_m": 0.0176
+    },
+    {
+     "frames_tracked": 31,
+     "frames_expected": 31,
+     "failure_rate": 0.0,
+     "median_m": 0.0119,
+     "p90_m": 0.0156,
+     "max_m": 0.0181
+    }
+   ],
+   "median_m": 0.0118,
+   "p90_m": 0.0154,
+   "failure_rate": 0.0
+  },
+  "no tags, measured floor": {
+   "runs": [
+    {
+     "frames_tracked": 212,
+     "frames_expected": 231,
+     "failure_rate": 0.0823,
+     "median_m": 0.0319,
+     "p90_m": 0.0522,
+     "max_m": 0.0898,
+     "mode": "measured"
+    },
+    {
+     "frames_tracked": 212,
+     "frames_expected": 231,
+     "failure_rate": 0.0823,
+     "median_m": 0.0314,
+     "p90_m": 0.0526,
+     "max_m": 0.0899,
+     "mode": "measured"
+    },
+    {
+     "frames_tracked": 212,
+     "frames_expected": 231,
+     "failure_rate": 0.0823,
+     "median_m": 0.0322,
+     "p90_m": 0.0523,
+     "max_m": 0.0986,
+     "mode": "measured"
+    }
+   ],
+   "median_m": 0.0319,
+   "p90_m": 0.0523,
+   "failure_rate": 0.0823
+  },
+  "no tags, robot size only": {
+   "runs": [
+    {
+     "frames_tracked": 212,
+     "frames_expected": 231,
+     "failure_rate": 0.0823,
+     "median_m": 0.0324,
+     "p90_m": 0.0537,
+     "max_m": 0.0797,
+     "mode": "robot-size"
+    },
+    {
+     "frames_tracked": 212,
+     "frames_expected": 231,
+     "failure_rate": 0.0823,
+     "median_m": 0.0326,
+     "p90_m": 0.0547,
+     "max_m": 0.0787,
+     "mode": "robot-size"
+    },
+    {
+     "frames_tracked": 212,
+     "frames_expected": 231,
+     "failure_rate": 0.0823,
+     "median_m": 0.0316,
+     "p90_m": 0.0542,
+     "max_m": 0.0901,
+     "mode": "robot-size"
+    }
+   ],
+   "median_m": 0.0324,
+   "p90_m": 0.0542,
+   "failure_rate": 0.0823
+  }
+ }
+}

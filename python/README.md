@@ -102,7 +102,7 @@ motionbench score runs/driver-07-t0
 ```
 
 See [docs/capture-guide.md](docs/capture-guide.md). On rendered test footage the
-tracker recovers the robot in 100% of frames with sub-centimetre mean position error.
+tracker finds the robot in every frame, with about 1 cm median position error (90% within 1.6 cm).
 No tags? Score an ordinary phone video:
 
 ```bash

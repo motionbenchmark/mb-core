@@ -1,0 +1,926 @@
+{
+ "game": "AIM-SORT@0.1",
+ "title": "VEX AIM barrel sorting",
+ "layout": "dev-01",
+ "max_points": 6,
+ "time_s": 45.0,
+ "simulated": true,
+ "baseline": "parameterized simulated drivers (uncalibrated)",
+ "design": {
+  "runs": 20,
+  "driver_runs": 20,
+  "paired": true,
+  "margin_points": 0.5,
+  "bootstrap": "paired runs (public); layouts then runs (unseen)",
+  "unseen_layouts": 10,
+  "unseen_seed_base": 5000
+ },
+ "class": {
+  "size": 20,
+  "runs_each": 3,
+  "median_of_means": 2.833333333333333,
+  "top_quarter": 3.0,
+  "bottom_quarter": 2.25,
+  "median_student": {
+   "id": "student-02",
+   "name": "Student 02",
+   "reaction_s": 0.3507628897856145,
+   "speed_use": 0.7060369627979831,
+   "steer_shake_deg": 4.632055337884182,
+   "precision": 0.6591545755864066,
+   "decisions": 0.8125885295558479,
+   "mistakes": 0.080608353046548,
+   "hesitate": 0.22362158403653204,
+   "strafe": 0.37880635796380896,
+   "blurb": "skill 0.58"
+  }
+ },
+ "public": {
+  "code": {
+   "deadreckon_v1.py": {
+    "runs": 20,
+    "mean_points": 1.7,
+    "median_points": 2.0,
+    "worst_points": 1.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 4.67,
+    "mean_bumps": 0.0,
+    "errors": []
+   },
+   "vision_v2.py": {
+    "runs": 20,
+    "mean_points": 2.45,
+    "median_points": 3.0,
+    "worst_points": 1.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.62,
+    "mean_bumps": 2.4,
+    "errors": []
+   },
+   "vision_tags_v3.py": {
+    "runs": 20,
+    "mean_points": 2.15,
+    "median_points": 2.5,
+    "worst_points": 0.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 4.33,
+    "mean_bumps": 1.1,
+    "errors": []
+   },
+   "planner_v4.py": {
+    "runs": 20,
+    "mean_points": 4.0,
+    "median_points": 4.0,
+    "worst_points": 4.0,
+    "best_points": 4.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 5.98,
+    "mean_bumps": 0.0,
+    "errors": []
+   }
+  },
+  "drivers": {
+   "rookie-riley": {
+    "name": "Rookie Riley",
+    "blurb": "First week with the controller. Slow to react, overshoots, sometimes heads for the wrong barrel.",
+    "traits": {
+     "id": "rookie-riley",
+     "name": "Rookie Riley",
+     "reaction_s": 0.55,
+     "speed_use": 0.55,
+     "steer_shake_deg": 9.0,
+     "precision": 0.3,
+     "decisions": 0.55,
+     "mistakes": 0.16,
+     "hesitate": 0.25,
+     "strafe": 0.0,
+     "blurb": "First week with the controller. Slow to react, overshoots, sometimes heads for the wrong barrel."
+    },
+    "runs": 20,
+    "mean_points": 2.0,
+    "median_points": 2.0,
+    "worst_points": 2.0,
+    "best_points": 2.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.53,
+    "mean_bumps": 0.15,
+    "errors": []
+   },
+   "nervous-noah": {
+    "name": "Nervous Noah",
+    "blurb": "Knows what to do but stops to think a lot.",
+    "traits": {
+     "id": "nervous-noah",
+     "name": "Nervous Noah",
+     "reaction_s": 0.45,
+     "speed_use": 0.6,
+     "steer_shake_deg": 5.0,
+     "precision": 0.6,
+     "decisions": 0.7,
+     "mistakes": 0.07,
+     "hesitate": 0.4,
+     "strafe": 0.1,
+     "blurb": "Knows what to do but stops to think a lot."
+    },
+    "runs": 20,
+    "mean_points": 2.1,
+    "median_points": 2.0,
+    "worst_points": 2.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.74,
+    "mean_bumps": 0.15,
+    "errors": []
+   },
+   "average-alex": {
+    "name": "Average Alex",
+    "blurb": "A typical student driver after a few sessions.",
+    "traits": {
+     "id": "average-alex",
+     "name": "Average Alex",
+     "reaction_s": 0.4,
+     "speed_use": 0.7,
+     "steer_shake_deg": 5.0,
+     "precision": 0.55,
+     "decisions": 0.75,
+     "mistakes": 0.08,
+     "hesitate": 0.15,
+     "strafe": 0.2,
+     "blurb": "A typical student driver after a few sessions."
+    },
+    "runs": 20,
+    "mean_points": 2.6,
+    "median_points": 3.0,
+    "worst_points": 1.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 4.37,
+    "mean_bumps": 0.85,
+    "errors": []
+   },
+   "speedy-sloane": {
+    "name": "Speedy Sloane",
+    "blurb": "Full speed everywhere. Fast when it works, messy when it doesn't.",
+    "traits": {
+     "id": "speedy-sloane",
+     "name": "Speedy Sloane",
+     "reaction_s": 0.3,
+     "speed_use": 1.0,
+     "steer_shake_deg": 7.0,
+     "precision": 0.4,
+     "decisions": 0.7,
+     "mistakes": 0.13,
+     "hesitate": 0.05,
+     "strafe": 0.3,
+     "blurb": "Full speed everywhere. Fast when it works, messy when it doesn't."
+    },
+    "runs": 20,
+    "mean_points": 3.75,
+    "median_points": 4.0,
+    "worst_points": 2.0,
+    "best_points": 4.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 6.05,
+    "mean_bumps": 0.95,
+    "errors": []
+   },
+   "steady-sam": {
+    "name": "Steady Sam",
+    "blurb": "Slow and careful. Rarely makes a mistake.",
+    "traits": {
+     "id": "steady-sam",
+     "name": "Steady Sam",
+     "reaction_s": 0.35,
+     "speed_use": 0.55,
+     "steer_shake_deg": 3.0,
+     "precision": 0.85,
+     "decisions": 0.85,
+     "mistakes": 0.03,
+     "hesitate": 0.1,
+     "strafe": 0.3,
+     "blurb": "Slow and careful. Rarely makes a mistake."
+    },
+    "runs": 20,
+    "mean_points": 2.0,
+    "median_points": 2.0,
+    "worst_points": 2.0,
+    "best_points": 2.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.56,
+    "mean_bumps": 0.05,
+    "errors": []
+   },
+   "pro-priya": {
+    "name": "Pro Priya",
+    "blurb": "The team's best driver: quick reactions, clean lines, smart order.",
+    "traits": {
+     "id": "pro-priya",
+     "name": "Pro Priya",
+     "reaction_s": 0.22,
+     "speed_use": 0.95,
+     "steer_shake_deg": 2.0,
+     "precision": 0.85,
+     "decisions": 0.95,
+     "mistakes": 0.02,
+     "hesitate": 0.03,
+     "strafe": 0.6,
+     "blurb": "The team's best driver: quick reactions, clean lines, smart order."
+    },
+    "runs": 20,
+    "mean_points": 3.5,
+    "median_points": 3.5,
+    "worst_points": 3.0,
+    "best_points": 4.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 5.95,
+    "mean_bumps": 1.0,
+    "errors": []
+   }
+  },
+  "typical_student": {
+   "runs": 20,
+   "mean_points": 2.9,
+   "median_points": 3.0,
+   "worst_points": 2.0,
+   "best_points": 3.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 4.39,
+   "mean_bumps": 0.7,
+   "errors": []
+  },
+  "comparisons": {
+   "deadreckon_v1.py": {
+    "typical student": {
+     "diff_points": -1.2,
+     "ci95": [
+      -1.5,
+      -0.9
+     ],
+     "verdict": "worse"
+    },
+    "Rookie Riley": {
+     "diff_points": -0.3,
+     "ci95": [
+      -0.6,
+      0.0
+     ],
+     "verdict": "no difference found"
+    },
+    "Nervous Noah": {
+     "diff_points": -0.4,
+     "ci95": [
+      -0.7,
+      -0.1
+     ],
+     "verdict": "worse"
+    },
+    "Average Alex": {
+     "diff_points": -0.9,
+     "ci95": [
+      -1.25,
+      -0.45
+     ],
+     "verdict": "worse"
+    },
+    "Speedy Sloane": {
+     "diff_points": -2.05,
+     "ci95": [
+      -2.35,
+      -1.7
+     ],
+     "verdict": "worse"
+    },
+    "Steady Sam": {
+     "diff_points": -0.3,
+     "ci95": [
+      -0.55,
+      0.0
+     ],
+     "verdict": "no difference found"
+    },
+    "Pro Priya": {
+     "diff_points": -1.8,
+     "ci95": [
+      -2.2,
+      -1.45
+     ],
+     "verdict": "worse"
+    }
+   },
+   "vision_v2.py": {
+    "typical student": {
+     "diff_points": -0.45,
+     "ci95": [
+      -0.8,
+      -0.1
+     ],
+     "verdict": "worse"
+    },
+    "Rookie Riley": {
+     "diff_points": 0.45,
+     "ci95": [
+      0.1,
+      0.75
+     ],
+     "verdict": "better"
+    },
+    "Nervous Noah": {
+     "diff_points": 0.35,
+     "ci95": [
+      0.0,
+      0.65
+     ],
+     "verdict": "no difference found"
+    },
+    "Average Alex": {
+     "diff_points": -0.15,
+     "ci95": [
+      -0.55,
+      0.25
+     ],
+     "verdict": "no difference found"
+    },
+    "Speedy Sloane": {
+     "diff_points": -1.3,
+     "ci95": [
+      -1.7,
+      -0.9
+     ],
+     "verdict": "worse"
+    },
+    "Steady Sam": {
+     "diff_points": 0.45,
+     "ci95": [
+      0.1,
+      0.75
+     ],
+     "verdict": "better"
+    },
+    "Pro Priya": {
+     "diff_points": -1.05,
+     "ci95": [
+      -1.4,
+      -0.75
+     ],
+     "verdict": "worse"
+    }
+   },
+   "vision_tags_v3.py": {
+    "typical student": {
+     "diff_points": -0.75,
+     "ci95": [
+      -1.2,
+      -0.35
+     ],
+     "verdict": "worse"
+    },
+    "Rookie Riley": {
+     "diff_points": 0.15,
+     "ci95": [
+      -0.3,
+      0.55
+     ],
+     "verdict": "no difference found"
+    },
+    "Nervous Noah": {
+     "diff_points": 0.05,
+     "ci95": [
+      -0.4,
+      0.451
+     ],
+     "verdict": "equivalent"
+    },
+    "Average Alex": {
+     "diff_points": -0.45,
+     "ci95": [
+      -0.95,
+      0.05
+     ],
+     "verdict": "no difference found"
+    },
+    "Speedy Sloane": {
+     "diff_points": -1.6,
+     "ci95": [
+      -2.05,
+      -1.2
+     ],
+     "verdict": "worse"
+    },
+    "Steady Sam": {
+     "diff_points": 0.15,
+     "ci95": [
+      -0.3,
+      0.55
+     ],
+     "verdict": "no difference found"
+    },
+    "Pro Priya": {
+     "diff_points": -1.35,
+     "ci95": [
+      -1.7,
+      -1.0
+     ],
+     "verdict": "worse"
+    }
+   },
+   "planner_v4.py": {
+    "typical student": {
+     "diff_points": 1.1,
+     "ci95": [
+      1.0,
+      1.25
+     ],
+     "verdict": "better"
+    },
+    "Rookie Riley": {
+     "diff_points": 2.0,
+     "ci95": [
+      2.0,
+      2.0
+     ],
+     "verdict": "better"
+    },
+    "Nervous Noah": {
+     "diff_points": 1.9,
+     "ci95": [
+      1.75,
+      2.0
+     ],
+     "verdict": "better"
+    },
+    "Average Alex": {
+     "diff_points": 1.4,
+     "ci95": [
+      1.15,
+      1.7
+     ],
+     "verdict": "better"
+    },
+    "Speedy Sloane": {
+     "diff_points": 0.25,
+     "ci95": [
+      0.05,
+      0.5
+     ],
+     "verdict": "better"
+    },
+    "Steady Sam": {
+     "diff_points": 2.0,
+     "ci95": [
+      2.0,
+      2.0
+     ],
+     "verdict": "better"
+    },
+    "Pro Priya": {
+     "diff_points": 0.5,
+     "ci95": [
+      0.3,
+      0.7
+     ],
+     "verdict": "better"
+    }
+   }
+  }
+ },
+ "comparisons": {
+  "deadreckon_v1.py": {
+   "headline": "On the public layout it scores 1.20 points less than the typical simulated driver (95% range -1.50 to -0.90). On unseen layouts it scores 2.20 points less than the typical simulated driver (95% range -2.75 to -1.55). Its own score drops from public to unseen (-1.05, 95% range -1.50 to -0.60)."
+  },
+  "vision_v2.py": {
+   "headline": "On the public layout it scores 0.45 points less than the typical simulated driver (95% range -0.80 to -0.10). On unseen layouts it shows no detectable difference from the typical simulated driver (-0.45, 95% range -1.05 to +0.20). Its own score holds from public to unseen (-0.05, 95% range -0.50 to +0.40)."
+  },
+  "vision_tags_v3.py": {
+   "headline": "On the public layout it scores 0.75 points less than the typical simulated driver (95% range -1.20 to -0.35). On unseen layouts it scores 1.00 points less than the typical simulated driver (95% range -1.50 to -0.50). Its own score shows no detectable change from public to unseen (-0.30, 95% range -1.00 to +0.35)."
+  },
+  "planner_v4.py": {
+   "headline": "On the public layout it scores 1.10 points more than the typical simulated driver (95% range +1.00 to +1.25). On unseen layouts it shows no detectable difference from the typical simulated driver (-0.05, 95% range -0.65 to +0.60). Its own score drops from public to unseen (-1.20, 95% range -1.60 to -0.85)."
+  }
+ },
+ "unseen": {
+  "code": {
+   "deadreckon_v1.py": {
+    "runs": 20,
+    "mean_points": 0.65,
+    "median_points": 0.0,
+    "worst_points": 0.0,
+    "best_points": 2.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 4.73,
+    "mean_bumps": 0.0,
+    "errors": []
+   },
+   "vision_v2.py": {
+    "runs": 20,
+    "mean_points": 2.4,
+    "median_points": 3.0,
+    "worst_points": 1.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.72,
+    "mean_bumps": 2.05,
+    "errors": []
+   },
+   "vision_tags_v3.py": {
+    "runs": 20,
+    "mean_points": 1.85,
+    "median_points": 2.0,
+    "worst_points": 0.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.84,
+    "mean_bumps": 2.2,
+    "errors": []
+   },
+   "planner_v4.py": {
+    "runs": 20,
+    "mean_points": 2.8,
+    "median_points": 3.0,
+    "worst_points": 1.0,
+    "best_points": 4.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 5.79,
+    "mean_bumps": 1.15,
+    "errors": []
+   }
+  },
+  "drivers": {
+   "rookie-riley": {
+    "name": "Rookie Riley",
+    "runs": 20,
+    "mean_points": 2.15,
+    "median_points": 2.0,
+    "worst_points": 2.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.34,
+    "mean_bumps": 0.55,
+    "errors": []
+   },
+   "nervous-noah": {
+    "name": "Nervous Noah",
+    "runs": 20,
+    "mean_points": 2.45,
+    "median_points": 3.0,
+    "worst_points": 1.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.56,
+    "mean_bumps": 0.25,
+    "errors": []
+   },
+   "average-alex": {
+    "name": "Average Alex",
+    "runs": 20,
+    "mean_points": 2.9,
+    "median_points": 3.0,
+    "worst_points": 2.0,
+    "best_points": 4.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 4.27,
+    "mean_bumps": 1.0,
+    "errors": []
+   },
+   "speedy-sloane": {
+    "name": "Speedy Sloane",
+    "runs": 20,
+    "mean_points": 4.15,
+    "median_points": 4.0,
+    "worst_points": 3.0,
+    "best_points": 5.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 5.92,
+    "mean_bumps": 1.2,
+    "errors": []
+   },
+   "steady-sam": {
+    "name": "Steady Sam",
+    "runs": 20,
+    "mean_points": 2.1,
+    "median_points": 2.0,
+    "worst_points": 0.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.42,
+    "mean_bumps": 0.25,
+    "errors": []
+   },
+   "pro-priya": {
+    "name": "Pro Priya",
+    "runs": 20,
+    "mean_points": 3.8,
+    "median_points": 4.0,
+    "worst_points": 2.0,
+    "best_points": 5.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 5.63,
+    "mean_bumps": 1.35,
+    "errors": []
+   }
+  },
+  "typical_student": {
+   "runs": 20,
+   "mean_points": 2.85,
+   "median_points": 3.0,
+   "worst_points": 1.0,
+   "best_points": 4.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 4.22,
+   "mean_bumps": 0.9,
+   "errors": []
+  },
+  "comparisons": {
+   "deadreckon_v1.py": {
+    "typical student": {
+     "diff_points": -2.2,
+     "ci95": [
+      -2.75,
+      -1.55
+     ],
+     "verdict": "worse"
+    },
+    "Rookie Riley": {
+     "diff_points": -1.5,
+     "ci95": [
+      -1.95,
+      -1.0
+     ],
+     "verdict": "worse"
+    },
+    "Nervous Noah": {
+     "diff_points": -1.8,
+     "ci95": [
+      -2.25,
+      -1.3
+     ],
+     "verdict": "worse"
+    },
+    "Average Alex": {
+     "diff_points": -2.25,
+     "ci95": [
+      -2.8,
+      -1.7
+     ],
+     "verdict": "worse"
+    },
+    "Speedy Sloane": {
+     "diff_points": -3.5,
+     "ci95": [
+      -3.9,
+      -3.05
+     ],
+     "verdict": "worse"
+    },
+    "Steady Sam": {
+     "diff_points": -1.45,
+     "ci95": [
+      -2.051,
+      -0.85
+     ],
+     "verdict": "worse"
+    },
+    "Pro Priya": {
+     "diff_points": -3.15,
+     "ci95": [
+      -3.6,
+      -2.65
+     ],
+     "verdict": "worse"
+    }
+   },
+   "vision_v2.py": {
+    "typical student": {
+     "diff_points": -0.45,
+     "ci95": [
+      -1.05,
+      0.2
+     ],
+     "verdict": "no difference found"
+    },
+    "Rookie Riley": {
+     "diff_points": 0.25,
+     "ci95": [
+      -0.201,
+      0.7
+     ],
+     "verdict": "no difference found"
+    },
+    "Nervous Noah": {
+     "diff_points": -0.05,
+     "ci95": [
+      -0.7,
+      0.6
+     ],
+     "verdict": "no difference found"
+    },
+    "Average Alex": {
+     "diff_points": -0.5,
+     "ci95": [
+      -1.05,
+      0.05
+     ],
+     "verdict": "no difference found"
+    },
+    "Speedy Sloane": {
+     "diff_points": -1.75,
+     "ci95": [
+      -2.2,
+      -1.3
+     ],
+     "verdict": "worse"
+    },
+    "Steady Sam": {
+     "diff_points": 0.3,
+     "ci95": [
+      -0.35,
+      0.9
+     ],
+     "verdict": "no difference found"
+    },
+    "Pro Priya": {
+     "diff_points": -1.4,
+     "ci95": [
+      -1.75,
+      -0.95
+     ],
+     "verdict": "worse"
+    }
+   },
+   "vision_tags_v3.py": {
+    "typical student": {
+     "diff_points": -1.0,
+     "ci95": [
+      -1.5,
+      -0.5
+     ],
+     "verdict": "worse"
+    },
+    "Rookie Riley": {
+     "diff_points": -0.3,
+     "ci95": [
+      -1.05,
+      0.35
+     ],
+     "verdict": "no difference found"
+    },
+    "Nervous Noah": {
+     "diff_points": -0.6,
+     "ci95": [
+      -1.25,
+      0.05
+     ],
+     "verdict": "no difference found"
+    },
+    "Average Alex": {
+     "diff_points": -1.05,
+     "ci95": [
+      -1.75,
+      -0.4
+     ],
+     "verdict": "worse"
+    },
+    "Speedy Sloane": {
+     "diff_points": -2.3,
+     "ci95": [
+      -3.1,
+      -1.5
+     ],
+     "verdict": "worse"
+    },
+    "Steady Sam": {
+     "diff_points": -0.25,
+     "ci95": [
+      -0.9,
+      0.35
+     ],
+     "verdict": "no difference found"
+    },
+    "Pro Priya": {
+     "diff_points": -1.95,
+     "ci95": [
+      -2.65,
+      -1.35
+     ],
+     "verdict": "worse"
+    }
+   },
+   "planner_v4.py": {
+    "typical student": {
+     "diff_points": -0.05,
+     "ci95": [
+      -0.65,
+      0.6
+     ],
+     "verdict": "no difference found"
+    },
+    "Rookie Riley": {
+     "diff_points": 0.65,
+     "ci95": [
+      0.05,
+      1.15
+     ],
+     "verdict": "better"
+    },
+    "Nervous Noah": {
+     "diff_points": 0.35,
+     "ci95": [
+      -0.25,
+      0.9
+     ],
+     "verdict": "no difference found"
+    },
+    "Average Alex": {
+     "diff_points": -0.1,
+     "ci95": [
+      -0.55,
+      0.3
+     ],
+     "verdict": "no difference found"
+    },
+    "Speedy Sloane": {
+     "diff_points": -1.35,
+     "ci95": [
+      -1.9,
+      -0.75
+     ],
+     "verdict": "worse"
+    },
+    "Steady Sam": {
+     "diff_points": 0.7,
+     "ci95": [
+      -0.001,
+      1.45
+     ],
+     "verdict": "no difference found"
+    },
+    "Pro Priya": {
+     "diff_points": -1.0,
+     "ci95": [
+      -1.55,
+      -0.45
+     ],
+     "verdict": "worse"
+    }
+   }
+  },
+  "change_from_public": {
+   "deadreckon_v1.py": {
+    "diff_points": -1.05,
+    "ci95": [
+     -1.5,
+     -0.6
+    ],
+    "verdict": "worse"
+   },
+   "vision_v2.py": {
+    "diff_points": -0.05,
+    "ci95": [
+     -0.5,
+     0.4
+    ],
+    "verdict": "equivalent"
+   },
+   "vision_tags_v3.py": {
+    "diff_points": -0.3,
+    "ci95": [
+     -1.0,
+     0.35
+    ],
+    "verdict": "no difference found"
+   },
+   "planner_v4.py": {
+    "diff_points": -1.2,
+    "ci95": [
+     -1.6,
+     -0.85
+    ],
+    "verdict": "worse"
+   }
+  }
+ }
+}

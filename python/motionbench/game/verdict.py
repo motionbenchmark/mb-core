@@ -1,25 +1,34 @@
-"""Code against drivers, in simulation: does this routine do better than people would?
+"""Code against a simulated-driver baseline: does this routine do better than the
+parameterized drivers would, before it runs on the robot?
 
-Each routine runs many times (every run draws its own wheel slip, vision noise
-and kick scatter). Each driver character plays the same game many times, and a
-made-up class of drivers gives a picture of the typical student. Then every
-comparison is a difference in mean points with a 95% bootstrap range:
+Design of the comparison
+------------------------
+* **Paired runs.** Run *i* of every agent uses the same seed, so the same layout and the
+  same draw of robot imperfections (wheel slip, drift, camera noise, kick scatter). A
+  comparison is the mean of paired differences, which removes the variation the agents
+  share.
+* **Two settings.** The public layout, and ``unseen`` layouts generated from the game's
+  layout rules (official verdicts keep their seed private).
+* **Resampling unit.** On the public layout the bootstrap resamples paired runs. On
+  unseen layouts it is hierarchical: resample layouts, then runs within each chosen
+  layout, so the range reflects variation across layouts as well as runs.
+* **Four outcomes**, with an equivalence margin ``margin`` (default 0.5 points):
 
-  better       the whole range is above zero
-  worse        the whole range is below zero
-  can't tell   the range includes zero (more runs, or the two really are close)
+    better / worse        the 95% range of the paired difference excludes zero
+    equivalent            the 95% range lies inside [-margin, +margin]
+    no difference found   neither: the range includes zero but is wider than the margin
 
-Verdicts also run on generated layouts nobody has seen, so a routine that only learned
-the public layout by heart shows it. (Official verdicts keep those layouts' seeds private.)
+  "No difference found" is not "the same": more runs may separate them.
 
-A verdict from simulation says what to try on the real robot first. It is not
-a result: real fields, batteries and drivers differ from any model.
+The drivers are a parameterized, uncalibrated baseline (see driver.py). A verdict says
+which version of the code to try on the robot first; it is not a comparison with real
+people. The change of a routine between public and unseen layouts does not depend on
+the drivers at all.
 """
 
 from __future__ import annotations
 
 import json
-import statistics as st
 from pathlib import Path
 from typing import Callable, Optional
 
@@ -35,7 +44,7 @@ def _stats(runs: list[RunResult]) -> dict:
     fin = [r.finish_s for r in runs if r.finish_s is not None]
     return {
         "runs": len(runs),
-        "mean_points": round(float(np.mean(p)), 3),
+        "mean_points": round(float(np.mean(p)), 4),
         "median_points": float(np.median(p)),
         "worst_points": float(min(p)),
         "best_points": float(max(p)),
@@ -47,155 +56,183 @@ def _stats(runs: list[RunResult]) -> dict:
     }
 
 
-def _diff_ci(a: list[float], b: list[float], rng: np.random.Generator, n: int = 4000) -> tuple[float, float, float]:
+def paired_ci(a: list[float], b: list[float], groups: Optional[list[int]], rng: np.random.Generator,
+              n: int = 4000) -> tuple[float, float, float]:
+    """Mean paired difference a-b with a 95% bootstrap range. ``groups`` (layout of each
+    pair) makes the bootstrap hierarchical: layouts first, then pairs within layouts."""
+    d = np.asarray(a, float) - np.asarray(b, float)
+    if groups is None:
+        idx = rng.integers(0, len(d), (n, len(d)))
+        boots = d[idx].mean(1)
+    else:
+        g = np.asarray(groups)
+        ids = np.unique(g)
+        members = [np.nonzero(g == k)[0] for k in ids]
+        boots = np.empty(n)
+        for i in range(n):
+            pick = rng.integers(0, len(ids), len(ids))
+            vals = [d[members[k]][rng.integers(0, len(members[k]), len(members[k]))] for k in pick]
+            boots[i] = np.concatenate(vals).mean()
+    return float(d.mean()), float(np.percentile(boots, 2.5)), float(np.percentile(boots, 97.5))
+
+
+def unpaired_ci(a: list[float], b: list[float], rng: np.random.Generator, n: int = 4000) -> tuple[float, float, float]:
     a, b = np.asarray(a, float), np.asarray(b, float)
-    ia = rng.integers(0, len(a), (n, len(a)))
-    ib = rng.integers(0, len(b), (n, len(b)))
-    d = a[ia].mean(1) - b[ib].mean(1)
+    d = a[rng.integers(0, len(a), (n, len(a)))].mean(1) - b[rng.integers(0, len(b), (n, len(b)))].mean(1)
     return float(a.mean() - b.mean()), float(np.percentile(d, 2.5)), float(np.percentile(d, 97.5))
 
 
-def _word(lo: float, hi: float) -> str:
-    return "better" if lo > 0 else "worse" if hi < 0 else "can't tell"
+def outcome(lo: float, hi: float, margin: float) -> str:
+    if lo > 0:
+        return "better"
+    if hi < 0:
+        return "worse"
+    if -margin <= lo and hi <= margin:
+        return "equivalent"
+    return "no difference found"
 
 
-def verdict(game: Game, routines: dict[str, str], *, layout: Optional[str] = None, runs: int = 20, driver_runs: int = 12,
-            class_size: int = 20, class_runs: int = 3, drivers: Optional[list[Driver]] = None, seed: int = 0,
-            unseen: int = 10, unseen_seed: int = 5000, out: Optional[str] = None,
-            progress: Optional[Callable[[str], None]] = None) -> dict:
-    """``unseen``: also play on this many generated layouts nobody has seen (seeds from
-    ``unseen_seed``; official verdicts keep that seed private). 0 turns it off."""
+def _cmp(a: list[RunResult], b: list[RunResult], groups, rng, margin) -> dict:
+    diff, lo, hi = paired_ci([r.points for r in a], [r.points for r in b], groups, rng)
+    return {"diff_points": round(diff, 3), "ci95": [round(lo, 3), round(hi, 3)], "verdict": outcome(lo, hi, margin)}
+
+
+def _change(after: list[RunResult], before: list[RunResult], rng, margin) -> dict:
+    """Different layouts, so not paired: an ordinary two-sample bootstrap."""
+    diff, lo, hi = unpaired_ci([r.points for r in after], [r.points for r in before], rng)
+    return {"diff_points": round(diff, 3), "ci95": [round(lo, 3), round(hi, 3)], "verdict": outcome(lo, hi, margin)}
+
+
+def _phrase(c: dict, who: str) -> str:
+    d, (lo, hi) = c["diff_points"], c["ci95"]
+    rng_ = f"95% range {lo:+.2f} to {hi:+.2f}"
+    return {
+        "better": f"scores {abs(d):.2f} points more than {who} ({rng_})",
+        "worse": f"scores {abs(d):.2f} points less than {who} ({rng_})",
+        "equivalent": f"is equivalent to {who} within the margin ({d:+.2f}, {rng_})",
+        "no difference found": f"shows no detectable difference from {who} ({d:+.2f}, {rng_})",
+    }[c["verdict"]]
+
+
+def verdict(game: Game, routines: dict[str, str], *, layout: Optional[str] = None, runs: int = 20,
+            driver_runs: Optional[int] = None, class_size: int = 20, class_runs: int = 3,
+            drivers: Optional[list[Driver]] = None, seed: int = 0, unseen: int = 10, unseen_seed: int = 5000,
+            margin: float = 0.5, out: Optional[str] = None, progress: Optional[Callable[[str], None]] = None) -> dict:
+    """``driver_runs`` defaults to ``runs`` so that every comparison is fully paired."""
     say = progress or (lambda m: None)
     rng = np.random.default_rng(seed)
     lay, _ = game.layout(layout)
     drivers = drivers or CHARACTERS
+    driver_runs = driver_runs or runs
     outp = Path(out) if out else None
+    use_unseen = bool(unseen and game.raw.get("layout_rules"))
+    lays_u = [f"gen-{unseen_seed + i}" for i in range(unseen)] if use_unseen else []
 
     def keep(r: RunResult, sub: str):
         if outp:
-            write_run(r, outp / "runs" / sub / f"seed-{r.seed:03d}", game, score=False)
+            write_run(r, outp / "runs" / sub / f"{r.layout}-seed-{r.seed:04d}", game, score=False)
 
-    code_runs: dict[str, list[RunResult]] = {}
-    for name, code in routines.items():
-        say(f"code {name}: {runs} runs")
-        code_runs[name] = []
-        for s in range(runs):
-            r = simulate(game, code=code, code_name=name, layout=lay, seed=1000 + s)
-            code_runs[name].append(r)
-            keep(r, f"code-{Path(name).stem}")
-    drv_runs: dict[str, list[RunResult]] = {}
-    for d in drivers:
-        say(f"driver {d.name}: {driver_runs} runs")
-        drv_runs[d.id] = []
-        for s in range(driver_runs):
-            r = simulate(game, driver=d, layout=lay, seed=2000 + s)
-            drv_runs[d.id].append(r)
-            keep(r, f"driver-{d.id}")
+    # the yardstick: the median member of a parameterized class of drivers
     say(f"a class of {class_size} simulated drivers, {class_runs} runs each")
     klass = class_roster(class_size, seed=seed)
-    class_means, class_all = [], []
-    for d in klass:
-        rs = [simulate(game, driver=d, layout=lay, seed=3000 + 17 * i) for i in range(class_runs)]
-        class_means.append(float(np.mean([r.points for r in rs])))
-        class_all += rs
-    order = np.argsort(class_means)
-    median_student = klass[int(order[len(order) // 2])]
+    class_means = [float(np.mean([simulate(game, driver=d, layout=lay, seed=3000 + 17 * i).points for i in range(class_runs)]))
+                   for d in klass]
+    median_student = klass[int(np.argsort(class_means)[len(class_means) // 2])]
+
+    def play(settings: list[tuple[str, int]], label: str) -> dict:
+        """Every agent on the same (layout, seed) list."""
+        res = {"code": {}, "drivers": {}}
+        for name, code in routines.items():
+            say(f"{label}: code {name}, {len(settings)} runs")
+            res["code"][name] = [simulate(game, code=code, code_name=name, layout=l, seed=s) for l, s in settings]
+            for r in res["code"][name]:
+                keep(r, f"{label}/code-{Path(name).stem}")
+        for d in drivers:
+            say(f"{label}: driver {d.name}")
+            res["drivers"][d.id] = [simulate(game, driver=d, layout=l, seed=s) for l, s in settings[:driver_runs]]
+            for r in res["drivers"][d.id]:
+                keep(r, f"{label}/driver-{d.id}")
+        res["median"] = [simulate(game, driver=median_student, layout=l, seed=s) for l, s in settings]
+        return res
+
+    pub_settings = [(lay, 1000 + s) for s in range(runs)]
+    pub = play(pub_settings, "public")
+    uns, uns_groups = None, None
+    if use_unseen:
+        uns_settings = [(lays_u[s % unseen], 6000 + s) for s in range(runs)]
+        uns_groups = [s % unseen for s in range(runs)]
+        uns = play(uns_settings, "unseen")
+
+    def block(res, groups, name):
+        a = res["code"][name]
+        comp = {"typical student": _cmp(a, res["median"], groups, rng, margin)}
+        for d in drivers:
+            b = res["drivers"][d.id]
+            k = min(len(a), len(b))
+            comp[d.name] = _cmp(a[:k], b, groups[:k] if groups else None, rng, margin)
+        return comp
 
     report = {
         "game": game.key, "title": game.raw["title"], "layout": lay, "max_points": game.max_points, "time_s": game.time_s,
-        "simulated": True,
-        "code": {n: _stats(rs) for n, rs in code_runs.items()},
-        "drivers": {d.id: {"name": d.name, "blurb": d.blurb, "traits": d.as_dict(), **_stats(drv_runs[d.id])} for d in drivers},
+        "simulated": True, "baseline": "parameterized simulated drivers (uncalibrated)",
+        "design": {"runs": runs, "driver_runs": driver_runs, "paired": True, "margin_points": margin,
+                   "bootstrap": "paired runs (public); layouts then runs (unseen)", "unseen_layouts": len(lays_u),
+                   "unseen_seed_base": unseen_seed if use_unseen else None},
         "class": {"size": class_size, "runs_each": class_runs, "median_of_means": float(np.median(class_means)),
                   "top_quarter": float(np.percentile(class_means, 75)), "bottom_quarter": float(np.percentile(class_means, 25)),
                   "median_student": median_student.as_dict()},
+        "public": {"code": {n: _stats(rs) for n, rs in pub["code"].items()},
+                   "drivers": {d.id: {"name": d.name, "blurb": d.blurb, "traits": d.as_dict(), **_stats(pub["drivers"][d.id])}
+                               for d in drivers},
+                   "typical_student": _stats(pub["median"]),
+                   "comparisons": {n: block(pub, None, n) for n in routines}},
         "comparisons": {},
     }
-    # the median student, run as often as the code, is the main yardstick
-    med_runs = [simulate(game, driver=median_student, layout=lay, seed=4000 + s) for s in range(runs)]
-    for n, rs in code_runs.items():
-        a = [r.points for r in rs]
-        comp = {}
-        for label, others in [("median student", med_runs)] + [(drv_runs[d.id][0].agent_name, drv_runs[d.id]) for d in drivers]:
-            diff, lo, hi = _diff_ci(a, [r.points for r in others], rng)
-            comp[label] = {"diff_points": round(diff, 2), "ci95": [round(lo, 2), round(hi, 2)], "verdict": _word(lo, hi)}
-        beats = [k for k, v in comp.items() if v["verdict"] == "better" and k != "median student"]
-        loses = [k for k, v in comp.items() if v["verdict"] == "worse" and k != "median student"]
-        m = comp["median student"]
-        if m["verdict"] == "better":
-            head = f"Better than the typical student driver by {m['diff_points']:+.1f} points (95% range {m['ci95'][0]:+.1f} to {m['ci95'][1]:+.1f})."
-        elif m["verdict"] == "worse":
-            head = f"Worse than the typical student driver by {abs(m['diff_points']):.1f} points (95% range {m['ci95'][0]:+.1f} to {m['ci95'][1]:+.1f})."
-        else:
-            head = f"Can't tell apart from the typical student driver ({m['diff_points']:+.1f} points, 95% range {m['ci95'][0]:+.1f} to {m['ci95'][1]:+.1f})."
-        best = max(drivers, key=lambda d: np.mean([r.points for r in drv_runs[d.id]]))
-        bv = comp[best.name]
-        tail = (f" It also beats the best simulated driver, {best.name}." if bv["verdict"] == "better" else
-                f" The best simulated driver, {best.name}, still does better." if bv["verdict"] == "worse" else
-                f" Against the best simulated driver, {best.name}, it's too close to call.")
-        report["comparisons"][n] = {"headline": head + tail, "vs": comp, "beats": beats, "loses_to": loses}
-    if unseen and game.raw.get("layout_rules"):
-        report["unseen"] = _unseen(game, routines, code_runs, drivers, drv_runs, median_student, runs, driver_runs, unseen,
-                                   unseen_seed, rng, say)
-        for n, u in report["unseen"]["comparisons"].items():
-            report["comparisons"][n]["headline"] += " " + u["headline"]
+    if uns:
+        report["unseen"] = {"code": {n: _stats(rs) for n, rs in uns["code"].items()},
+                            "drivers": {d.id: {"name": d.name, **_stats(uns["drivers"][d.id])} for d in drivers},
+                            "typical_student": _stats(uns["median"]),
+                            "comparisons": {n: block(uns, uns_groups, n) for n in routines},
+                            # within-routine change: does not involve the drivers at all
+                            "change_from_public": {n: _change(uns["code"][n], pub["code"][n], rng, margin) for n in routines}}
+    for n in routines:
+        p = report["public"]["comparisons"][n]["typical student"]
+        head = f"On the public layout it {_phrase(p, 'the typical simulated driver')}."
+        if uns:
+            u = report["unseen"]["comparisons"][n]["typical student"]
+            ch = report["unseen"]["change_from_public"][n]
+            ch = report["unseen"]["change_from_public"][n]
+            word = {"better": "rises", "worse": "drops", "equivalent": "holds", "no difference found": "shows no detectable change"}[ch["verdict"]]
+            head += (f" On unseen layouts it {_phrase(u, 'the typical simulated driver')}. Its own score {word} from public to unseen"
+                     f" ({ch['diff_points']:+.2f}, 95% range {ch['ci95'][0]:+.2f} to {ch['ci95'][1]:+.2f}).")
+        report["comparisons"][n] = {"headline": head}
     if outp:
         outp.mkdir(parents=True, exist_ok=True)
         (outp / "verdict.json").write_text(json.dumps(report, indent=1))
     return report
 
 
-def _unseen(game, routines, code_runs, drivers, drv_runs, median_student, runs, driver_runs, n_layouts, base, rng, say) -> dict:
-    """The same comparisons on generated layouts: does the code still hold up on a field it hasn't seen?"""
-    lays = [f"gen-{base + i}" for i in range(n_layouts)]
-    say(f"unseen layouts: {n_layouts} generated layouts")
-    u_code = {n: [simulate(game, code=c, code_name=n, layout=lays[s % n_layouts], seed=6000 + s) for s in range(runs)]
-              for n, c in routines.items()}
-    u_drv = {d.id: [simulate(game, driver=d, layout=lays[s % n_layouts], seed=7000 + s) for s in range(driver_runs)] for d in drivers}
-    u_med = [simulate(game, driver=median_student, layout=lays[s % n_layouts], seed=8000 + s) for s in range(runs)]
-    best = max(drivers, key=lambda d: np.mean([r.points for r in u_drv[d.id]]))
-    out = {"layouts": n_layouts, "seed_base": base, "code": {n: _stats(rs) for n, rs in u_code.items()},
-           "drivers": {d.id: {"name": d.name, **_stats(u_drv[d.id])} for d in drivers},
-           "median_student": _stats(u_med), "comparisons": {}}
-    for n, rs in u_code.items():
-        a = [r.points for r in rs]
-        dm, lm, hm = _diff_ci(a, [r.points for r in u_med], rng)
-        db, lb, hb = _diff_ci(a, [r.points for r in u_drv[best.id]], rng)
-        dp, lp, hp = _diff_ci(a, [r.points for r in code_runs[n]], rng)
-        w = _word(lm, hm)
-        head = (f"On layouts it hasn't seen it scores {np.mean(a):.1f} (vs {np.mean([r.points for r in code_runs[n]]):.1f} on the public one): "
-                f"{'better than' if w == 'better' else 'worse than' if w == 'worse' else 'level with'} the typical student there.")
-        out["comparisons"][n] = {
-            "headline": head,
-            "vs median student": {"diff_points": round(dm, 2), "ci95": [round(lm, 2), round(hm, 2)], "verdict": w},
-            "vs best driver": {"driver": best.name, "diff_points": round(db, 2), "ci95": [round(lb, 2), round(hb, 2)], "verdict": _word(lb, hb)},
-            "change_from_public": {"diff_points": round(dp, 2), "ci95": [round(lp, 2), round(hp, 2)], "verdict": _word(lp, hp)},
-        }
-    return out
-
-
 def print_verdict(r: dict) -> None:
-    print(f"{r['title']} ({r['game']}, layout {r['layout']}) - SIMULATED, {r['time_s']:.0f} s, max {r['max_points']:.0f} points")
-    rows = [(f"code: {n}", s) for n, s in r["code"].items()] + [(f"driver: {v['name']}", v) for v in r["drivers"].values()]
-    print(f"{'':<34}{'mean':>6}{'median':>8}{'worst':>7}{'best':>6}{'all in':>8}{'path m':>8}{'bumps':>7}")
-    for label, s in rows:
-        print(f"{label[:33]:<34}{s['mean_points']:>6.2f}{s['median_points']:>8.1f}{s['worst_points']:>7.0f}{s['best_points']:>6.0f}"
-              f"{s['full_score_runs']:>5}/{s['runs']:<2}{s['mean_path_m']:>8.1f}{s['mean_bumps']:>7.1f}")
-    c = r["class"]
-    print(f"class of {c['size']} simulated students: median {c['median_of_means']:.2f} points, middle half "
-          f"{c['bottom_quarter']:.2f}-{c['top_quarter']:.2f}")
-    for n, comp in r["comparisons"].items():
-        print(f"\nVERDICT for {n}: {comp['headline']}")
-        for k, v in comp["vs"].items():
-            print(f"   vs {k:<16} {v['diff_points']:+.2f} points  [{v['ci95'][0]:+.2f}, {v['ci95'][1]:+.2f}]  {v['verdict']}")
-        for e in r["code"][n]["errors"]:
-            print(f"   note: the routine stopped with {e}")
-    u = r.get("unseen")
-    if u:
-        print(f"\nUNSEEN LAYOUTS ({u['layouts']} generated, same start, barrels placed at random)")
-        for n, c in u["comparisons"].items():
-            s = u["code"][n]
-            print(f"   {n:<22} mean {s['mean_points']:.2f}  change from public {c['change_from_public']['diff_points']:+.2f}  "
-                  f"vs typical student {c['vs median student']['diff_points']:+.2f} ({c['vs median student']['verdict']})  "
-                  f"vs {c['vs best driver']['driver']} {c['vs best driver']['diff_points']:+.2f} ({c['vs best driver']['verdict']})")
-        print(f"   typical student on unseen layouts: {u['median_student']['mean_points']:.2f}")
+    d = r["design"]
+    print(f"{r['title']} ({r['game']}) - SIMULATED, {r['time_s']:.0f} s, max {r['max_points']:.0f} points")
+    print(f"baseline: {r['baseline']}; {d['runs']} paired runs per agent; equivalence margin +/-{d['margin_points']} points")
+    for setting in ("public", "unseen"):
+        if setting not in r:
+            continue
+        S = r[setting]
+        title = f"public layout {r['layout']}" if setting == "public" else f"{d['unseen_layouts']} unseen layouts"
+        print(f"\n{title.upper()}")
+        print(f"{'':<34}{'mean':>7}{'worst':>7}{'best':>6}{'all in':>8}")
+        rows = [(f"code: {n}", s) for n, s in S["code"].items()] + [("typical student", S["typical_student"])] + \
+               [(f"driver: {v['name']}", v) for v in S["drivers"].values()]
+        for label, s in rows:
+            print(f"{label[:33]:<34}{s['mean_points']:>7.2f}{s['worst_points']:>7.0f}{s['best_points']:>6.0f}{s['full_score_runs']:>5}/{s['runs']:<2}")
+        for n, comp in S["comparisons"].items():
+            print(f"  {n}:")
+            for k, v in comp.items():
+                print(f"     vs {k:<16} {v['diff_points']:+.2f}  [{v['ci95'][0]:+.2f}, {v['ci95'][1]:+.2f}]  {v['verdict']}")
+        if setting == "unseen":
+            for n, c in S["change_from_public"].items():
+                print(f"  {n}: change from public {c['diff_points']:+.2f} [{c['ci95'][0]:+.2f}, {c['ci95'][1]:+.2f}] {c['verdict']}")
+    for n, c in r["comparisons"].items():
+        print(f"\nVERDICT {n}: {c['headline']}")

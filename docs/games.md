@@ -104,47 +104,41 @@ few filmed runs per student) is the obvious next step.
 
 ## The verdict
 
-Every routine runs 20 times and every character 12 times; the median student 20
-times. Each comparison is the difference in mean points with a 95% bootstrap
-range: **better** if the whole range is above zero, **worse** if it is below,
-**can't tell** if it includes zero.
+The drivers are a **parameterized, uncalibrated baseline**: a verdict says the code beats
+(or doesn't beat) these simulated drivers, not real people.
 
-The four sample routines on layout dev-01 (45 s, 6 points possible):
+- **Paired runs.** Run *i* of every agent uses the same seed: the same layout and the same
+  draw of robot imperfections. Comparisons are means of paired differences.
+- **Public and unseen layouts.** 20 runs on the public layout, and 20 spread over 10
+  generated layouts (official verdicts keep that seed private).
+- **Resampling unit.** Public: paired runs. Unseen: layouts first, then runs within them,
+  so the range covers variation across layouts.
+- **Four outcomes**, with an equivalence margin of 0.5 points: **better** or **worse** when
+  the 95% range excludes zero; **equivalent** when the range lies inside ±0.5; **no
+  difference found** otherwise. No difference found is not the same as equivalent.
+- A routine's **change from public to unseen** is a comparison with itself and does not
+  depend on the drivers at all.
 
-| routine | idea | mean points | verdict vs typical student |
-|---|---|---|---|
-| `deadreckon_v1.py` | fixed plan, no sensors, measured order | 1.7 | worse (-1.0) |
-| `vision_v2.py` | AI Vision to find barrels, odometry home | 2.5 | can't tell (-0.3) |
-| `vision_tags_v3.py` | v2 plus AprilTag homing at the zone | 2.2 | worse (-0.6) |
-| `planner_v4.py` | planned order, full speed, vision for the last few cm, spread drop spots | 4.0 | better (+1.3); too close to call against the best drivers |
+The four sample routines (45 s, 6 points possible; `results/aim-sort-verdict-v0.1.json`):
 
-The simulated drivers range from 1.9 (Rookie Riley) to 4.1 (Speedy Sloane)
-points. Two things the simulation found that a real run would also show: the
-tag-homing routine wastes time searching for the tag, and routines that drop
-every barrel on the same spot pick up the one already there.
+| routine | public | vs typical driver | unseen | vs typical driver | change |
+|---|---|---|---|---|---|
+| `deadreckon_v1.py` | 1.70 | worse (-1.20) | 0.65 | worse (-2.20) | worse (-1.05) |
+| `vision_v2.py` | 2.45 | worse (-0.45) | 2.40 | no difference found (-0.45) | equivalent (-0.05) |
+| `vision_tags_v3.py` | 2.15 | worse (-0.75) | 1.85 | worse (-1.00) | no difference found (-0.30) |
+| `planner_v4.py` | 4.00 | better (+1.10) | 2.80 | no difference found (-0.05) | worse (-1.20) |
 
-### Unseen layouts
+The typical simulated driver scores 2.90 on the public layout and 2.85 on unseen
+layouts; the six characters range from 2.00 to 3.75 (public) and 2.10 to 4.15 (unseen).
+The planner beats every simulated character on the public layout and none of the two
+best on unseen layouts: its plan encodes where the barrels are. The routine that searches
+with the camera holds its score. Two other findings a real run would also show: the
+tag-homing routine wastes time searching for the tag, and routines that drop every barrel
+on the same spot pick up the one already there. At AIM's top speed of 200 mm/s no agent
+sorts all six barrels in 45 s; the best runs score 4 or 5.
 
-A routine can learn the public layout by heart. So the verdict also plays on 10
-generated layouts (same start, barrels placed at random away from the zones, the
-start and each other); official verdicts keep that seed private. On dev-01's
-routines:
-
-| routine | public layout | unseen layouts | change | vs typical student, unseen |
-|---|---|---|---|---|
-| `deadreckon_v1.py` | 1.7 | 0.7 | -1.1 | worse |
-| `vision_v2.py` | 2.5 | 2.4 | -0.1 | worse (-0.5) |
-| `vision_tags_v3.py` | 2.2 | 1.9 | -0.3 | worse |
-| `planner_v4.py` | 4.0 | 2.8 | -1.2 | level (can't tell) |
-
-The typical simulated student scores 2.9 on the unseen layouts. The best routine on
-the public layout owes most of its lead to knowing where the barrels are: on fields it
-hasn't seen, its advantage over the typical student disappears, while the routine that
-looks for barrels barely changes. That is exactly what a public-only verdict would miss.
-
-One more finding: at AIM's top speed of 200 mm/s, sorting all six barrels in 45
-seconds is out of reach. The best runs score 4 or 5. Either the task's time
-limit should be longer, or "how many in 45 s" is the measure.
+Simulated agents are also less variable than real ones (some score the same in every
+run), so ranges here are likely narrower than they will be on real robots.
 
 ## Next
 

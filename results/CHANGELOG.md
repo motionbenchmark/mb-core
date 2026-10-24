@@ -4,6 +4,17 @@ Every change to a published board or result, newest first. Boards carry the spec
 scorer version they were produced with; results under an older spec stay valid as
 results under that spec. See [docs/protocol.md](../docs/protocol.md).
 
+## 2026-10-24 (later)
+- **Game verdicts are paired** (same seeds for every agent), resampled over layouts then runs
+  on unseen layouts, and use four outcomes with a 0.5-point equivalence margin
+  (better / worse / equivalent / no difference found). `aim-sort-verdict-v0.1.json`
+  regenerated; the drivers now run as many paired runs as the code (20).
+- **Capture accuracy corrected.** Re-measured over three render seeds with medians, 90th
+  percentiles and missing frames (`paper/results/capture-accuracy.json`): about 1 cm with
+  tags, about 3 cm without (earlier text said about 2 cm and about 6 cm, from single runs).
+- **People comparison guard:** `vs_people` is reported only when the median person beats
+  chance by at least 10% of the task's maximum. No published board changes.
+
 ## 2026-10-24
 - **Match tracking baseline** (`match-baseline-v0.1.json`, synthetic): three simulated
   matches, baseline tracker re-run after the alliance-vote change (one vote per frame).
