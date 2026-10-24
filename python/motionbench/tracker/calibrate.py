@@ -18,13 +18,15 @@ from .stabilize import Stabilizer
 from .video import _cv2, iter_frames, probe
 
 
-def empty_floor(video: "str | Path", *, width: int = 540, samples: int = 90) -> np.ndarray:
-    """Median of aligned frames across the whole video: moving things vanish."""
+def empty_floor(video: "str | Path", *, width: int = 540, samples: int = 90, start_s: float = 0.0,
+                end_s: Optional[float] = None) -> np.ndarray:
+    """Median of aligned frames across the video (or ``start_s``..``end_s``): moving things vanish."""
     cv2 = _cv2()
     info = probe(video)
-    fps = max(0.5, min(10.0, samples / max(info.duration_s, 1e-3)))
+    span = (end_s if end_s is not None else info.duration_s) - start_s
+    fps = max(0.5, min(10.0, samples / max(span, 1e-3)))
     stab, acc = None, []
-    for _, f in iter_frames(video, width=width, fps=fps):
+    for _, f in iter_frames(video, width=width, fps=fps, start_s=start_s, end_s=end_s):
         if stab is None:
             stab = Stabilizer(f)
             size = (f.shape[1], f.shape[0])
@@ -35,9 +37,10 @@ def empty_floor(video: "str | Path", *, width: int = 540, samples: int = 90) -> 
 
 
 def write_calibration_page(video: "str | Path", out_html: "str | Path", *, width: int = 540,
-                           png: Optional["str | Path"] = None, defaults: Optional[dict] = None) -> Path:
+                           png: Optional["str | Path"] = None, defaults: Optional[dict] = None,
+                           start_s: float = 0.0, end_s: Optional[float] = None) -> Path:
     cv2 = _cv2()
-    bg = empty_floor(video, width=width)
+    bg = empty_floor(video, width=width, start_s=start_s, end_s=end_s)
     if png:
         cv2.imwrite(str(png), bg)
     ok, buf = cv2.imencode(".jpg", bg, [cv2.IMWRITE_JPEG_QUALITY, 88])

@@ -3,7 +3,9 @@
     motionbench match synth -o data/match-sim --seeds 1-5          simulate matches (ground truth)
     motionbench match render data/match-sim/m0001 -o m0001.mp4      broadcast-style video + gt.csv
     motionbench match report data/match-sim/m0001 [--png paths.png] per-robot metrics by period
-    motionbench match track m0001.mp4 -o tracks.csv                 baseline tracker (no tags)
+    motionbench calibrate match.mp4 --vex-field --width 1020 --start 9 -o calib.html   tap the field corners
+    motionbench match track match.mp4 --calib calib.json --start 9 -o tracks.csv      baseline tracker (no tags)
+    motionbench match from-tracks tracks.csv -o my-match/            tracks -> match folder (then `match report`)
     motionbench match eval data/match-sim/m0001 tracks.csv          score a tracker against ground truth
 """
 
@@ -54,12 +56,20 @@ def add_parser(sub) -> None:
     q.add_argument("video")
     q.add_argument("-o", "--out", required=True, help="tracks.csv (t_s,track_id,x_m,y_m,alliance)")
     q.add_argument("--camera", help="camera.json (frame_size, f_px, camera_height_m, floor_corners_px, field_m); default: the broadcast camera")
+    q.add_argument("--calib", help="calib.json from `motionbench calibrate VIDEO --vex-field` (tap the four field corners)")
     q.add_argument("--fps", type=float, default=10.0)
     q.add_argument("--start", type=float, default=0.0, help="video time where the overhead shot starts (s)")
     q.add_argument("--end", type=float)
     q.add_argument("--match-start", type=float, help="video time of match t=0 (default: --start)")
     q.add_argument("--robots", type=int, default=4)
     q.add_argument("--overlay", help="write a video with the tracks drawn on it")
+
+    q = ms.add_parser("from-tracks", help="turn tracks.csv into a match folder (so `match report` works on real video)")
+    q.add_argument("tracks")
+    q.add_argument("-o", "--out", required=True)
+    q.add_argument("--robots", type=int, default=4)
+    q.add_argument("--id", default="tracked", help="match id")
+    q.add_argument("--name", action="append", default=[], metavar="ROBOT=NAME", help="e.g. red1=1234A (repeatable)")
 
     q = ms.add_parser("eval", help="score tracker output against a match's ground truth")
     q.add_argument("match")
@@ -97,10 +107,25 @@ def run(a) -> int:
     elif a.match_cmd == "track":
         from .track import track_match
 
-        cam = json.loads(Path(a.camera).read_text()) if a.camera else None
+        if a.calib:
+            from .io import camera_from_calib
+
+            cam = camera_from_calib(a.calib)
+            print(f"camera: f {cam['f_px']:.0f} px, {cam['camera_height_m']:.2f} m up, tilted {cam['tilt_deg']:.0f} deg", file=sys.stderr)
+        else:
+            cam = json.loads(Path(a.camera).read_text()) if a.camera else None
         info = track_match(a.video, a.out, camera=cam, fps=a.fps, start_s=a.start, end_s=a.end, match_start_s=a.match_start,
                            n_robots=a.robots, overlay=a.overlay, progress=lambda m: print(m, file=sys.stderr))
         print(json.dumps(info, indent=1))
+    elif a.match_cmd == "from-tracks":
+        from .io import match_from_tracks
+
+        names = dict(n.split("=", 1) for n in a.name)
+        d = match_from_tracks(a.tracks, a.out, n_robots=a.robots, match_id=a.id, names=names)
+        meta = json.loads((d / "match.json").read_text())
+        for r in meta["robots"]:
+            print(f"{r['id']:>6}  {r['alliance']:<7} tracks {', '.join(r['tracks'])}")
+        print(f"wrote {d}; next: motionbench match report {d}")
     elif a.match_cmd == "eval":
         from .eval import evaluate, print_eval
 

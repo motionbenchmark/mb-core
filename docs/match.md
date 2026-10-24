@@ -12,7 +12,8 @@ no tags and with people, blocks and structures in the way.
 | `motionbench match synth -o DIR --seeds 1-5` | simulate 2 v 2 matches with full ground truth |
 | `motionbench match render MATCH -o clip.mp4` | broadcast-style video of a match, plus per-frame ground truth |
 | `motionbench match report MATCH [--png paths.png]` | per-robot metrics, split by period |
-| `motionbench match track VIDEO -o tracks.csv` | baseline tracker for fixed-camera footage (no tags) |
+| `motionbench match track VIDEO --calib calib.json -o tracks.csv` | baseline tracker for fixed-camera footage (no tags) |
+| `motionbench match from-tracks tracks.csv -o MATCH` | stitch tracks into robots and write a match folder for `report` |
 | `motionbench match eval MATCH tracks.csv` | score a tracker against ground truth |
 
 Everything here is **synthetic** unless it says otherwise. Simulated matches
@@ -84,6 +85,22 @@ position, heading, the image point of the footprint centre and the image box.
 A different camera is a `match.json` edit away (`camera`: frame size, focal
 length, height, the four floor corners in pixels and the field size).
 
+## Scoring a real match
+
+1. Film from a fixed camera that sees all four field corners for the whole match.
+2. `motionbench calibrate match.mp4 --vex-field --width 1020 --start 9 -o calib.html`: open the
+   page, tap the field's four inside corners (far left, far right, near right, near left) and
+   download `calib.json`. `--start` skips a broadcast intro; use `--field W L` for other fields.
+3. `motionbench match track match.mp4 --calib calib.json --start 9 --match-start 12 -o tracks.csv --overlay check.mp4`
+   (`--match-start` is the video time when the match clock starts). Watch `check.mp4`.
+4. `motionbench match from-tracks tracks.csv -o my-match/ --name red1=1234A`: tracks that broke
+   briefly are stitched back together and named by alliance.
+5. `motionbench match report my-match/ --png paths.png`.
+
+Ask the teams and the event before filming or using a recording: matches show students. The
+project publishes robot paths, never the footage. The same guide is on the website at
+https://motionbench.org/guides/matches.
+
 ## Report
 
 `motionbench match report` works on any match folder, simulated or tracked,
@@ -134,16 +151,16 @@ Baseline on three simulated matches (`data/match-sim-v0.1` m0001–m0003, render
 | match | recall | precision | median error | 90% error | ID switches | IDF1 | MOTA | alliance |
 |---|---|---|---|---|---|---|---|---|
 | m0001 | 97.1% | 98.6% | 8.0 cm | 17.7 cm | 25 | 65.1% | 95.2% | 68.4% |
-| m0002 | 89.8% | 96.0% | 8.9 cm | 19.2 cm | 29 | 65.7% | 85.5% | 90.6% |
-| m0003 | 90.1% | 94.1% | 7.0 cm | 15.8 cm | 44 | 48.3% | 83.5% | 61.7% |
+| m0002 | 89.5% | 95.8% | 8.9 cm | 19.1 cm | 33 | 65.6% | 84.9% | 90.6% |
+| m0003 | 90.4% | 94.3% | 7.0 cm | 15.8 cm | 43 | 48.3% | 84.0% | 61.5% |
 
 It finds the robots and puts them in the right place to within a robot's bumper, but keeping
 each robot's identity for the whole match is where it falls down: that is the main target.
 
 On the real broadcast clip (a minute of the overhead shot; no ground truth yet) the baseline
-keeps a track on all four robots for the whole minute. Two robots change identity once each,
-and 4 of its 6 track identities get the right alliance colour: red game blocks near a blue
-robot are enough to fool the colour vote.
+keeps a track on all four robots for the whole minute. One robot changes identity once, when
+a pause symbol from the screen recording appears over the field and the tracker follows it;
+four of its five tracks get the right alliance colour.
 
 Known weaknesses, which are also the next things to build: robots that stand
 still for much of the clip leak into the empty-field picture; two robots pushing
