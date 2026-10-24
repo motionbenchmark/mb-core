@@ -15,6 +15,8 @@ task's goals, measured the same way every time.
 > sidewalk vehicles, or open-airspace drones, and nothing here is a safety
 > certification. Read the [manifesto](MANIFESTO.md) for why that line matters.
 
+> **Paper (draft for comment):** [paper/](paper/README.md) - methodology and preliminary results. **Protocol:** [docs/protocol.md](docs/protocol.md).
+
 ## How it works
 
 ```
