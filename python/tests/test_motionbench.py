@@ -324,3 +324,64 @@ def test_match_camera_from_calib_and_from_tracks(match_dir, tmp_path):
     assert sorted(r["id"] for r in meta["robots"]) == ["blue1", "blue2", "red1", "red2"]
     assert any(r["tracks"] == ["0", "9"] for r in meta["robots"])
     assert report(d)["robots"]["red1"]["match"]["distance_m"] > 5
+
+
+# ----------------------------------------------------------------------------- games: code vs simulated drivers
+GAME_DIR = Path(__file__).resolve().parents[2] / "games" / "aim-sort"
+
+
+def test_game_definition_validates_and_scores():
+    from motionbench.game import Game
+
+    g = Game.load(GAME_DIR)
+    assert g.key == "AIM-SORT@0.1" and g.max_points == 6
+    s = g.score_world([{"id": "o1", "kind": "barrel-orange", "x": 0.1, "y": 0.6},
+                       {"id": "b1", "kind": "barrel-blue", "x": 0.1, "y": 0.6},
+                       {"id": "b2", "kind": "barrel-blue", "x": 1.7, "y": 0.6, "held": True}])
+    assert s["points"] == 1
+
+
+def test_vexcode_aim_emulator_moves_like_the_api(tmp_path):
+    from motionbench.game import Game, simulate
+
+    g = Game.load(GAME_DIR)
+    code = "from vex import *\nrobot=Robot()\nrobot.set_move_velocity(100)\nrobot.move_for(300, 90)\nrobot.turn_to(90)\nwait(1, SECONDS)\n"
+    r = simulate(g, code=code, layout="dev-01", noise=0.0)
+    t, x, y, th = r.poses[-1]
+    assert x == pytest.approx(0.9144 + 0.3, abs=0.01) and y == pytest.approx(0.12, abs=0.01)  # 300 mm to the right
+    assert th == pytest.approx(0.0, abs=0.03)  # heading 90 = facing +x
+    assert 3.0 < r.ended_s < 5.0  # 1.5 s at 200 mm/s, a 90 deg turn at the default 75 deg/s, and the wait
+    # runaway loops still end when the clock does; crashes are reported, not raised
+    assert simulate(g, code="from vex import *\nwhile True:\n    pass\n", layout="dev-01").status == "time"
+    bad = simulate(g, code="from vex import *\nrobot=Robot()\nrobot.fly()\n", layout="dev-01")
+    assert bad.status == "error" and "fly" in bad.error
+
+
+def test_game_runs_agree_with_the_standard_scorer(tmp_path):
+    from motionbench.game import CHARACTERS, Game, simulate, write_run
+
+    g = Game.load(GAME_DIR)
+    code = (GAME_DIR / "routines" / "planner_v4.py").read_text()
+    a = simulate(g, code=code, layout="dev-01", seed=4)
+    b = simulate(g, code=code, layout="dev-01", seed=4)
+    assert a.poses == b.poses and a.points == b.points  # deterministic per seed
+    assert a.points >= 3
+    write_run(a, tmp_path / "run", g)
+    rep = mb.score(tmp_path / "run" / "trace")
+    assert rep["success"]["score"] == a.points
+    d = simulate(g, driver=CHARACTERS[-1], layout="dev-01", seed=1)
+    assert d.points >= 2 and d.agent_kind == "driver"
+
+
+def test_game_verdict_compares_code_with_drivers():
+    from motionbench.game import CHARACTERS, Game
+    from motionbench.game.verdict import verdict
+
+    g = Game.load(GAME_DIR)
+    code = (GAME_DIR / "routines" / "planner_v4.py").read_text()
+    r = verdict(g, {"v4.py": code}, layout="dev-01", runs=4, driver_runs=3, class_size=4, class_runs=1,
+                drivers=[CHARACTERS[0], CHARACTERS[-1]])
+    comp = r["comparisons"]["v4.py"]
+    assert set(comp["vs"]) == {"median student", "Rookie Riley", "Pro Priya"}
+    assert comp["vs"]["Rookie Riley"]["verdict"] in ("better", "can't tell", "worse")
+    assert r["simulated"] is True and comp["headline"]

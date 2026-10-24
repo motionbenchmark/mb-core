@@ -121,6 +121,18 @@ score and submit a run to the project site for review.
 
 Onboard logging for VEX V5 (PROS): [integrations/vex/pros](integrations/vex/pros).
 
+### Code vs drivers, in simulation
+
+Define a game once (`games/<name>/game.json`), then run your VEXcode AIM Python routine
+against it hundreds of times, play the same game with simulated drivers (reaction time,
+steering, precision, decisions, mistakes), and get a verdict before the code ever runs on
+the robot. See [docs/games.md](docs/games.md).
+
+```bash
+motionbench game simulate games/aim-sort --code my_routine.py --layout dev-01 -o runs/try1 --video try1.mp4
+motionbench game verdict games/aim-sort --layout dev-01 --code v1.py --code v2.py
+```
+
 ### Multi-robot matches
 
 Four robots, two alliances, one fixed broadcast camera: simulate matches with full
@@ -202,6 +214,8 @@ python/                   PyO3 bindings + motionbench Python package
   motionbench/synth.py      synthetic dataset generator
   motionbench/tracker/      AprilTag and tag-free trackers, renderer, tag sheets
   motionbench/match/        multi-robot matches: simulator, broadcast renderer, report, tracker, benchmark
+  motionbench/game/         games: VEX AIM simulator running VEXcode Python, simulated drivers, verdicts, video
+games/                    game definitions (game.json) and sample routines
 tasks/                    task specs (ID@VERSION.json)
 data/synthetic-v0.1/      570 synthetic traces (CC BY 4.0)
 data/match-sim-v0.1/      5 synthetic 2 v 2 matches with ground truth (CC BY 4.0)
