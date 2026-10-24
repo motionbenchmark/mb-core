@@ -1,0 +1,776 @@
+{
+ "game": "AIM-SORT@0.1",
+ "title": "VEX AIM barrel sorting",
+ "layout": "dev-01",
+ "max_points": 6,
+ "time_s": 45.0,
+ "simulated": true,
+ "code": {
+  "deadreckon_v1.py": {
+   "runs": 20,
+   "mean_points": 1.7,
+   "median_points": 2.0,
+   "worst_points": 1.0,
+   "best_points": 3.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 4.67,
+   "mean_bumps": 0.0,
+   "errors": []
+  },
+  "vision_v2.py": {
+   "runs": 20,
+   "mean_points": 2.45,
+   "median_points": 3.0,
+   "worst_points": 1.0,
+   "best_points": 3.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 3.62,
+   "mean_bumps": 2.4,
+   "errors": []
+  },
+  "vision_tags_v3.py": {
+   "runs": 20,
+   "mean_points": 2.15,
+   "median_points": 2.5,
+   "worst_points": 0.0,
+   "best_points": 3.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 4.33,
+   "mean_bumps": 1.1,
+   "errors": []
+  },
+  "planner_v4.py": {
+   "runs": 20,
+   "mean_points": 4.0,
+   "median_points": 4.0,
+   "worst_points": 4.0,
+   "best_points": 4.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 5.98,
+   "mean_bumps": 0.0,
+   "errors": []
+  }
+ },
+ "drivers": {
+  "rookie-riley": {
+   "name": "Rookie Riley",
+   "blurb": "First week with the controller. Slow to react, overshoots, sometimes heads for the wrong barrel.",
+   "traits": {
+    "id": "rookie-riley",
+    "name": "Rookie Riley",
+    "reaction_s": 0.55,
+    "speed_use": 0.55,
+    "steer_shake_deg": 9.0,
+    "precision": 0.3,
+    "decisions": 0.55,
+    "mistakes": 0.16,
+    "hesitate": 0.25,
+    "strafe": 0.0,
+    "blurb": "First week with the controller. Slow to react, overshoots, sometimes heads for the wrong barrel."
+   },
+   "runs": 12,
+   "mean_points": 1.917,
+   "median_points": 2.0,
+   "worst_points": 1.0,
+   "best_points": 3.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 3.57,
+   "mean_bumps": 0.17,
+   "errors": []
+  },
+  "nervous-noah": {
+   "name": "Nervous Noah",
+   "blurb": "Knows what to do but stops to think a lot.",
+   "traits": {
+    "id": "nervous-noah",
+    "name": "Nervous Noah",
+    "reaction_s": 0.45,
+    "speed_use": 0.6,
+    "steer_shake_deg": 5.0,
+    "precision": 0.6,
+    "decisions": 0.7,
+    "mistakes": 0.07,
+    "hesitate": 0.4,
+    "strafe": 0.1,
+    "blurb": "Knows what to do but stops to think a lot."
+   },
+   "runs": 12,
+   "mean_points": 2.25,
+   "median_points": 2.0,
+   "worst_points": 2.0,
+   "best_points": 3.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 3.82,
+   "mean_bumps": 0.08,
+   "errors": []
+  },
+  "average-alex": {
+   "name": "Average Alex",
+   "blurb": "A typical student driver after a few sessions.",
+   "traits": {
+    "id": "average-alex",
+    "name": "Average Alex",
+    "reaction_s": 0.4,
+    "speed_use": 0.7,
+    "steer_shake_deg": 5.0,
+    "precision": 0.55,
+    "decisions": 0.75,
+    "mistakes": 0.08,
+    "hesitate": 0.15,
+    "strafe": 0.2,
+    "blurb": "A typical student driver after a few sessions."
+   },
+   "runs": 12,
+   "mean_points": 2.833,
+   "median_points": 3.0,
+   "worst_points": 2.0,
+   "best_points": 3.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 4.42,
+   "mean_bumps": 1.0,
+   "errors": []
+  },
+  "speedy-sloane": {
+   "name": "Speedy Sloane",
+   "blurb": "Full speed everywhere. Fast when it works, messy when it doesn't.",
+   "traits": {
+    "id": "speedy-sloane",
+    "name": "Speedy Sloane",
+    "reaction_s": 0.3,
+    "speed_use": 1.0,
+    "steer_shake_deg": 7.0,
+    "precision": 0.4,
+    "decisions": 0.7,
+    "mistakes": 0.13,
+    "hesitate": 0.05,
+    "strafe": 0.3,
+    "blurb": "Full speed everywhere. Fast when it works, messy when it doesn't."
+   },
+   "runs": 12,
+   "mean_points": 4.083,
+   "median_points": 4.0,
+   "worst_points": 4.0,
+   "best_points": 5.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 6.25,
+   "mean_bumps": 1.0,
+   "errors": []
+  },
+  "steady-sam": {
+   "name": "Steady Sam",
+   "blurb": "Slow and careful. Rarely makes a mistake.",
+   "traits": {
+    "id": "steady-sam",
+    "name": "Steady Sam",
+    "reaction_s": 0.35,
+    "speed_use": 0.55,
+    "steer_shake_deg": 3.0,
+    "precision": 0.85,
+    "decisions": 0.85,
+    "mistakes": 0.03,
+    "hesitate": 0.1,
+    "strafe": 0.3,
+    "blurb": "Slow and careful. Rarely makes a mistake."
+   },
+   "runs": 12,
+   "mean_points": 2.083,
+   "median_points": 2.0,
+   "worst_points": 2.0,
+   "best_points": 3.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 3.63,
+   "mean_bumps": 0.08,
+   "errors": []
+  },
+  "pro-priya": {
+   "name": "Pro Priya",
+   "blurb": "The team's best driver: quick reactions, clean lines, smart order.",
+   "traits": {
+    "id": "pro-priya",
+    "name": "Pro Priya",
+    "reaction_s": 0.22,
+    "speed_use": 0.95,
+    "steer_shake_deg": 2.0,
+    "precision": 0.85,
+    "decisions": 0.95,
+    "mistakes": 0.02,
+    "hesitate": 0.03,
+    "strafe": 0.6,
+    "blurb": "The team's best driver: quick reactions, clean lines, smart order."
+   },
+   "runs": 12,
+   "mean_points": 3.833,
+   "median_points": 4.0,
+   "worst_points": 3.0,
+   "best_points": 4.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 6.03,
+   "mean_bumps": 1.0,
+   "errors": []
+  }
+ },
+ "class": {
+  "size": 20,
+  "runs_each": 3,
+  "median_of_means": 2.833333333333333,
+  "top_quarter": 3.0,
+  "bottom_quarter": 2.25,
+  "median_student": {
+   "id": "student-02",
+   "name": "Student 02",
+   "reaction_s": 0.3507628897856145,
+   "speed_use": 0.7060369627979831,
+   "steer_shake_deg": 4.632055337884182,
+   "precision": 0.6591545755864066,
+   "decisions": 0.8125885295558479,
+   "mistakes": 0.080608353046548,
+   "hesitate": 0.22362158403653204,
+   "strafe": 0.37880635796380896,
+   "blurb": "skill 0.58"
+  }
+ },
+ "comparisons": {
+  "deadreckon_v1.py": {
+   "headline": "Worse than the typical student driver by 1.0 points (95% range -1.4 to -0.6). The best simulated driver, Speedy Sloane, still does better. On layouts it hasn't seen it scores 0.7 (vs 1.7 on the public one): worse than the typical student there.",
+   "vs": {
+    "median student": {
+     "diff_points": -1.0,
+     "ci95": [
+      -1.35,
+      -0.6
+     ],
+     "verdict": "worse"
+    },
+    "Rookie Riley": {
+     "diff_points": -0.22,
+     "ci95": [
+      -0.62,
+      0.2
+     ],
+     "verdict": "can't tell"
+    },
+    "Nervous Noah": {
+     "diff_points": -0.55,
+     "ci95": [
+      -0.93,
+      -0.18
+     ],
+     "verdict": "worse"
+    },
+    "Average Alex": {
+     "diff_points": -1.13,
+     "ci95": [
+      -1.47,
+      -0.78
+     ],
+     "verdict": "worse"
+    },
+    "Speedy Sloane": {
+     "diff_points": -2.38,
+     "ci95": [
+      -2.72,
+      -2.05
+     ],
+     "verdict": "worse"
+    },
+    "Steady Sam": {
+     "diff_points": -0.38,
+     "ci95": [
+      -0.7,
+      -0.05
+     ],
+     "verdict": "worse"
+    },
+    "Pro Priya": {
+     "diff_points": -2.13,
+     "ci95": [
+      -2.47,
+      -1.77
+     ],
+     "verdict": "worse"
+    }
+   },
+   "beats": [],
+   "loses_to": [
+    "Nervous Noah",
+    "Average Alex",
+    "Speedy Sloane",
+    "Steady Sam",
+    "Pro Priya"
+   ]
+  },
+  "vision_v2.py": {
+   "headline": "Can't tell apart from the typical student driver (-0.2 points, 95% range -0.7 to +0.1). The best simulated driver, Speedy Sloane, still does better. On layouts it hasn't seen it scores 2.4 (vs 2.5 on the public one): worse than the typical student there.",
+   "vs": {
+    "median student": {
+     "diff_points": -0.25,
+     "ci95": [
+      -0.65,
+      0.15
+     ],
+     "verdict": "can't tell"
+    },
+    "Rookie Riley": {
+     "diff_points": 0.53,
+     "ci95": [
+      0.1,
+      0.97
+     ],
+     "verdict": "better"
+    },
+    "Nervous Noah": {
+     "diff_points": 0.2,
+     "ci95": [
+      -0.23,
+      0.58
+     ],
+     "verdict": "can't tell"
+    },
+    "Average Alex": {
+     "diff_points": -0.38,
+     "ci95": [
+      -0.77,
+      0.02
+     ],
+     "verdict": "can't tell"
+    },
+    "Speedy Sloane": {
+     "diff_points": -1.63,
+     "ci95": [
+      -2.02,
+      -1.3
+     ],
+     "verdict": "worse"
+    },
+    "Steady Sam": {
+     "diff_points": 0.37,
+     "ci95": [
+      0.0,
+      0.7
+     ],
+     "verdict": "can't tell"
+    },
+    "Pro Priya": {
+     "diff_points": -1.38,
+     "ci95": [
+      -1.77,
+      -1.0
+     ],
+     "verdict": "worse"
+    }
+   },
+   "beats": [
+    "Rookie Riley"
+   ],
+   "loses_to": [
+    "Speedy Sloane",
+    "Pro Priya"
+   ]
+  },
+  "vision_tags_v3.py": {
+   "headline": "Worse than the typical student driver by 0.6 points (95% range -1.1 to -0.1). The best simulated driver, Speedy Sloane, still does better. On layouts it hasn't seen it scores 1.9 (vs 2.1 on the public one): worse than the typical student there.",
+   "vs": {
+    "median student": {
+     "diff_points": -0.55,
+     "ci95": [
+      -1.05,
+      -0.05
+     ],
+     "verdict": "worse"
+    },
+    "Rookie Riley": {
+     "diff_points": 0.23,
+     "ci95": [
+      -0.3,
+      0.73
+     ],
+     "verdict": "can't tell"
+    },
+    "Nervous Noah": {
+     "diff_points": -0.1,
+     "ci95": [
+      -0.6,
+      0.37
+     ],
+     "verdict": "can't tell"
+    },
+    "Average Alex": {
+     "diff_points": -0.68,
+     "ci95": [
+      -1.17,
+      -0.2
+     ],
+     "verdict": "worse"
+    },
+    "Speedy Sloane": {
+     "diff_points": -1.93,
+     "ci95": [
+      -2.38,
+      -1.5
+     ],
+     "verdict": "worse"
+    },
+    "Steady Sam": {
+     "diff_points": 0.07,
+     "ci95": [
+      -0.4,
+      0.5
+     ],
+     "verdict": "can't tell"
+    },
+    "Pro Priya": {
+     "diff_points": -1.68,
+     "ci95": [
+      -2.17,
+      -1.22
+     ],
+     "verdict": "worse"
+    }
+   },
+   "beats": [],
+   "loses_to": [
+    "Average Alex",
+    "Speedy Sloane",
+    "Pro Priya"
+   ]
+  },
+  "planner_v4.py": {
+   "headline": "Better than the typical student driver by +1.3 points (95% range +1.1 to +1.6). Against the best simulated driver, Speedy Sloane, it's too close to call. On layouts it hasn't seen it scores 2.8 (vs 4.0 on the public one): level with the typical student there.",
+   "vs": {
+    "median student": {
+     "diff_points": 1.3,
+     "ci95": [
+      1.1,
+      1.55
+     ],
+     "verdict": "better"
+    },
+    "Rookie Riley": {
+     "diff_points": 2.08,
+     "ci95": [
+      1.83,
+      2.33
+     ],
+     "verdict": "better"
+    },
+    "Nervous Noah": {
+     "diff_points": 1.75,
+     "ci95": [
+      1.5,
+      2.0
+     ],
+     "verdict": "better"
+    },
+    "Average Alex": {
+     "diff_points": 1.17,
+     "ci95": [
+      1.0,
+      1.42
+     ],
+     "verdict": "better"
+    },
+    "Speedy Sloane": {
+     "diff_points": -0.08,
+     "ci95": [
+      -0.25,
+      0.0
+     ],
+     "verdict": "can't tell"
+    },
+    "Steady Sam": {
+     "diff_points": 1.92,
+     "ci95": [
+      1.75,
+      2.0
+     ],
+     "verdict": "better"
+    },
+    "Pro Priya": {
+     "diff_points": 0.17,
+     "ci95": [
+      0.0,
+      0.42
+     ],
+     "verdict": "can't tell"
+    }
+   },
+   "beats": [
+    "Rookie Riley",
+    "Nervous Noah",
+    "Average Alex",
+    "Steady Sam"
+   ],
+   "loses_to": []
+  }
+ },
+ "unseen": {
+  "layouts": 10,
+  "seed_base": 5000,
+  "code": {
+   "deadreckon_v1.py": {
+    "runs": 20,
+    "mean_points": 0.65,
+    "median_points": 0.0,
+    "worst_points": 0.0,
+    "best_points": 2.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 4.73,
+    "mean_bumps": 0.0,
+    "errors": []
+   },
+   "vision_v2.py": {
+    "runs": 20,
+    "mean_points": 2.4,
+    "median_points": 3.0,
+    "worst_points": 1.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.72,
+    "mean_bumps": 2.05,
+    "errors": []
+   },
+   "vision_tags_v3.py": {
+    "runs": 20,
+    "mean_points": 1.85,
+    "median_points": 2.0,
+    "worst_points": 0.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.84,
+    "mean_bumps": 2.2,
+    "errors": []
+   },
+   "planner_v4.py": {
+    "runs": 20,
+    "mean_points": 2.8,
+    "median_points": 3.0,
+    "worst_points": 1.0,
+    "best_points": 4.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 5.79,
+    "mean_bumps": 1.15,
+    "errors": []
+   }
+  },
+  "drivers": {
+   "rookie-riley": {
+    "name": "Rookie Riley",
+    "runs": 12,
+    "mean_points": 1.75,
+    "median_points": 2.0,
+    "worst_points": 0.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.28,
+    "mean_bumps": 1.0,
+    "errors": []
+   },
+   "nervous-noah": {
+    "name": "Nervous Noah",
+    "runs": 12,
+    "mean_points": 2.5,
+    "median_points": 2.5,
+    "worst_points": 2.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.52,
+    "mean_bumps": 0.33,
+    "errors": []
+   },
+   "average-alex": {
+    "name": "Average Alex",
+    "runs": 12,
+    "mean_points": 3.0,
+    "median_points": 3.0,
+    "worst_points": 2.0,
+    "best_points": 4.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 4.12,
+    "mean_bumps": 1.0,
+    "errors": []
+   },
+   "speedy-sloane": {
+    "name": "Speedy Sloane",
+    "runs": 12,
+    "mean_points": 4.167,
+    "median_points": 4.0,
+    "worst_points": 4.0,
+    "best_points": 5.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 5.93,
+    "mean_bumps": 1.08,
+    "errors": []
+   },
+   "steady-sam": {
+    "name": "Steady Sam",
+    "runs": 12,
+    "mean_points": 2.25,
+    "median_points": 2.0,
+    "worst_points": 2.0,
+    "best_points": 3.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 3.48,
+    "mean_bumps": 0.08,
+    "errors": []
+   },
+   "pro-priya": {
+    "name": "Pro Priya",
+    "runs": 12,
+    "mean_points": 3.583,
+    "median_points": 4.0,
+    "worst_points": 2.0,
+    "best_points": 4.0,
+    "full_score_runs": 0,
+    "mean_finish_s": null,
+    "mean_path_m": 5.54,
+    "mean_bumps": 1.5,
+    "errors": []
+   }
+  },
+  "median_student": {
+   "runs": 20,
+   "mean_points": 2.9,
+   "median_points": 3.0,
+   "worst_points": 2.0,
+   "best_points": 4.0,
+   "full_score_runs": 0,
+   "mean_finish_s": null,
+   "mean_path_m": 4.3,
+   "mean_bumps": 0.95,
+   "errors": []
+  },
+  "comparisons": {
+   "deadreckon_v1.py": {
+    "headline": "On layouts it hasn't seen it scores 0.7 (vs 1.7 on the public one): worse than the typical student there.",
+    "vs median student": {
+     "diff_points": -2.25,
+     "ci95": [
+      -2.65,
+      -1.85
+     ],
+     "verdict": "worse"
+    },
+    "vs best driver": {
+     "driver": "Speedy Sloane",
+     "diff_points": -3.52,
+     "ci95": [
+      -3.93,
+      -3.13
+     ],
+     "verdict": "worse"
+    },
+    "change_from_public": {
+     "diff_points": -1.05,
+     "ci95": [
+      -1.45,
+      -0.6
+     ],
+     "verdict": "worse"
+    }
+   },
+   "vision_v2.py": {
+    "headline": "On layouts it hasn't seen it scores 2.4 (vs 2.5 on the public one): worse than the typical student there.",
+    "vs median student": {
+     "diff_points": -0.5,
+     "ci95": [
+      -0.9,
+      -0.15
+     ],
+     "verdict": "worse"
+    },
+    "vs best driver": {
+     "driver": "Speedy Sloane",
+     "diff_points": -1.77,
+     "ci95": [
+      -2.18,
+      -1.4
+     ],
+     "verdict": "worse"
+    },
+    "change_from_public": {
+     "diff_points": -0.05,
+     "ci95": [
+      -0.5,
+      0.4
+     ],
+     "verdict": "can't tell"
+    }
+   },
+   "vision_tags_v3.py": {
+    "headline": "On layouts it hasn't seen it scores 1.9 (vs 2.1 on the public one): worse than the typical student there.",
+    "vs median student": {
+     "diff_points": -1.05,
+     "ci95": [
+      -1.6,
+      -0.55
+     ],
+     "verdict": "worse"
+    },
+    "vs best driver": {
+     "driver": "Speedy Sloane",
+     "diff_points": -2.32,
+     "ci95": [
+      -2.85,
+      -1.8
+     ],
+     "verdict": "worse"
+    },
+    "change_from_public": {
+     "diff_points": -0.3,
+     "ci95": [
+      -0.95,
+      0.35
+     ],
+     "verdict": "can't tell"
+    }
+   },
+   "planner_v4.py": {
+    "headline": "On layouts it hasn't seen it scores 2.8 (vs 4.0 on the public one): level with the typical student there.",
+    "vs median student": {
+     "diff_points": -0.1,
+     "ci95": [
+      -0.55,
+      0.3
+     ],
+     "verdict": "can't tell"
+    },
+    "vs best driver": {
+     "driver": "Speedy Sloane",
+     "diff_points": -1.37,
+     "ci95": [
+      -1.8,
+      -0.95
+     ],
+     "verdict": "worse"
+    },
+    "change_from_public": {
+     "diff_points": -1.2,
+     "ci95": [
+      -1.6,
+      -0.85
+     ],
+     "verdict": "worse"
+    }
+   }
+  }
+ }
+}
