@@ -617,6 +617,8 @@ class Firmware:
             if not box:
                 continue
             x0, y0, bw, bh, _ = box
+            if bw < 10:  # too small to decode (recorded runs don't see this tag from the start, where it is ~7 px)
+                continue
             item = {"type": 8, "id": int(tid), "type_str": "tag", "originx": x0, "originy": y0, "width": bw, "height": bh, "score": 0,
                     "name": "", "angle": 0}
             item.update({"x0": x0, "y0": y0, "x1": x0 + bw, "y1": y0, "x2": x0 + bw, "y2": y0 + bh, "x3": x0, "y3": y0 + bh})
