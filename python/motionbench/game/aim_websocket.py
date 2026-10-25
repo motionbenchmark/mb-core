@@ -205,11 +205,25 @@ class Clock:
                 me.acc -= k * DT
                 self.sleep(k * DT)
 
+    _UNTRACED = ("threading.py", "selectors.py", "queue.py", "heapq.py")
+    _SIM_DIR = str(Path(__file__).resolve().parent.parent)  # the simulator itself is never charged as program time
+
     def _tracer(self, frame, event, arg):
+        """Charge time for the program's own lines (busy loops burn the clock as on the robot). The
+        scheduler and Python's threading are never traced: yielding inside them would deadlock."""
+        if event == "call":
+            fn = frame.f_code.co_filename
+            if fn.endswith(self._UNTRACED) or fn.startswith(self._SIM_DIR) or getattr(self._local, "in_sched", False):
+                return None
+            return self._tracer
         if event == "line":
             self._lines += 1
-            if self._lines % LINE_COST[0] == 0:
-                self.cost(LINE_COST[1])
+            if self._lines % LINE_COST[0] == 0 and not getattr(self._local, "in_sched", False):
+                self._local.in_sched = True
+                try:
+                    self.cost(LINE_COST[1])
+                finally:
+                    self._local.in_sched = False
         return self._tracer
 
     def finish_threads(self):

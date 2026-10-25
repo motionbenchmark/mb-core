@@ -411,3 +411,116 @@ def test_game_verdict_compares_code_with_drivers():
     assert r["unseen"]["change_from_public"]["v4.py"]["verdict"] in ("better", "worse", "equivalent", "no difference found")
     assert r["design"]["paired"] and r["design"]["unseen_layouts"] == 2
     assert r["simulated"] is True and comp["headline"]
+
+
+# -- robo-bench games: AprilTag signs, the targets goal, the AIM WebSocket client -------------------------
+GAMES = Path(__file__).resolve().parents[2] / "games"
+
+
+def _tag1_trace(tmp_path, events):
+    task = mb.load_task("MB-AIM-TAG1@0.1")
+    s = task["layouts"]["photo"]["start"]
+    poses = [(i * 0.1, s["x"] - i * 0.002, s["y"], s["theta"]) for i in range(50)]
+    return mb.write_trace(tmp_path / "t", task="MB-AIM-TAG1@0.1", seed="photo", agent_id="t", agent_class="ai",
+                          poses=poses, events=events, tier="S", capture="sim")
+
+
+def test_targets_goal_counts_only_valid_knocks(tmp_path):
+    assert mb.score(_tag1_trace(tmp_path / "a", [(2.0, "target_down", "T1", "ball")]))["success"]["score"] == 1
+    r = mb.score(_tag1_trace(tmp_path / "b", [(2.0, "target_down", "T1", "rammed"), (2.0, "rule_flag", "T1", "rammed")]))
+    assert r["success"]["score"] == 0 and r["safety"]["rule_flags"] == 1
+    assert mb.score(_tag1_trace(tmp_path / "c", []))["success"]["completion"] == 0
+
+
+def _held_ball_facing_tag(game_dir, seed=0):
+    from motionbench.game.spec import Game
+    from motionbench.game.world import World
+
+    g = Game.load(GAMES / game_dir)
+    w = World(g, seed=seed)
+    tag = next(o for o in w.objects if o.shape == "tag" and o.id == "T1")
+    ball = next(o for o in w.objects if o.shape == "ball")
+    face = math.radians(90 - tag.facing)  # stand 12 cm in front of the sign, facing it
+    w.x, w.y = tag.x + math.cos(face) * 0.12, tag.y + math.sin(face) * 0.12
+    w.th = face + math.pi
+    ball.held, w.held = True, ball
+    return g, w, tag
+
+
+def test_kicked_ball_knocks_the_sign_and_ramming_is_flagged():
+    g, w, tag = _held_ball_facing_tag("rb-tag1")
+    w.kick("HARD")
+    for _ in range(200):
+        w.step()
+    assert tag.down and tag.knocked_by == "ball"
+    assert g.score_world(w.final_objects(), w.events)["points"] == 1
+    g, w, tag = _held_ball_facing_tag("rb-tag1")
+    w.held.held, w.held = False, None
+    w.objects[0].x = 0.05  # ball out of the way
+    w.cmd_v = (math.cos(w.th) * 0.1, math.sin(w.th) * 0.1)
+    for _ in range(200):
+        w.step()
+    assert tag.down and tag.knocked_by == "rammed"
+    assert any(e[1] == "rule_flag" for e in w.events)
+    assert g.score_world(w.final_objects(), w.events)["points"] == 0
+
+
+def test_turning_against_a_wall_knocks_the_held_ball_loose():
+    from motionbench.game.spec import Game
+    from motionbench.game.world import World
+
+    w = World(Game.load(GAMES / "rb-tag1"))
+    ball = w.objects[0]
+    w.x, w.y, w.th = w.W - w.R - 0.001, 0.25, 0.0  # nose against the right wall
+    ball.held, w.held = True, ball
+    w.cmd_w = 2.0
+    for _ in range(50):
+        w.step()
+    assert not ball.held and any(e[1] == "dislodge" for e in w.events)
+
+
+def test_robo_bench_games_validate_and_link_tasks():
+    from motionbench.game.spec import Game
+
+    keys = {f"{t['id']}@{t['version']}" for t in mb.tasks()}
+    for name in ("rb-tag1", "rb-tag2", "rb-tag2-barrels", "rb-sort"):
+        g = Game.load(GAMES / name)
+        assert g.raw["motionbench_task"] in keys
+        assert g.max_points == {"rb-tag1": 1, "rb-tag2": 2, "rb-tag2-barrels": 2, "rb-sort": 6}[name]
+
+
+AIM_CLIENT = Path(__import__("os").environ.get("AIM_CLIENT_DIR", Path(__file__).resolve().parents[3] / "robo-bench"))
+
+
+@pytest.mark.skipif(not (AIM_CLIENT / "vex" / "aim.py").exists(), reason="AIM WebSocket client not found (set AIM_CLIENT_DIR)")
+def test_aim_websocket_client_runs_unchanged_against_the_simulated_robot():
+    from motionbench.game.aim_websocket import run_program
+    from motionbench.game.spec import Game
+    from motionbench.game.world import World
+
+    code = """
+from vex import *
+robot = Robot()
+timer = Timer()
+robot.vision.model_detection(True)
+ball = robot.vision.get_data(AiObjdesc(0))
+print("ball", len(ball), round(ball[0].bearing) if ball else None)
+def ticker():
+    for _ in range(3):
+        print("tick", round(timer.time(SECONDS)))
+        wait(1, SECONDS)
+Thread(ticker)
+robot.turn_for(RIGHT, 90, 50)
+print("heading", round(robot.inertial.get_heading()))
+robot.move_for(2000, 0, 10)
+robot.kicker.kick(HARD)
+"""
+    g = Game.load(GAMES / "rb-tag1")
+    r = run_program(code, World(g, seed=0), AIM_CLIENT, filename="p.py")
+    out = [ln for _, ln in r["console"]]
+    assert out[0].startswith("Welcome to the AIM Websocket Python Client")
+    assert out[1].startswith("ball 1")
+    assert any(ln.startswith("tick") for ln in out) and any(ln.startswith("heading 9") for ln in out)
+    assert any("wait timed out, stopping" in ln for ln in out)  # the client's 10 s limit on blocking moves
+    assert r["status"] == "error" and "HARD" in r["error"]  # HARD isn't exported by `from vex import *`, as on the robot
+    assert r["status_log"] and r["ended_s"] < 20
