@@ -129,17 +129,29 @@ def run(a) -> int:
         return 0
     if a.game_cmd == "score":
         rd = Path(a.run)
+        events = None
         if (rd / "run.json").exists():
-            objs = json.loads((rd / "run.json").read_text())["objects"]
+            rj = json.loads((rd / "run.json").read_text())
+            objs, events = rj["objects"], rj.get("events")
         else:  # a trace folder: final object positions from world_final.json, kinds from the game's layout
             trace = rd / "trace" if (rd / "trace").exists() else rd
             man = json.loads((trace / "manifest.json").read_text())
             _, lay = game.layout(man.get("seed"))
             kinds = {o["id"]: o["kind"] for o in lay["objects"]}
             objs = [dict(o, kind=kinds[o["id"]]) for o in json.loads((trace / "world_final.json").read_text())["objects"]]
-        s = game.score_world(objs)
+            if (trace / "events.csv").exists():
+                import csv
+                with open(trace / "events.csv") as f:
+                    events = [(float(r["t_s"]), r["type"], r.get("object_id", ""), r.get("detail", "")) for r in csv.DictReader(f)]
+        s = game.score_world(objs, events)
         for o in s["objects"]:
-            print(f"  {o['id']:<6} {o['kind']:<15} {('in ' + o['zone']) if o['zone'] else ('held' if o['held'] else '-'):<12} {o['points']:g}")
+            if o.get("target"):
+                where = f"down ({o['knocked_by']})" if o["down"] else "standing"
+            else:
+                where = ("in " + o["zone"]) if o["zone"] else ("held" if o["held"] else "-")
+            print(f"  {o['id']:<6} {o['kind']:<15} {where:<16} {o['points']:g}")
+        if s.get("failed"):
+            print(f"failed: {s['failed']}")
         print(f"{s['points']:g} / {s['max_points']:g} points")
         return 0
     if a.game_cmd == "verdict":

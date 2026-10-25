@@ -78,7 +78,8 @@ class Game:
         start = dict(self.raw["layouts"][rules.get("start_from", next(iter(self.raw["layouts"])))]["start"])
         margin, spacing = rules.get("margin_m", 0.08), rules.get("min_spacing_m", 0.15)
         clear, pad = rules.get("clear_of_start_m", 0.25), rules.get("clear_of_zones_m", 0.05)
-        objs: list[dict] = []
+        base = self.raw["layouts"][rules.get("start_from", next(iter(self.raw["layouts"])))]
+        objs: list[dict] = [dict(o) for o in base["objects"] if o["id"] in set(rules.get("keep", []))]
         for kind, count in rules["objects"].items():
             for k in range(int(count)):
                 for _ in range(2000):
@@ -105,7 +106,25 @@ class Game:
     @property
     def max_points(self) -> float:
         _, lay = self.layout()
-        return sum(self.points_for(o["kind"], z) for o in lay["objects"] for z in [self.best_zone(o["kind"])] if z)
+        zone_pts = sum(self.points_for(o["kind"], z) for o in lay["objects"] for z in [self.best_zone(o["kind"])] if z)
+        return zone_pts + self.target_points * len(self.target_ids(lay))
+
+    # -- targets: AprilTag signs to knock down ----------------------------------------------------------
+    @property
+    def targets_rule(self) -> Optional[dict]:
+        return self.raw["scoring"].get("targets")
+
+    @property
+    def target_points(self) -> float:
+        r = self.targets_rule
+        return float(r.get("points", 1)) if r else 0.0
+
+    def target_ids(self, lay: dict) -> list[str]:
+        r = self.targets_rule
+        if not r:
+            return []
+        kinds = set(r.get("kinds", []))
+        return [o["id"] for o in lay["objects"] if o["kind"] in kinds]
 
     def best_zone(self, kind: str) -> Optional[str]:
         rules = [r for r in self.raw["scoring"]["rules"] if r["object"] == kind]
@@ -137,6 +156,17 @@ class Game:
                     errs.append(f"layout {name}: object {o.get('id')} has unknown kind {o.get('kind')!r}")
                 if not (0 <= o.get("x", -1) <= W and 0 <= o.get("y", -1) <= H):
                     errs.append(f"layout {name}: object {o.get('id')} is outside the field")
+        tr = g["scoring"].get("targets")
+        if tr:
+            for k in tr.get("kinds", []):
+                if k not in g["objects"]:
+                    errs.append(f"targets rule names unknown object kind {k!r}")
+                elif g["objects"][k].get("shape") != "tag":
+                    errs.append(f"targets rule: object kind {k!r} must have shape 'tag'")
+        for name, lay in g["layouts"].items():
+            for o in lay.get("objects", []):
+                if g["objects"].get(o.get("kind"), {}).get("shape") == "tag" and "tag_id" not in o:
+                    errs.append(f"layout {name}: AprilTag sign {o.get('id')} needs a tag_id")
         for r in g["scoring"].get("rules", []):
             if r.get("object") not in g["objects"]:
                 errs.append(f"scoring rule for unknown object {r.get('object')!r}")
@@ -154,11 +184,27 @@ class Game:
                 out.append(name)
         return out
 
-    def score_world(self, objects: list[dict]) -> dict:
-        """``objects``: [{id, kind, x, y, held?}] at rest after the match."""
+    def score_world(self, objects: list[dict], events: Optional[list] = None) -> dict:
+        """``objects``: [{id, kind, x, y, held?}] at rest after the match. ``events``: the run's
+        ``(t, kind, object_id, detail)`` events, needed for targets (which sign fell, and what hit it)
+        and for rules that fail the run."""
         rows, total = [], 0.0
+        tr = self.targets_rule or {}
+        tkinds, valid_by = set(tr.get("kinds", [])), set(tr.get("valid_by", ["ball"]))
+        down = {}
+        for e in events or []:
+            if e[1] == "target_down" and e[2] not in down:
+                down[e[2]] = (e[0], e[3])
         for o in objects:
             pts, zone = 0.0, None
+            if o["kind"] in tkinds:
+                t, by = down.get(o["id"], (None, ""))
+                ok = t is not None and by in valid_by
+                pts = self.target_points if ok else 0.0
+                total += pts
+                rows.append({"id": o["id"], "kind": o["kind"], "target": True, "down": t is not None, "down_s": t,
+                             "knocked_by": by, "points": pts})
+                continue
             if not o.get("held"):
                 for z in self.zone_of(o["x"], o["y"]):
                     p = self.points_for(o["kind"], z)
@@ -166,7 +212,12 @@ class Game:
                         pts, zone = p, z
             total += pts
             rows.append({"id": o["id"], "kind": o["kind"], "zone": zone, "points": pts, "held": bool(o.get("held"))})
-        return {"points": total, "max_points": self.max_points, "objects": rows}
+        fails = [{"t": e[0], "rule": e[1], "object": e[2], "detail": e[3]} for e in events or []
+                 if e[1] in self.raw["scoring"].get("fail_on", [])]
+        out = {"points": total, "max_points": self.max_points, "objects": rows}
+        if fails:
+            out.update(points=0.0, points_before_fail=total, failed=fails[0]["detail"], fails=fails)
+        return out
 
 
 def heading_to_theta(heading_deg: float) -> float:

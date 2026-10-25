@@ -11,8 +11,15 @@ encoders say), a slow sideways drift, turn overshoot, kick scatter and, for
 vision, measurement noise and missed detections. Dead-reckoning code
 accumulates those errors; code that looks at the field can correct them.
 
-Assumptions, not AIM specifications: the robot's footprint (0.09 m radius),
-accelerations, kick speeds and friction.
+Games can also stand AprilTag signs on the field (``shape: "tag"``): a thin plate
+on a small base that falls over when something hits it. What knocked it down is
+recorded (a rolling ball, the robot itself, a carried ball, another object), so a
+game's rules decide what counts. A ball or barrel held on the front magnet is
+knocked loose when the robot turns while it is pressed against a wall.
+
+Assumptions, not AIM specifications: the robot's footprint (0.09 m radius unless
+the game sets ``robot.radius_m``), accelerations, kick speeds, friction, how hard
+a hit must be to knock a sign down, and when a held object comes loose.
 """
 
 from __future__ import annotations
@@ -35,6 +42,8 @@ KICK_SPEED = {"SOFT": 0.35, "MEDIUM": 0.7, "HARD": 1.2}
 FRICTION = {"barrel": 2.5, "ball": 0.45}  # m/s^2 deceleration while sliding / rolling
 CAPTURE_GAP = 0.018  # how close the object must be to the robot's front to be picked up
 CAPTURE_BEARING = math.radians(28)
+KNOCK_SPEED = 0.12  # m/s: a free object at least this fast knocks a standing sign over
+DISLODGE_W = math.radians(25)  # turning faster than this with the held object against a wall knocks it loose
 
 
 def _wrap(a: float) -> float:
@@ -53,6 +62,13 @@ class Obj:
     vy: float = 0.0
     held: bool = False
     released: bool = False  # just let go: not picked up again until the robot has moved away
+    capture_gap: float = CAPTURE_GAP
+    capture_bearing: float = CAPTURE_BEARING
+    tag_id: int = -1  # AprilTag signs: the tag's id
+    facing: float = 0.0  # AprilTag signs: field heading (deg, clockwise from +y) the printed face points to
+    down: bool = False  # AprilTag signs: knocked over
+    knocked_by: str = ""
+    wall_bounced: bool = False  # since it last left the robot
 
 
 @dataclass
@@ -90,9 +106,17 @@ class World:
         self.cmd_v = (0.0, 0.0)  # desired field-frame velocity
         self.cmd_w = 0.0
         self.objects: list[Obj] = []
+        self.R = float(game.raw.get("robot", {}).get("radius_m", ROBOT_R))
+        self.rules = game.raw.get("scoring", {}).get("rule_flags", [])
+        self._contacts: set = set()
         for o in lay["objects"]:
             k = game.object_kind(o["kind"])
-            self.objects.append(Obj(o["id"], o["kind"], k.get("shape", "barrel"), k.get("radius_m", 0.022), o["x"], o["y"]))
+            ob = Obj(o["id"], o["kind"], k.get("shape", "barrel"), k.get("radius_m", 0.022), o["x"], o["y"])
+            ob.capture_gap = float(k.get("capture_gap_m", CAPTURE_GAP))
+            ob.capture_bearing = math.radians(float(k.get("capture_bearing_deg", math.degrees(CAPTURE_BEARING))))
+            if ob.shape == "tag":
+                ob.tag_id, ob.facing = int(o.get("tag_id", -1)), float(o.get("facing_deg", 0.0))
+            self.objects.append(ob)
         self.held: Optional[Obj] = None
         self.t = 0.0
         self.busy_until = 0.0  # placing / kicking: drive commands wait
@@ -108,7 +132,7 @@ class World:
 
     # -- geometry helpers -------------------------------------------------------------------------
     def front(self, extra: float = 0.0) -> tuple[float, float]:
-        return self.x + math.cos(self.th) * (ROBOT_R + extra), self.y + math.sin(self.th) * (ROBOT_R + extra)
+        return self.x + math.cos(self.th) * (self.R + extra), self.y + math.sin(self.th) * (self.R + extra)
 
     def to_robot(self, px: float, py: float) -> tuple[float, float]:
         """Field point -> (distance, bearing clockwise from the robot's heading, radians)."""
@@ -118,7 +142,7 @@ class World:
     def record(self):
         if self.t + 1e-9 >= self._next_rec:
             self.poses.append((round(self.t, 3), round(self.x, 4), round(self.y, 4), round(_wrap(self.th), 4)))
-            self.object_track.append([[round(o.x, 4), round(o.y, 4), int(o.held)] for o in self.objects])
+            self.object_track.append([[round(o.x, 4), round(o.y, 4), int(o.held), int(o.down)] for o in self.objects])
             self._next_rec += 0.05
 
     def event(self, kind: str, oid: str = "", detail: str = ""):
@@ -129,14 +153,14 @@ class World:
         if self.held is not None:
             return
         for o in self.objects:
-            if o.held:
+            if o.held or o.shape == "tag":
                 continue
             d, b = self.to_robot(o.x, o.y)
             if o.released:
-                if d > ROBOT_R + o.r + 0.04:
+                if d > self.R + o.r + 0.04:
                     o.released = False
                 continue
-            if d <= ROBOT_R + o.r + CAPTURE_GAP and abs(b) <= CAPTURE_BEARING and math.hypot(o.vx, o.vy) < 0.4:
+            if d <= self.R + o.r + o.capture_gap and abs(b) <= o.capture_bearing and math.hypot(o.vx, o.vy) < 0.4:
                 o.held, o.vx, o.vy = True, 0.0, 0.0
                 self.held = o
                 self.event("pickup", o.id)
@@ -150,6 +174,7 @@ class World:
         fx, fy = self.front(o.r + 0.012)
         o.x, o.y, o.held, o.released = fx, fy, False, True
         o.vx = o.vy = 0.0
+        o.wall_bounced = False
         self.held = None
         self.busy_until = self.t + 0.6
         self.event("place", o.id, ",".join(self.game.zone_of(o.x, o.y)))
@@ -165,6 +190,7 @@ class World:
         fx, fy = self.front(o.r + 0.004)
         o.x, o.y, o.held, o.released = fx, fy, False, True
         o.vx, o.vy = sp * math.cos(a) + self.vx, sp * math.sin(a) + self.vy
+        o.wall_bounced = False
         self.held = None
         self.event("kick", o.id, force.upper())
 
@@ -200,8 +226,18 @@ class World:
         self._collide()
         self._objects(dt)
         if self.held is not None:
-            fx, fy = self.front(self.held.r + 0.004)
-            self.held.x, self.held.y = fx, fy
+            o = self.held
+            fx, fy = self.front(o.r + 0.004)
+            o.x, o.y = fx, fy
+            against = fx < o.r + 0.003 or fx > self.W - o.r - 0.003 or fy < o.r + 0.003 or fy > self.H - o.r - 0.003
+            if against and abs(self.w) > DISLODGE_W:
+                # pressed against the wall while turning: the magnet loses it
+                o.x, o.y = min(max(fx, o.r), self.W - o.r), min(max(fy, o.r), self.H - o.r)
+                o.held, o.released, o.wall_bounced = False, True, True
+                tx, ty = -math.sin(self.th) * self.w * (self.R + o.r), math.cos(self.th) * self.w * (self.R + o.r)
+                o.vx, o.vy = tx * 0.8, ty * 0.8
+                self.held = None
+                self.event("dislodge", o.id, "turned against the wall")
         else:
             self.grab_check()
         self.t += dt
@@ -209,7 +245,7 @@ class World:
 
     def _collide(self):
         hit = False
-        m = ROBOT_R
+        m = self.R
         if self.x < m or self.x > self.W - m or self.y < m or self.y > self.H - m:
             hit = True
             self.x, self.y = min(max(self.x, m), self.W - m), min(max(self.y, m), self.H - m)
@@ -231,14 +267,81 @@ class World:
                 self.event("bump")
         self._bumping = hit
 
+    def _rule(self, key: str, oid: str, detail: str):
+        """Record a game-rule violation once per contact (the contact must end before it counts again)."""
+        if (key, oid) in self._contacts:
+            self._touching.add((key, oid))
+            return
+        self._contacts.add((key, oid))
+        self._touching.add((key, oid))
+        self.event(key, oid, detail)
+        if key in self.rules:
+            self.event("rule_flag", oid, detail)
+
+    def knock(self, tag: Obj, by: str):
+        tag.down, tag.knocked_by = True, by
+        self.event("target_down", tag.id, by)
+        if by in ("rammed", "carried") and "target_rammed" in self.rules:
+            self.event("rule_flag", tag.id, f"target knocked down by the robot ({by})")
+
+    def _tags(self):
+        """Standing AprilTag signs: knocked over by the robot or by a moving object."""
+        robot_speed = math.hypot(self.vx, self.vy) + abs(self.w) * self.R
+        for t in self.objects:
+            if t.shape != "tag" or t.down:
+                continue
+            if math.hypot(t.x - self.x, t.y - self.y) < self.R + t.r:
+                if robot_speed > 0.01:
+                    self.knock(t, "rammed")
+                continue
+            h = self.held
+            if h is not None and math.hypot(t.x - h.x, t.y - h.y) < h.r + t.r:
+                if robot_speed > 0.01:
+                    self.knock(t, "carried")
+                continue
+            for o in self.objects:
+                if o is t or o.held or o.shape == "tag":
+                    continue
+                dx, dy = o.x - t.x, o.y - t.y
+                d = math.hypot(dx, dy)
+                if d < o.r + t.r:
+                    sp = math.hypot(o.vx, o.vy)
+                    nx, ny = (dx / d, dy / d) if d > 1e-9 else (1.0, 0.0)
+                    o.x, o.y = t.x + nx * (o.r + t.r), t.y + ny * (o.r + t.r)
+                    vn = o.vx * nx + o.vy * ny
+                    if vn < 0:  # bounce off the sign
+                        o.vx -= 1.6 * vn * nx
+                        o.vy -= 1.6 * vn * ny
+                    if sp >= KNOCK_SPEED:
+                        self.knock(t, "ball" if o.shape == "ball" else o.kind)
+                        break
+
+    def _barrel_rules(self):
+        """Contacts a game may forbid: a ball hitting a barrel before it has bounced off a wall, and the robot
+        running into a barrel while carrying the ball."""
+        balls = [o for o in self.objects if o.shape == "ball"]
+        for b in self.objects:
+            if b.shape != "barrel":
+                continue
+            for ball in balls:
+                if not ball.held and not ball.wall_bounced and math.hypot(ball.x - b.x, ball.y - b.y) < ball.r + b.r + 0.002 \
+                        and math.hypot(ball.vx, ball.vy) > 0.02:
+                    self._rule("barrel_hit", b.id, "barrel hit directly by the ball")
+            if self.held is not None and self.held.shape == "ball":
+                h = self.held
+                if math.hypot(b.x - self.x, b.y - self.y) < self.R + b.r + 0.002 or math.hypot(b.x - h.x, b.y - h.y) < h.r + b.r + 0.002:
+                    self._rule("barrel_hit", b.id, "ran into the barrel while carrying the ball")
+
     def _objects(self, dt: float):
+        self._touching: set = set()
+        self._tags()
         for o in self.objects:
-            if o.held:
+            if o.held or o.shape == "tag":
                 continue
             # pushed by the robot body
             dx, dy = o.x - self.x, o.y - self.y
             d = math.hypot(dx, dy)
-            lim = ROBOT_R + o.r
+            lim = self.R + o.r
             if d < lim:
                 nx, ny = (dx / d, dy / d) if d > 1e-9 else (math.cos(self.th), math.sin(self.th))
                 o.x, o.y = self.x + nx * lim, self.y + ny * lim
@@ -259,13 +362,15 @@ class World:
                 if o.x < o.r or o.x > self.W - o.r:
                     o.x = min(max(o.x, o.r), self.W - o.r)
                     o.vx = -o.vx * e
+                    o.wall_bounced = True
                 if o.y < o.r or o.y > self.H - o.r:
                     o.y = min(max(o.y, o.r), self.H - o.r)
                     o.vy = -o.vy * e
+                    o.wall_bounced = True
         # objects push each other
         for i, a in enumerate(self.objects):
             for b in self.objects[i + 1:]:
-                if a.held or b.held:
+                if a.held or b.held or a.shape == "tag" or b.shape == "tag":
                     continue
                 dx, dy = b.x - a.x, b.y - a.y
                 d = math.hypot(dx, dy)
@@ -277,6 +382,14 @@ class World:
                     a.y -= ny * over
                     b.x += nx * over
                     b.y += ny * over
+                    vrel = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny
+                    if vrel > 0:  # pass momentum on (a rolling ball moves a barrel); equal masses, restitution 0.6
+                        j = 0.8 * vrel
+                        a.vx, a.vy = a.vx - j * nx, a.vy - j * ny
+                        b.vx, b.vy = b.vx + j * nx, b.vy + j * ny
+        if self.rules:
+            self._barrel_rules()
+        self._contacts &= self._touching
 
     # -- end of match --------------------------------------------------------------------------------------
     def settle(self, max_s: float = 3.0):
@@ -287,7 +400,13 @@ class World:
             self.step()
 
     def touching_robot(self, o: Obj) -> bool:
-        return o.held or math.hypot(o.x - self.x, o.y - self.y) <= ROBOT_R + o.r + 0.003
+        return o.held or math.hypot(o.x - self.x, o.y - self.y) <= self.R + o.r + 0.003
 
     def final_objects(self) -> list[dict]:
-        return [{"id": o.id, "kind": o.kind, "x": round(o.x, 4), "y": round(o.y, 4), "held": self.touching_robot(o)} for o in self.objects]
+        out = []
+        for o in self.objects:
+            d = {"id": o.id, "kind": o.kind, "x": round(o.x, 4), "y": round(o.y, 4), "held": self.touching_robot(o)}
+            if o.shape == "tag":
+                d.update(tag_id=o.tag_id, down=o.down, knocked_by=o.knocked_by)
+            out.append(d)
+        return out

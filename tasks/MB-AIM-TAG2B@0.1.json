@@ -1,0 +1,52 @@
+{
+  "id": "MB-AIM-TAG2B",
+  "version": "0.1",
+  "title": "Knock down two AprilTags without hitting the barrels (VEX AIM, 18 in field)",
+  "domain": "vex-aim",
+  "description": "As two-tag, but a barrel stands next to each sign. 1 point per sign knocked down by the ball; the run fails (0 points) if the ball hits a barrel before bouncing off a wall, or the robot runs into a barrel while carrying the ball. Arena: the 18 x 18 in (0.457 m) VEX AIM field, 4 tiles. Layout 'photo' reproduces a team's start photo. MotionBench-defined, not an official VEX game.",
+  "arena": {
+    "width_m": 0.4572,
+    "height_m": 0.4572,
+    "obstacles": [],
+    "zones": {}
+  },
+  "robot": {
+    "radius_m": 0.035
+  },
+  "budget": {
+    "time_s": 60
+  },
+  "goal": {
+    "kind": "targets",
+    "valid_by": [
+      "ball"
+    ]
+  },
+  "reference": {
+    "floor": 0,
+    "people_comparable": true
+  },
+  "layouts": {
+    "photo": {
+      "start": {
+        "x": 0.42,
+        "y": 0.366,
+        "theta": -3.1067
+      },
+      "objects": [
+        {
+          "id": "T1",
+          "x": 0.035,
+          "y": 0.309,
+          "kind": "apriltag-sign"
+        },
+        {
+          "id": "T2",
+          "x": 0.326,
+          "y": 0.032,
+          "kind": "apriltag-sign"
+        }
+      ]
+    }
+  }
+}
