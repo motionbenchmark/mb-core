@@ -339,7 +339,7 @@ class Firmware:
         self.model_on, self.tags_on, self.colors_on = True, True, False
         self.colors: dict[int, dict] = {}
         self.cal_until = -1.0
-        self.battery = 100
+        self.battery0 = int(rng.integers(28, 90))  # recorded runs report 28-37 %
         self._vision: list = []
         self._vision_t = -1.0
         self._last = (world.vx, world.vy, world.w)
@@ -507,14 +507,14 @@ class Firmware:
         right_a = (dvx * math.sin(w.th) - dvy * math.cos(w.th)) / 9.81
         rot = self._rot_cw_deg()  # unwrapped
         yaw = ((self.raw_heading() + 180) % 360) - 180
-        self.battery = max(20, 100 - int(w.t / 30))
+        self.battery = max(5, self.battery0 - int(w.t / 60))
         return {
             "controller": {"flags": "0x0000", "stick_x": 0, "stick_y": 0, "battery": 0},
             "robot": {"flags": hex(self.flags()), "battery": self.battery, "touch_flags": "0x0000", "touch_x": 0, "touch_y": 0,
                       "robot_x": f"{rx:.3f}", "robot_y": f"{ry:.3f}", "roll": "0.000", "pitch": "0.000", "yaw": f"{yaw:.3f}",
                       "heading": f"{self.raw_heading():.3f}", "rotation": f"{self.raw_heading0 + rot:.3f}",
                       "acceleration": {"x": f"{fwd_a:.3f}", "y": f"{right_a:.3f}", "z": "-1.000"},
-                      "gyro_rate": {"x": "0.00", "y": "0.00", "z": f"{-math.degrees(dw):.2f}"},
+                      "gyro_rate": {"x": "0.000", "y": "0.000", "z": f"{-math.degrees(dw):.3f}"},
                       "screen": {"row": "1", "column": "1"}},
             "aivision": {"classnames": {"count": 4, "items": [{"index": 0, "name": "SportsBall"}, {"index": 1, "name": "BlueBarrel"},
                                                                {"index": 2, "name": "OrangeBarrel"}, {"index": 3, "name": "Robot"}]},
@@ -591,8 +591,8 @@ class Firmware:
                 continue
             x0, y0, bw, bh, _ = box
             if self.model_on and o.kind in CLASS_ID:
-                items.append({"type": 4, "id": CLASS_ID[o.kind], "type_str": "model", "originx": x0, "originy": y0, "width": bw, "height": bh,
-                              "score": int(w.rng.integers(72, 99)), "name": "", "angle": 0})
+                items.append({"type": 4, "id": CLASS_ID[o.kind], "type_str": "aiobj", "originx": x0, "originy": y0, "width": bw, "height": bh,
+                              "score": int(w.rng.integers(88, 100)), "name": "", "angle": 0})
             self._color(items, k.get("colour"), x0, y0, bw, bh)
         # AprilTag signs on the field, and tags on the walls
         signs = [(o.x, o.y, o.facing, o.tag_id, o.down, kinds[o.kind]) for o in w.objects if o.shape == "tag"]
@@ -735,7 +735,7 @@ def run_program(code: str, world: World, client_dir: "str | Path", *, filename: 
         if world.t + 1e-9 >= link.next_status:
             link.next_status = world.t + STATUS_PERIOD
             st = fw.status()
-            if world.t + 1e-9 >= link._next_tel:
+            if link.status_thread is not None and world.t + 1e-9 >= link._next_tel:  # recorded once the program's Robot exists
                 link._next_tel = world.t + TELEMETRY_PERIOD
                 link.status_log.append((round(world.t, 3), st))
                 if on_status:
