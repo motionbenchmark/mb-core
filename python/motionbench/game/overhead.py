@@ -187,7 +187,7 @@ class OverheadCamera:
             else:
                 self._barrel(img, o["x"], o["y"], k.get("radius_m", 0.014), k.get("colour"))
         if label:
-            cv2.putText(img, label, (self.size[0] - 220, self.size[1] - 14), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (150, 150, 150), 1, cv2.LINE_AA)
+            cv2.putText(img, label, (16, self.size[1] - 14), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (190, 190, 190), 1, cv2.LINE_AA)
         return img
 
 
