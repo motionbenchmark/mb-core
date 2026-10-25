@@ -108,7 +108,8 @@ class DriverController:
 
     def _choose(self, seen):
         _, x, y, th, objs = seen
-        todo = [(oid, ox, oy) for oid, ox, oy, held in objs if not held and not self._sorted(oid, ox, oy)]
+        movable = {o.id for o in self.w.objects if o.shape != "tag" and self.w.game.best_zone(o.kind)}
+        todo = [(oid, ox, oy) for oid, ox, oy, held in objs if oid in movable and not held and not self._sorted(oid, ox, oy)]
         if not todo:
             self.state = "done"
             return
@@ -173,7 +174,7 @@ class DriverController:
             gx, gy = self.goal
             dist = math.hypot(gx - sx, gy - sy)
             stop_at = 0.16 if self.early_release else 0.04 + 0.05 * (1 - d.precision)
-            if dist < stop_at + ROBOT_R * 0.5:
+            if dist < stop_at + self.w.R * 0.5:
                 w.place()
                 self.backoff_until = w.busy_until + 0.25 + 0.3 * (1 - d.precision)
                 self.state = "choose"

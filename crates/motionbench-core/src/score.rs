@@ -153,6 +153,7 @@ pub fn score(task: &Task, trace: &Trace) -> Result<Report> {
         Goal::Delivery { .. } => {
             delivery(task, layout, &poses, &cum, &events, trace, &mut warnings)
         }
+        Goal::Targets { valid_by } => targets(layout, &poses, &cum, &events, valid_by),
         Goal::Coverage {
             cell_m,
             tool_width_m,
@@ -489,6 +490,82 @@ fn delivery(
             mean_target_error_m: (!errs.is_empty()).then(|| crate::stats::mean(&errs)),
             mean_heading_error_rad: None,
         },
+        None,
+    )
+}
+
+/// Knock-down goal (RFC-0003). A target counts once, at its first valid
+/// `target_down` event. The oracle is a nearest-first tour from the start
+/// through the targets that fell; agents that knock targets down from a
+/// distance can beat it, so path efficiency is capped at 1 as for every goal.
+fn targets(
+    layout: &Layout,
+    poses: &[PoseSample],
+    cum: &[f64],
+    events: &[Event],
+    valid_by: &[String],
+) -> Scored {
+    let ids: BTreeSet<&str> = layout.objects.iter().map(|o| o.id.as_str()).collect();
+    let mut first: BTreeMap<&str, f64> = BTreeMap::new();
+    for e in events {
+        if e.kind == "target_down"
+            && ids.contains(e.object_id.as_str())
+            && (valid_by.is_empty() || valid_by.iter().any(|v| v == &e.detail))
+        {
+            first.entry(e.object_id.as_str()).or_insert(e.t_s);
+        }
+    }
+    let n = layout.objects.len();
+    let hits = first.len();
+    let completed = hits == n && n > 0;
+    let last_hit = first.values().cloned().fold(None, |a: Option<f64>, t| {
+        Some(a.map_or(t, |a| a.max(t)))
+    });
+    let actual = match last_hit {
+        Some(t) => {
+            let i = poses
+                .iter()
+                .position(|p| p.t_s >= t)
+                .unwrap_or(poses.len() - 1);
+            cum[i]
+        }
+        None => 0.0,
+    };
+    // nearest-first tour through the targets that fell
+    let mut remaining: Vec<(f64, f64)> = layout
+        .objects
+        .iter()
+        .filter(|o| first.contains_key(o.id.as_str()))
+        .map(|o| (o.x, o.y))
+        .collect();
+    let (mut px, mut py) = (layout.start.x, layout.start.y);
+    let mut oracle = 0.0;
+    while !remaining.is_empty() {
+        let (j, d) = remaining
+            .iter()
+            .enumerate()
+            .map(|(j, &(x, y))| (j, dist(px, py, x, y)))
+            .min_by(|a, b| a.1.partial_cmp(&b.1).unwrap())
+            .unwrap();
+        oracle += d;
+        let (x, y) = remaining.remove(j);
+        px = x;
+        py = y;
+    }
+    (
+        Success {
+            score: hits as f64,
+            max_score: n as f64,
+            completion: hits as f64 / n.max(1) as f64,
+            completed,
+        },
+        Efficiency {
+            time_to_goal_s: if completed { last_hit } else { None },
+            path_length_m: *cum.last().unwrap(),
+            oracle_length_m: oracle,
+            path_efficiency: ratio(oracle, actual),
+        },
+        Precision::default(),
         None,
     )
 }

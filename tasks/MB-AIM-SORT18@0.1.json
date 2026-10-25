@@ -1,0 +1,94 @@
+{
+  "id": "MB-AIM-SORT18",
+  "version": "0.1",
+  "title": "Sort barrels into the squares of AprilTags 4 and 0 (VEX AIM, 18 in field)",
+  "domain": "vex-aim",
+  "description": "Sort six barrels in 60 s: orange barrels into the 9 in tile holding AprilTag 4, blue barrels into the tile holding AprilTag 0. 1 point per barrel at rest with its centre inside the right tile, not touching the robot. Arena: the 18 x 18 in (0.457 m) VEX AIM field, 4 tiles. Layout 'photo' reproduces a team's start photo. MotionBench-defined, not an official VEX game.",
+  "arena": {
+    "width_m": 0.4572,
+    "height_m": 0.4572,
+    "obstacles": [],
+    "zones": {
+      "tag0-square": {
+        "x": 0.0,
+        "y": 0.2286,
+        "w": 0.2286,
+        "h": 0.2286,
+        "label": "tag0-square"
+      },
+      "tag4-square": {
+        "x": 0.2286,
+        "y": 0.0,
+        "w": 0.2286,
+        "h": 0.2286,
+        "label": "tag4-square"
+      }
+    }
+  },
+  "robot": {
+    "radius_m": 0.035
+  },
+  "budget": {
+    "time_s": 60
+  },
+  "goal": {
+    "kind": "delivery"
+  },
+  "reference": {
+    "floor": 0,
+    "people_comparable": true
+  },
+  "layouts": {
+    "photo": {
+      "start": {
+        "x": 0.124,
+        "y": 0.035,
+        "theta": 1.5708
+      },
+      "objects": [
+        {
+          "id": "b1",
+          "x": 0.261,
+          "y": 0.331,
+          "zone": "tag0-square",
+          "kind": "barrel-blue"
+        },
+        {
+          "id": "b2",
+          "x": 0.038,
+          "y": 0.299,
+          "zone": "tag0-square",
+          "kind": "barrel-blue"
+        },
+        {
+          "id": "b3",
+          "x": 0.331,
+          "y": 0.167,
+          "zone": "tag0-square",
+          "kind": "barrel-blue"
+        },
+        {
+          "id": "o1",
+          "x": 0.415,
+          "y": 0.319,
+          "zone": "tag4-square",
+          "kind": "barrel-orange"
+        },
+        {
+          "id": "o2",
+          "x": 0.223,
+          "y": 0.214,
+          "zone": "tag4-square",
+          "kind": "barrel-orange"
+        },
+        {
+          "id": "o3",
+          "x": 0.069,
+          "y": 0.147,
+          "zone": "tag4-square",
+          "kind": "barrel-orange"
+        }
+      ]
+    }
+  }
+}

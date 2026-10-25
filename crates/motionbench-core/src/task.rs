@@ -79,6 +79,14 @@ pub enum Goal {
         #[serde(default, skip_serializing_if = "Option::is_none")]
         edge_reach_m: Option<f64>,
     },
+    /// Knock down each target in the layout's `objects` (AprilTag signs, pins).
+    /// Scored from `target_down` events (RFC-0003): an event counts when its
+    /// object is a target and its `detail` (what knocked it down) is listed in
+    /// `valid_by`; an empty list accepts any cause.
+    Targets {
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        valid_by: Vec<String>,
+    },
 }
 
 impl Goal {
@@ -87,6 +95,7 @@ impl Goal {
             Goal::Waypoints { .. } => "waypoints",
             Goal::Delivery { .. } => "delivery",
             Goal::Coverage { .. } => "coverage",
+            Goal::Targets { .. } => "targets",
         }
     }
 }
@@ -226,6 +235,16 @@ impl Task {
                 }
             }
         }
+        if let Goal::Targets { .. } = &self.goal {
+            for (seed, layout) in &self.layouts {
+                if layout.objects.is_empty() {
+                    return Err(Error::InvalidTask(format!(
+                        "{}: layout '{seed}' has no targets",
+                        self.key()
+                    )));
+                }
+            }
+        }
         if self.layouts.is_empty() {
             return Err(Error::InvalidTask(format!(
                 "{}: needs at least one public layout",
@@ -256,6 +275,22 @@ const BUILTIN: &[(&str, &str)] = &[
     (
         "MB-AIM-SORT@0.1",
         include_str!("../../../tasks/MB-AIM-SORT@0.1.json"),
+    ),
+    (
+        "MB-AIM-TAG1@0.1",
+        include_str!("../../../tasks/MB-AIM-TAG1@0.1.json"),
+    ),
+    (
+        "MB-AIM-TAG2@0.1",
+        include_str!("../../../tasks/MB-AIM-TAG2@0.1.json"),
+    ),
+    (
+        "MB-AIM-TAG2B@0.1",
+        include_str!("../../../tasks/MB-AIM-TAG2B@0.1.json"),
+    ),
+    (
+        "MB-AIM-SORT18@0.1",
+        include_str!("../../../tasks/MB-AIM-SORT18@0.1.json"),
     ),
 ];
 
@@ -289,7 +324,7 @@ mod tests {
     #[test]
     fn builtins_parse() {
         let ts = builtin_tasks();
-        assert_eq!(ts.len(), 5);
+        assert_eq!(ts.len(), 9);
         for t in ts {
             assert!(t.free_area() > 0.0);
         }
