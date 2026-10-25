@@ -518,9 +518,10 @@ fn targets(
     let n = layout.objects.len();
     let hits = first.len();
     let completed = hits == n && n > 0;
-    let last_hit = first.values().cloned().fold(None, |a: Option<f64>, t| {
-        Some(a.map_or(t, |a| a.max(t)))
-    });
+    let last_hit = first
+        .values()
+        .cloned()
+        .fold(None, |a: Option<f64>, t| Some(a.map_or(t, |a| a.max(t))));
     let actual = match last_hit {
         Some(t) => {
             let i = poses
