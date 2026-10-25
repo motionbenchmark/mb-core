@@ -54,7 +54,8 @@ def _path_len(poses) -> float:
 def _finish(world: World, detail: dict) -> Optional[float]:
     if detail["points"] < detail["max_points"]:
         return None
-    t = [e[0] for e in world.events if e[1] in ("place", "kick")]
+    t = [o["down_s"] for o in detail["objects"] if o.get("target") and o.get("down_s") is not None]
+    t += [e[0] for e in world.events if e[1] in ("place", "kick")] if any(not o.get("target") for o in detail["objects"] if o["points"]) else []
     return max(t) if t else None
 
 
@@ -71,7 +72,7 @@ def simulate(game: Game, *, code: Optional[str] = None, code_name: str = "routin
         agent, kind, name = driver.id, "driver", driver.name
     world.settle()
     objs = world.final_objects()
-    detail = game.score_world(objs)
+    detail = game.score_world(objs, world.events)
     return RunResult(game.key, world.layout_name, agent, kind, name, seed, info["status"], info.get("error"), detail["points"],
                      detail["max_points"], _finish(world, detail), info["ended_s"], round(_path_len(world.poses), 3), world.bumps,
                      objs, world.poses, world.events, detail, None, world.object_track, [o.id for o in world.objects])

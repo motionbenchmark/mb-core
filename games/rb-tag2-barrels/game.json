@@ -1,0 +1,136 @@
+{
+  "format": "motionbench-game",
+  "format_version": "0.1",
+  "id": "AIM-TAG2B",
+  "version": "0.1",
+  "title": "Knock down two AprilTags without hitting the barrels",
+  "platform": "vex-aim",
+  "description": "As two-tag, but a barrel stands next to each sign. 1 point per sign knocked down by the ball; the run fails (0 points) if the ball hits a barrel before bouncing off a wall, or the robot runs into a barrel while carrying the ball.",
+  "source": {
+    "created": "2026-10-25",
+    "inferred_from": [
+      "robo-bench games/game3/description.txt",
+      "robo-bench games/game3/start.jpg"
+    ],
+    "notes": "Positions measured from the overhead start photo (18 in field, 4 tiles of 9 in); robot centre corrected for the camera's perspective (x1.09, from a real run). The robot's 3.5 cm radius, the tag sizes and the camera were calibrated against recorded real Game 1 runs; which way each sign faces are estimates from the photo, not measurements."
+  },
+  "robo_bench": {
+    "game": "game3",
+    "description_file": "games/game3/description.txt"
+  },
+  "motionbench_task": "MB-AIM-TAG2B@0.1",
+  "robot": {
+    "radius_m": 0.035,
+    "note": "VEX AIM footprint, measured from a real run's overhead frames (robot next to the captured ball)"
+  },
+  "field": {
+    "width_m": 0.4572,
+    "height_m": 0.4572,
+    "style": "aim-18in",
+    "obstacles": [],
+    "zones": {},
+    "tags": []
+  },
+  "objects": {
+    "barrel-blue": {
+      "shape": "barrel",
+      "radius_m": 0.014,
+      "height_m": 0.03,
+      "colour": "blue"
+    },
+    "barrel-orange": {
+      "shape": "barrel",
+      "radius_m": 0.014,
+      "height_m": 0.03,
+      "colour": "orange"
+    },
+    "sports-ball": {
+      "shape": "ball",
+      "radius_m": 0.0125,
+      "height_m": 0.026,
+      "colour": "yellow",
+      "capture_gap_m": 0.012,
+      "capture_bearing_deg": 30,
+      "note": "magnetic: rolls onto the kicker when the robot's front is close"
+    },
+    "tag-sign": {
+      "shape": "tag",
+      "radius_m": 0.016,
+      "height_m": 0.08,
+      "colour": "purple",
+      "note": "AprilTag sign: a ~3.3 cm wide plate on a small base, tag square ~1.4 cm centred ~3.5 cm up; the robot's camera reads it only from the front",
+      "tag_square_m": 0.014,
+      "tag_centre_height_m": 0.035
+    }
+  },
+  "layouts": {
+    "photo": {
+      "start": {
+        "x": 0.42,
+        "y": 0.366,
+        "heading_deg": 268
+      },
+      "objects": [
+        {
+          "id": "ball",
+          "kind": "sports-ball",
+          "x": 0.221,
+          "y": 0.383
+        },
+        {
+          "id": "T1",
+          "kind": "tag-sign",
+          "x": 0.035,
+          "y": 0.309,
+          "tag_id": 1,
+          "facing_deg": 70
+        },
+        {
+          "id": "T2",
+          "kind": "tag-sign",
+          "x": 0.326,
+          "y": 0.032,
+          "tag_id": 3,
+          "facing_deg": 15
+        },
+        {
+          "id": "B1",
+          "kind": "barrel-blue",
+          "x": 0.068,
+          "y": 0.287
+        },
+        {
+          "id": "O1",
+          "kind": "barrel-orange",
+          "x": 0.29,
+          "y": 0.055
+        }
+      ]
+    }
+  },
+  "match": {
+    "time_s": 60,
+    "mode": "skills",
+    "robots": 1
+  },
+  "scoring": {
+    "rules": [],
+    "counts_when": "targets: the sign falls because a free-rolling ball hit it; barrels: at rest after the match, centre inside the tile, not touching the robot",
+    "rule_flags": [
+      "target_rammed",
+      "barrel_hit"
+    ],
+    "fail_on": [
+      "barrel_hit"
+    ],
+    "targets": {
+      "kinds": [
+        "tag-sign"
+      ],
+      "points": 1,
+      "valid_by": [
+        "ball"
+      ]
+    }
+  }
+}

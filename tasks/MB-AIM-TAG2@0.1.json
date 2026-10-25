@@ -1,0 +1,52 @@
+{
+  "id": "MB-AIM-TAG2",
+  "version": "0.1",
+  "title": "Knock down two AprilTags with the ball (VEX AIM, 18 in field)",
+  "domain": "vex-aim",
+  "description": "Grab the ball, knock down one AprilTag sign with it, grab the ball again and knock down the second, in 60 s. 1 point per sign knocked down by the ball. Arena: the 18 x 18 in (0.457 m) VEX AIM field, 4 tiles. Layout 'photo' reproduces a team's start photo. MotionBench-defined, not an official VEX game.",
+  "arena": {
+    "width_m": 0.4572,
+    "height_m": 0.4572,
+    "obstacles": [],
+    "zones": {}
+  },
+  "robot": {
+    "radius_m": 0.035
+  },
+  "budget": {
+    "time_s": 60
+  },
+  "goal": {
+    "kind": "targets",
+    "valid_by": [
+      "ball"
+    ]
+  },
+  "reference": {
+    "floor": 0,
+    "people_comparable": true
+  },
+  "layouts": {
+    "photo": {
+      "start": {
+        "x": 0.42,
+        "y": 0.357,
+        "theta": -3.1067
+      },
+      "objects": [
+        {
+          "id": "T1",
+          "x": 0.409,
+          "y": 0.215,
+          "kind": "apriltag-sign"
+        },
+        {
+          "id": "T2",
+          "x": 0.098,
+          "y": 0.108,
+          "kind": "apriltag-sign"
+        }
+      ]
+    }
+  }
+}

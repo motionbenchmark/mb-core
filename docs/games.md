@@ -140,6 +140,25 @@ sorts all six barrels in 45 s; the best runs score 4 or 5.
 Simulated agents are also less variable than real ones (some score the same in every
 run), so ranges here are likely narrower than they will be on real robots.
 
+## Programs for the AIM WebSocket client (robo-bench)
+
+`motionbench.game.aim_websocket` runs programs written for the VEX AIM **WebSocket Python
+client** (the one that drives the robot from a laptop over Wi-Fi), unchanged: the client's own
+code runs, and only its connection is replaced by a simulated robot that answers its commands and
+sends it status packets. Time, `sleep`, `wait` and threads run on simulated time.
+
+```python
+from motionbench.game.aim_websocket import run_program
+r = run_program(code, World(Game.load("games/rb-tag1"), seed=0), client_dir="path/to/robo-bench")
+```
+
+Four games reproduce robo-bench's fields (`games/rb-tag1`, `rb-tag2`, `rb-tag2-barrels`,
+`rb-sort`), with AprilTag **signs** standing on the field: a sign falls when something hits it, and
+the game records what did (a rolling ball, the robot, a carried ball). Knock-down games use the
+`targets` goal (RFC-0003). The simulated robot was calibrated against a recorded real session;
+replaying its four programs reproduces each real outcome. robo-bench's `sim/` runs its whole
+generate → run → feedback loop on this.
+
 ## Next
 
 - VEX IQ Level Up as a game (IQ drivetrain model, bean bags, pyramid tiers) once

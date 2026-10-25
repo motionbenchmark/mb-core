@@ -1,0 +1,46 @@
+{
+  "id": "MB-AIM-TAG1",
+  "version": "0.1",
+  "title": "Knock down one AprilTag with the ball (VEX AIM, 18 in field)",
+  "domain": "vex-aim",
+  "description": "Grab the magnetic sports ball and use it to knock down the standing AprilTag sign, in 60 s. 1 point when the sign falls because the ball hit it; knocking it down with the robot (or by pushing the ball into it while carrying it) does not count and is flagged. Arena: the 18 x 18 in (0.457 m) VEX AIM field, 4 tiles. Layout 'photo' reproduces a team's start photo. MotionBench-defined, not an official VEX game.",
+  "arena": {
+    "width_m": 0.4572,
+    "height_m": 0.4572,
+    "obstacles": [],
+    "zones": {}
+  },
+  "robot": {
+    "radius_m": 0.035
+  },
+  "budget": {
+    "time_s": 60
+  },
+  "goal": {
+    "kind": "targets",
+    "valid_by": [
+      "ball"
+    ]
+  },
+  "reference": {
+    "floor": 0,
+    "people_comparable": true
+  },
+  "layouts": {
+    "photo": {
+      "start": {
+        "x": 0.42,
+        "y": 0.354,
+        "theta": -3.1241
+      },
+      "objects": [
+        {
+          "id": "T1",
+          "x": 0.221,
+          "y": 0.219,
+          "kind": "apriltag-sign"
+        }
+      ]
+    }
+  }
+}
