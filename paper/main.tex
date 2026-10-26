@@ -7,6 +7,8 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit}
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
 \usepackage{enumitem}
@@ -14,94 +16,124 @@
 
 \newcommand{\mb}{\textsc{MotionBench}}
 \newcommand{\todo}[1]{\textcolor{red!70!black}{[#1]}}
+\newcommand{\release}{\texttt{paper-v0.3}}
 
-\title{\mb{}: A Goal-Referenced Framework for Evaluating\\Robot Performance from Trajectory Data\\[0.5em]
-\large Design, Open-Source Implementation, and Preliminary Experiments}
+\title{\mb{}: Agent-Independent Robot Evaluation\\through Goal-Referenced Outcome Scoring\\[0.5em]
+\large An Open Framework and Preliminary Evaluation in Simulation}
 \author{Abhay Yadav\\[0.3em]
 \small Independent researcher, San Francisco Bay Area, California, USA \quad \todo{contact email}\\
 \small \url{https://motionbench.org} \quad \url{https://github.com/motionbenchmark/mb-core}}
-\date{Draft v0.2, October 2026}
+\date{Draft v0.3, October 2026}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Robot performance is hard to compare across agents, environments and control methods: a
-student driving a robot, the team's autonomous code and a commercial product are rarely
-measured the same way. We propose \mb{}, a framework that scores any attempt at a task as the
-share of the task's stated goal it achieved, computed from the attempt's recorded trajectory
-alone, without access to the agent's software. We describe the scoring model, an open
-implementation (a deterministic scorer, a trajectory format, phone-video capture tools, and a
-simulator that runs unmodified VEX AIM Python code), and an evaluation protocol with public
-and unseen layouts. In a preliminary simulated experiment on a classroom sorting task, the
-best of four routines on the public layout outscores a parameterized simulated-driver baseline
-by 1.10 points out of 6 (paired 95\% interval 1.00 to 1.25), but on ten unseen layouts its
-score falls by 1.20 points and it shows no detectable difference from that baseline, while a
-camera-based routine keeps its score. On synthetic video, tag-free capture places the robot
-within about 3\,cm (median); it has not yet been validated on real footage, and the
-simulated drivers are not calibrated against real people. These two gaps, and a paired
-comparison of real drivers with their own code, are the next research objectives.
+Comparing human-operated and autonomous robots is difficult when their control methods differ. In
+student robotics competitions, for example, match scores do not show whether a programmed routine
+performs better than a human driver under the same conditions. This paper introduces \mb{}, an open
+framework for evaluating robot task performance from externally observed trajectories and task-state
+measurements, without access to the agent's controller. \mb{} defines task-specific goals, reports
+the share of the goal an attempt achieved beside the level reached by chance, and specifies a
+protocol for comparing agents over repeated trials and previously unseen layouts. The framework is
+implemented as a deterministic scorer, trajectory-capture tools and a simulator that runs VEX AIM
+Python routines unchanged. In a preliminary simulated study of an object-sorting task, a routine that
+encodes the public layout scores 4.00 of 6 points there but 2.80 on unseen layouts, while a
+camera-based routine scores 2.45 and 2.35. These results illustrate the method; they do not establish
+real-world measurement accuracy or any comparison with real people, which remain to be tested. The
+implementation and protocol are released so that the method can be examined and validated on
+physical robots.
 \end{abstract}
 
 \section{Introduction}
 
-Students in robot competitions open every match with a period in which the robot runs its own
-code, followed by a period of human driving, and they argue about which of the two is better.
-This work grew out of that argument in the author's own VEX competitions, and out of RoboBench,
-an earlier project with friends: a real-time loop in which large language models write VEX robot
-code, the code runs, and the results feed back, to see how quickly the models learn to operate
-in a real VEX environment. Both raised the same need for a fair, repeatable way to say how well
-an attempt went.
-The question generalizes: how much of a job does a given agent --- a person, team-written code,
-AI-written code, a person with robot assistance, or a commercial robot --- actually get done?
-Answering it fairly is difficult. Match scores mix in opponents and luck; product claims are
-best cases; and the strongest research benchmarks evaluate learned control policies on
-standardized robots and scenes~\cite{robodojo2026,libero2023,calvin2022,metaworld2019}, which
-excludes most of the agents above.
+In VEX robotics competitions, my team spends a lot of time improving autonomous routines. But I kept
+coming back to a basic question: was our code actually better than driving the robot ourselves? We
+could compare match scores, but those depended on the field, the opposing alliance and everything
+else that happened in the match. They did not tell us how much of a task each approach could
+complete under the same conditions.
 
-\mb{} starts from the other end: \emph{it fixes the task and its goal, and measures whatever
-attempts it}. This paper is a framework paper with preliminary feasibility experiments. Its
-contributions are:
+I ran into the same problem working with friends on RoboBench, a project in which large language
+models write VEX robot code, the code runs on a robot, and the results are fed back to improve the
+next attempt. We needed a consistent way to say whether one attempt was better than another, without
+depending on how the code had been written.
+
+\mb{} grew out of that problem. Instead of evaluating the controller, it measures the observable
+outcome of a task: where the robot went and what state it left the task in. The same scoring
+procedure can then be applied to a human driver, a programmed routine, AI-generated code or a
+commercial robot, provided the task and operating conditions are comparable. The research question
+is whether such \emph{agent-independent} evaluation can be made fair, repeatable and cheap enough to
+run with a phone camera.
+
+This is a framework and methodology paper. Its experiments use simulation, synthetic video, one real
+capture and one open dataset; they show how the method works and what it is designed to catch, and
+no empirical claim about real robots, real code or real people is made from them. The contributions
+are:
 \begin{enumerate}
-  \item a \textbf{goal-referenced scoring model} that reports, for every kind of agent, the share
-    of the task's goal achieved, beside the level reached by chance, with comparisons to people
-    restricted to tasks where people use the same means (Section~\ref{sec:scoring});
-  \item an \textbf{open implementation} in which the only interface between an agent and the
-    benchmark is its recorded trajectory (Section~\ref{sec:impl});
-  \item an \textbf{evaluation protocol} with public and unseen layouts, paired comparisons and
-    explicit outcomes for ``no difference found'' versus ``equivalent'' (Section~\ref{sec:protocol});
-  \item a \textbf{preliminary experiment} showing that a routine's advantage on a public layout
-    can disappear on unseen layouts (Section~\ref{sec:experiment}).
+  \item a \textbf{goal-referenced scoring model} that reports the share of a task's goal achieved,
+    beside chance, with comparisons to people only where people use the same means
+    (Section~\ref{sec:framework});
+  \item an \textbf{open implementation} whose only interface to an agent is a recorded trace of
+    poses and task state (Section~\ref{sec:impl});
+  \item an \textbf{evaluation protocol} with public and unseen layouts, paired comparisons and explicit
+    outcomes that separate ``no difference found'' from ``equivalent'' (Section~\ref{sec:protocol});
+  \item a \textbf{preliminary simulated study} that runs the protocol end to end
+    (Section~\ref{sec:eval}).
 \end{enumerate}
-Table~\ref{tab:status} separates what is built, what our experiments show, and what remains a
-hypothesis.
+Figure~\ref{fig:pipeline} shows the framework, and Table~\ref{tab:status} separates what is built,
+what has been demonstrated (in simulation or on synthetic data) and what is not yet shown.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\small, node distance=4mm and 6mm,
+  agent/.style={draw, rounded corners=2pt, fill=blue!6, minimum width=27mm, minimum height=9mm, align=center},
+  box/.style={draw, rounded corners=2pt, fill=gray!8, minimum width=92mm, minimum height=8mm, align=center},
+  arr/.style={-{Stealth[length=2mm]}, thick}]
+\node[agent] (a1) {Human driver\\\footnotesize manual control};
+\node[agent, right=of a1] (a2) {Team code\\\footnotesize autonomous};
+\node[agent, right=of a2] (a3) {AI-written code\\\footnotesize or a product};
+\node[box, below=7mm of a2] (task) {Same task, layout and conditions (task specification)};
+\node[box, below=of task] (obs) {Observed trajectory $(t,x,y,\theta)$ + task-state measurements\\\footnotesize phone video, printed tags, the robot's log, or a simulator};
+\node[box, below=of obs] (sc) {\mb{} scorer (deterministic, open source)\\\footnotesize goal score $\cdot$ chance level $\cdot$ secondary measures};
+\node[box, below=of sc, fill=green!6] (out) {Comparable results with uncertainty\\\footnotesize goal share, completion rate, worst run, paired intervals, public vs.\ unseen layouts};
+\foreach \a in {a1,a2,a3} \draw[arr] (\a.south) -- (\a.south |- task.north);
+\draw[arr] (task) -- (obs); \draw[arr] (obs) -- (sc); \draw[arr] (sc) -- (out);
+\end{tikzpicture}
+\caption{The \mb{} framework. Agents are never integrated with the benchmark: the scorer sees only
+what was observed during the attempt, and every agent is scored by the same rules.}
+\label{fig:pipeline}
+\end{figure}
 
 \begin{table}[t]
 \centering\small
 \begin{tabular}{@{}p{0.31\linewidth}p{0.31\linewidth}p{0.31\linewidth}@{}}
 \toprule
-\textbf{Built and released} & \textbf{Shown (preliminary)} & \textbf{Not yet shown} \\
+\textbf{Built and released} & \textbf{Demonstrated (simulated or synthetic)} & \textbf{Not yet shown} \\
 \midrule
-Scorer, trajectory format and task specifications (Apache-2.0 / CC~BY~4.0)
-& The scorer is deterministic and its boards are reproducible from published traces
-& That task specifications and scoring rules capture what practitioners mean by ``done'' \\[3pt]
+Scorer, trace format and task specifications (Apache-2.0 / CC~BY~4.0)
+& The scorer is deterministic; published boards rebuild byte-identically from their traces
+& That task specifications capture what practitioners mean by ``done'' \\[3pt]
 Phone-video capture, with and without printed tags
-& On synthetic video: $\approx$1\,cm median error with tags, $\approx$3\,cm without
+& Synthetic video: about 1\,cm median error with tags, about 3\,cm without
 & Accuracy on real footage (reflections, blur, occlusion, camera motion) \\[3pt]
-VEX AIM simulator that runs unmodified routines; parameterized simulated drivers
-& Public-layout advantage of a routine can vanish on unseen layouts (simulation)
-& That simulated drivers resemble real students; that simulated gaps match real ones \\[3pt]
-Protocol: tiers, run counts, unseen layouts, paired verdicts
-& Rankings by the secondary index are stable under local weight changes (synthetic)
+VEX AIM simulator running unmodified routines; parameterized simulated drivers
+& Simulation: a public-layout advantage can vanish on unseen layouts
+& That the simulator matches a real AIM robot; that simulated drivers resemble real students \\[3pt]
+Protocol: tiers, run counts, unseen layouts, paired comparisons
+& --- (the verified tier is proposed and has not been exercised)
 & Repeatability of real sessions; a controlled comparison of real drivers and their code \\
+\midrule
+\multicolumn{3}{@{}p{0.97\linewidth}@{}}{\textbf{Physical measurements in this paper:} one hand-held
+video of a robot vacuum (no ground truth) and 120 motion-capture walks from an open
+dataset~\cite{thormagni2024}. Everything else is simulated or synthetic.}\\
 \bottomrule
 \end{tabular}
-\caption{Status of the work. All quantitative results in this paper come from simulation,
-synthetic video, one real capture or one open dataset.}
+\caption{Status of the work.}
 \label{tab:status}
 \end{table}
 
-\section{Related work}
+\section{Related work}\label{sec:related}
 
 \paragraph{Benchmarks for robot policies.} Meta-World~\cite{metaworld2019}, CALVIN~\cite{calvin2022}
 and LIBERO~\cite{libero2023} evaluate learned manipulation policies in simulation;
@@ -109,241 +141,274 @@ Habitat~\cite{habitat2019} does so for embodied navigation; SimplerEnv~\cite{sim
 how well simulated evaluation predicts real-robot results. RoboDojo~\cite{robodojo2026} combines
 simulated and real tasks on standardized bimanual hardware, scores real trials by blinded human
 evaluators with partial credit, and verifies submissions on hidden layouts.
-RoboArena~\cite{roboarena2025} distributes real-world evaluation across institutions through
-pairwise comparisons. These benchmarks standardize the robot and setting, evaluate the policy,
-and require integration with their software. \mb{} standardizes the task, evaluates the whole
-agent (robot, software and any human operator), and uses only the recorded outcome. We adopt from
-this literature explicit protocols, hidden layouts, repeatability reporting and a separation
-between verified and unverified results.
+RoboArena~\cite{roboarena2025} distributes real-world evaluation across institutions through pairwise
+comparisons. Evaluating task completion, standardizing tasks and using held-out layouts are not new;
+\mb{} adopts explicit protocols, hidden layouts, repeatability reporting and a separation between
+verified and unverified results from this literature. What it changes is the unit being evaluated:
+the whole agent (robot, software and any human operator), observed from outside.
+Table~\ref{tab:compare} summarizes the difference without claiming that other benchmarks could not be
+extended in the same direction.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Dimension & Typical policy benchmark & \mb{} \\
+\midrule
+Requires integration with the agent's software & Often & No \\
+Can evaluate a human driver & Not usually its focus & Yes, where comparable \\
+Can evaluate closed-source robots & Platform-dependent & Intended to \\
+Accepts ordinary phone video & Generally not standard & Yes, with limitations \\
+Tests unseen task layouts & Many do & Yes \\
+Evaluates physical task completion & Yes & Yes \\
+\bottomrule
+\end{tabular}
+\caption{How \mb{} differs from a typical policy benchmark.}
+\label{tab:compare}
+\end{table}
 
 \paragraph{Human reference points.} Human-normalized scores were popularized by the Arcade Learning
-Environment~\cite{ale2013,mnih2015}. Section~\ref{sec:scoring} explains why \mb{} moved from
+Environment~\cite{ale2013,mnih2015}. Section~\ref{sec:framework} explains why \mb{} moved from
 normalizing to people to a goal-referenced score.
 
 \paragraph{Reporting under uncertainty.} Agarwal et al.~\cite{agarwal2021} show that point estimates
-over few runs mislead and recommend interval estimates; we use bootstrap
-intervals~\cite{efron1979}, paired designs and an equivalence margin.
+over few runs mislead and recommend interval estimates. \mb{} uses bootstrap
+intervals~\cite{efron1979}, paired designs and an equivalence margin in the spirit of two one-sided
+tests~\cite{lakens2017}.
 
-\paragraph{Product test methods.} IEC~62929~\cite{iec62929} specifies laboratory methods for
-household cleaning robots. \mb{} is complementary: it measures robots where they are used, from
+\paragraph{Product test methods.} IEC~62929~\cite{iec62929} specifies laboratory methods for household
+cleaning robots. \mb{} is complementary: it aims to measure robots where they are used, from
 ordinary video.
 
-\section{Scoring model}\label{sec:scoring}
+\section{The \mb{} framework}\label{sec:framework}
+
+\paragraph{What is measured.} \mb{} scores task outcomes from externally observable trajectories and
+task-state measurements, without access to the agent's controller. A trace holds timestamped poses
+$(t,x,y,\theta)$ of the robot, optional events (for example ``target knocked down'') and, for tasks
+that move objects, the final positions of those objects. The scorer combines these with the task
+specification (arena geometry, robot footprint, goal, budget). For waypoint and coverage tasks the
+goal depends on the robot's path alone; for delivery tasks it depends on where the objects ended up,
+which the robot's path cannot determine and must be measured separately.
 
 \paragraph{Tasks.} A task specifies an arena (size, obstacles, zones), the robot footprint, a time
-budget, public layouts, layout rules for generating unseen ones, and a goal of one of three kinds:
-\emph{waypoints} (reach each in order within position and heading tolerances), \emph{delivery}
-(each object rests in its target zone at the end) or \emph{coverage} (share of free floor swept
-by a tool of given width). Table~\ref{tab:tasks} lists the current tasks; they use competition
-hardware but never copy a season's game.
-
-\paragraph{Versions.} Three version numbers appear and are independent. A \emph{task} carries its own
-version after the @ in its name; the two VEX V5 tasks are at 1.0 because their field and rules are
-settled, the others at 0.1 because they are experimental. The \emph{specification} (0.2)
-versions the trace and board formats and the scoring rules. The \emph{scorer} (0.1.0) versions
-the software. Every report records all three, and results under an older specification remain
-valid under that specification.
+budget, public layouts, rules for generating unseen layouts, and a goal of one of three kinds:
+\emph{waypoints} (reach each in order within position and heading tolerances), \emph{delivery} (each
+object rests in its target zone at the end) or \emph{coverage} (share of free floor swept by a tool of
+given width). Table~\ref{tab:tasks} lists the current task specifications and which of them are used
+in this paper; they use competition hardware but never copy a season's game. A task carries its own
+version (after the @); the trace format and scoring rules are versioned by the specification (0.2),
+and the software by the scorer version (0.1.0). Every report records all three.
 
 \begin{table}[t]
 \centering\small
 \resizebox{\linewidth}{!}{%
-\begin{tabular}{@{}llllll@{}}
+\begin{tabular}{@{}lllllll@{}}
 \toprule
-Task & Platform & Goal & Arena & Budget & People comparable \\
+Task & Platform & Goal & Arena & Budget & People comparable & Used here \\
 \midrule
-MB-VEX-NAV@1.0 & VEX V5 & 6 waypoints, 5\,cm / 5\textdegree & 3.66\,m square & 20\,s & yes \\
-MB-VEX-PICK@1.0 & VEX V5 & deliver 6 objects & 3.66\,m square & 60\,s & yes \\
-MB-AIM-NAV@0.1 & VEX AIM & 5 waypoints, 3\,cm / 10\textdegree & 1.83 $\times$ 1.22\,m & 20\,s & yes \\
-MB-AIM-SORT@0.1 & VEX AIM & sort 6 barrels by colour & 1.83 $\times$ 1.22\,m & 45\,s & yes \\
-MB-COVER@0.1 & floor robots & cover free floor, 30\,cm tool & 4 $\times$ 3\,m & 180\,s & no \\
-MB-FIELD-HALLWAY@0.1 & robot vacuum & cover visible floor & 1.3 $\times$ 3.0\,m & 137\,s & no \\
+MB-VEX-NAV@1.0 & VEX V5 & 6 waypoints, 5\,cm / 5\textdegree & 3.66\,m square & 20\,s & yes & index (App.~\ref{app:index}) \\
+MB-VEX-PICK@1.0 & VEX V5 & deliver 6 objects & 3.66\,m square & 60\,s & yes & index (App.~\ref{app:index}) \\
+MB-AIM-NAV@0.1 & VEX AIM & 5 waypoints, 3\,cm / 10\textdegree & 1.83 $\times$ 1.22\,m & 20\,s & yes & --- \\
+MB-AIM-SORT@0.1 & VEX AIM & sort 6 barrels by colour & 1.83 $\times$ 1.22\,m & 45\,s & yes & main study \\
+MB-COVER@0.1 & floor robots & cover free floor, 30\,cm tool & 4 $\times$ 3\,m & 180\,s & no & index (App.~\ref{app:index}) \\
+MB-FIELD-HALLWAY@0.1 & robot vacuum & cover visible floor & 1.3 $\times$ 3.0\,m & 137\,s & no & demonstration \\
 \bottomrule
 \end{tabular}}
-\caption{Current tasks (specification 0.2). ``People comparable'': a person can do the same job
-with the same means, for example by driving the same robot.}
+\caption{Current task specifications. Only MB-AIM-SORT has a controlled (simulated) experiment;
+the others are implemented and used only for the demonstrations indicated. ``People comparable'': a
+person can do the same job with the same means, for example by driving the same robot.}
 \label{tab:tasks}
 \end{table}
 
 \paragraph{Primary outcome: goal score.} For a run with success $S$ in task units and maximum
-$S_{\max}$, the goal score is $g = S/S_{\max}\in[0,1]$. For each agent we report the mean over its
-runs with a 95\% bootstrap interval, the worst run, and the \emph{completion rate} (share of runs
-that achieved the whole goal). Time to goal is reported over runs that achieved it.
+$S_{\max}$, the goal score is $g = S/S_{\max}\in[0,1]$. For each agent the board reports the mean over
+its runs with a 95\% bootstrap interval, the worst run, and the \emph{completion rate} (share of runs
+that achieved the whole goal). Time to goal is reported over runs that achieved it. The goal score is
+the headline and the only quantity used in this paper's comparisons.
 
 \paragraph{Chance.} Each task reports the goal score of a randomly moving robot beside the agents'
-scores, without subtracting it. On coverage, a random walk already covers about half a room;
-readers should see that rather than have it absorbed into a transformation.
+scores, without subtracting it. On coverage, a random walk already covers about half a room; readers
+should see that rather than have it absorbed into a transformation.
 
-\paragraph{Comparison with people (optional).} Our first specification normalized every agent to the
+\paragraph{Comparison with people (optional).} The first specification normalized every agent to the
 median person on the task, following~\cite{mnih2015}. That turned differences in equipment into
 apparent differences in skill when means differed (a robot vacuum against a person with a stick
 vacuum), left tasks without a human baseline unscored, and saturated where most people finish.
 Specification 0.2 reports
 $\mathrm{vs\_people}=(S-S_{\text{chance}})/(S_{\text{people}}-S_{\text{chance}})$ only on tasks
-declared people-comparable, only when people's median beats chance by at least 10\% of
-$S_{\max}$ (otherwise the ratio is unstable and is not reported), and never as the headline.
+declared people-comparable, only when people's median beats chance by at least 10\% of $S_{\max}$
+(otherwise the ratio is unstable), and never as the headline.
 
-\paragraph{Secondary measures and an experimental index.} Boards also report path efficiency $e$
-(shortest sensible path over path driven, clamped to $[0,1]$), consistency
-$c=\mathrm{clamp}(1-\sigma_S/\mu_S, 0, 1)$ with $c=0$ when $\mu_S=0$ and $\sigma_S$ the sample
-standard deviation of success over runs, and safety $s=1/(1+\bar v)\in(0,1]$ with $\bar v$ the mean
-number of contact or rule violations per run. A single index ranks agents within one task:
-\[\mathrm{MBI}=0.50\,g+0.20\,e+0.15\,c+0.15\,s\;\in[0,1].\]
-The weights are a design choice, not an estimate; we treat the index as experimental and
-secondary to $g$, never average it across tasks, and report its sensitivity to the weights
-(Section~\ref{sec:feasibility}).
+\paragraph{Secondary measures.} Boards also report path efficiency, consistency and safety, defined
+precisely in Appendix~\ref{app:index}. Path efficiency compares the path driven with a simple
+reference length computed by the scorer (straight lines through the waypoints reached; a greedy
+nearest-first single-carry tour for deliveries; covered area divided by tool width for coverage). The
+reference ignores obstacles and robot kinematics, so it is a yardstick, not a shortest path.
+An optional index combines these measures with the goal score for ranking within one task. Combining
+them is a value judgement with known problems: consistency rewards an agent that always scores 1 of 6
+over a better agent with varied results, and one safety violation means different things on
+different tasks. The index is therefore secondary, never averaged across tasks, not used in this
+paper's conclusions, and can be ignored; its definition and weight sensitivity are in
+Appendix~\ref{app:index}.
 
-\paragraph{Ranks.} For display, agents share a rank while their intervals overlap the leader's.
-This is a presentation convention, not a test of equivalence.
+\paragraph{Ranks.} For display, agents share a rank while their intervals overlap the leader's. This
+is a presentation convention, not a test of equivalence.
 
 \section{Implementation}\label{sec:impl}
 
-\paragraph{Trajectory traces and the scorer.} A run is a directory with a manifest (task, layout,
-agent and its class, capture method, tier, file hashes), timestamped poses $(t,x,y,\theta)$,
-optional events and the final positions of objects. This is the only interface between an agent
-and the benchmark, so closed products can be evaluated from video alone. The scorer is
-implemented once in Rust and called from Python and the command line; it validates traces
-(hashes, monotonic time, sampling gaps), computes run reports and builds boards. An independent
-browser page recomputes waypoints, deliveries and coverage from raw poses and flags disagreements.
-\emph{Determinism is not accuracy}: the scorer returning the same report for the same trace says
-nothing about whether the trace, the task specification or the scoring rules are right, which is
-why capture accuracy, task design and the protocol are examined separately.
+\paragraph{Traces and the scorer.} A run is a directory with a manifest (task, layout, agent and its
+class, capture method, tier, file hashes), timestamped poses, optional events and final object
+positions. This is the only interface between an agent and the benchmark. The scorer is implemented
+once in Rust and called from Python and the command line; it validates traces (hashes, monotonic time,
+sampling gaps), computes run reports and builds boards. A separate recount, written in JavaScript in
+the toolkit's report page, recomputes waypoints, deliveries and coverage from raw poses and flags
+disagreements with the scorer. Both were written with the same AI assistant, so they are not fully
+independent checks. Returning the same report for the same trace says nothing about whether the
+trace or the task specification is right; capture accuracy and task design are examined separately.
 
-\paragraph{Capture.} With printed AprilTags~\cite{olson2011} in the arena corners and on the robot,
-a per-frame homography maps the image to the floor. Without tags, frames of a fixed or hand-held
-camera are aligned to the first frame; the per-pixel median gives an empty-floor image and the
-robot is the region that differs from it. The floor plane comes from four image points outlining
-a floor rectangle~\cite{hartley2004}; focal length and scale come from a measured width and length,
-or from the robot's known size by searching for the camera parameters at which its silhouettes
-match. The robot's position is taken half a robot behind the lowest point of its silhouette;
-floor the camera cannot see is excluded from coverage and safety.
+\paragraph{Capture.} With printed AprilTags~\cite{olson2011} in the arena corners and on the robot, a
+per-frame homography maps the image to the floor. Without tags, frames of a fixed or hand-held camera
+are aligned to the first frame; the per-pixel median gives an empty-floor image and the robot is the
+region that differs from it. The floor plane comes from four image points outlining a floor
+rectangle~\cite{hartley2004}; focal length and scale come from a measured width and length, or from
+the robot's known size. The robot's position is taken half a robot behind the lowest point of its
+silhouette, and its heading from its direction of travel, so tag-free capture cannot measure heading
+while the robot turns in place. Floor the camera cannot see is excluded from coverage and safety.
 
-\paragraph{Simulation: games and drivers.} A \emph{game} is defined once (field, zones, wall-mounted
-fiducials, objects, layouts, layout rules, match length, scoring) and then simulated many times;
-a game may link to a task with the same layouts, in which case simulated runs are also scored by
-the standard scorer and the two scores must agree. The first platform is VEX AIM, a small
-holonomic classroom robot with a magnetic pick-up, a kicker and a camera. The simulator runs
-VEXcode AIM Python files unmodified: the import header receives stand-ins for the robot, every API
-call advances simulated time, speeds follow the published API limits (200\,mm/s, 150\textdegree/s),
-and each run draws its own wheel slip, drift, turn overshoot, kick scatter and camera noise. The
-\emph{parameterized simulated-driver baseline} consists of controller policies with explicit traits
+\paragraph{Simulation.} A \emph{game} is defined once (field, zones, wall-mounted fiducials, objects,
+layouts, layout rules, match length, scoring) and then simulated many times; a game may link to a task
+with the same layouts, in which case simulated runs are also scored by the standard scorer. The first
+platform is VEX AIM, a small holonomic classroom robot with a magnetic pick-up, a kicker and a camera.
+The simulator runs VEXcode AIM Python files unmodified: the robot API is replaced by stand-ins, every
+call advances simulated time, speeds are capped at the published API limits (200\,mm/s,
+150\textdegree/s), and each run draws its own wheel slip, drift, turn overshoot, kick scatter and
+camera noise. These are modelling assumptions; speed limits alone do not validate the simulator's
+dynamics, pick-up, kicking, perception or collisions against a real AIM robot. The
+\emph{parameterized simulated-driver baseline} is a set of controller policies with explicit traits
 (reaction time with partial anticipation, share of full speed used, steering shake, placement
-precision, choice of next object, mistake and hesitation rates); six named characters span a
-plausible classroom, and the \emph{typical simulated driver} is the median member of a simulated
-class of twenty. These traits are chosen to be plausible; they are not fitted to real students.
+precision, choice of next object, mistake and hesitation rates). Six named characters span a range of
+skill, and the \emph{typical simulated driver} is the median member of a simulated class of twenty.
+The traits were chosen by hand to be plausible and are listed in Appendix~\ref{app:drivers}; they are
+not fitted to real students.
 
 \section{Evaluation protocol}\label{sec:protocol}
 
 \paragraph{Tiers.} Results are \emph{simulated} (S), \emph{field} (F: a real robot captured and
 submitted by its owner, reviewed before publication) or \emph{verified} (V). They are never mixed
-without labels.
+without labels. The verified tier is a proposed procedure that has not yet been carried out: it
+requires a layout sent at the start, one uncut fixed-camera video with a code word, every attempt
+reported, and a second reviewer re-scoring at least one run from raw video; reviewers declare
+conflicts of interest (details in the protocol document in the repository).
 
 \paragraph{Runs and layouts.} An agent needs at least five runs on a task to be ranked (ten
 recommended); runs are consecutive attempts and every attempt is reported. Public layouts are
 published; unseen layouts are generated from each task's layout rules with an unpublished seed.
 
-\paragraph{Comparisons.} When two agents are compared in simulation, run $i$ of each uses the same
-seed (the same layout and the same draw of robot imperfections), and the comparison is the mean of
-paired differences with a 95\% bootstrap interval. The resampling unit is the paired run on a single
-layout; across unseen layouts the bootstrap is hierarchical (layouts, then runs within each chosen
-layout), so intervals reflect variation across layouts. Outcomes are \emph{better} or \emph{worse}
-when the interval excludes zero, \emph{equivalent} when it lies within a margin of $\pm0.5$ points,
-and \emph{no difference found} otherwise. No difference found does not mean equivalent.
+\paragraph{Paired comparisons.} In simulation, run $i$ of every agent uses the same seed, so the same
+layout and the same draw of robot imperfections, and a comparison is the mean of paired differences.
+Intervals are 95\% percentile bootstrap intervals from 4{,}000 resamples. On one layout the resampling
+unit is the paired run; across unseen layouts the bootstrap is hierarchical (layouts, then runs within
+each chosen layout). Paired simulated runs share the simulator and its assumptions, so they are not
+independent experimental replicates in the sense of separate physical sessions.
 
-\paragraph{Verified runs.} A verified session requires a layout sent at the start; one uncut video
-from a fixed camera showing the arena, a code word sent at the start and every run; a trace from
-tags or from the converter run by a reviewer; all attempts reported; the agent described (for code,
-the routine's version, shared privately on request); and a second reviewer re-scoring at least one
-run from raw video. Reviewers are project maintainers or volunteers who have re-scored three
-reference runs within tolerance; they declare conflicts and may not review a team, school, family
-member or product maker they are connected to. If the two reviewers disagree, a third decides,
-and reviewer identities are recorded with the result.
+\paragraph{Outcomes.} \emph{Better} or \emph{worse} when the interval excludes zero; \emph{equivalent}
+when the interval lies strictly inside a margin of $\pm\delta$; \emph{no difference found} otherwise.
+Requiring a 95\% interval inside the margin is a conservative version of the two one-sided tests
+procedure~\cite{lakens2017}, which uses a 90\% interval. For the sorting task $\delta=0.5$ points, half
+of the smallest scoring unit (one barrel), fixed before the study; it is a convention, not derived
+from what matters to users, and other tasks will need their own. ``No difference found'' does not mean
+equivalent.
 
-\paragraph{Disputes, versions, minors.} Disputes are re-scored by a reviewer who did not score the
-original; every change to a published result is logged with versions and date. Published results
-use trajectories, not footage; videos showing people are not published without permission (for
-minors, a parent's or guardian's).
+\section{Preliminary evaluation}\label{sec:eval}
 
-\section{Preliminary experiment: does a public-layout advantage generalize?}\label{sec:experiment}
+All numbers in this section describe the simulation or synthetic video. Every agent, the robot model
+and every driver trait are assumptions, so they illustrate what the protocol reports and what it
+catches; they are not measurements of VEX AIM robots or of students.
+
+\subsection{Does a public-layout advantage generalize?}
 
 \begin{figure}[t]
 \centering
 \includegraphics[height=4.6cm]{figs/aim-sim.jpg}\hfill
-\includegraphics[height=4.6cm]{figs/hallway-tracked.jpg}
-\caption{Left: the simulated AIM sorting game (labelled as simulation in all outputs). Right: the
-tag-free capture of a household robot vacuum from one hand-held phone video
-(Section~\ref{sec:feasibility}).}
-\label{fig:scenes}
+\includegraphics[height=4.6cm,width=0.5\linewidth,keepaspectratio]{figs/verdict-unseen.pdf}
+\caption{Left: the simulated AIM sorting game (labelled as simulation in all outputs). Right: mean
+points on the public layout and on ten unseen layouts (20 paired runs per agent). The drivers are a
+parameterized, uncalibrated baseline.}
+\label{fig:verdict}
 \end{figure}
 
 \paragraph{Setup.} One VEX AIM robot must sort three orange and three blue barrels into the zone of
 their colour on a 1.83\,m\,$\times$\,1.22\,m table within 45\,s (one point per barrel; six maximum).
 Four routines, written for the public layout, span common approaches: \emph{dead reckoning} (a fixed
-plan, no sensors); \emph{vision} (the camera finds the nearest barrel, wheel odometry returns it to
-the zone); \emph{vision + tags} (as vision, then homing on the AprilTag behind each zone); and
+plan, no sensors); \emph{vision} (the camera finds the nearest barrel, wheel odometry returns it to the
+zone); \emph{vision + tags} (as vision, then homing on the AprilTag behind each zone); and
 \emph{planner} (the barrel positions of the public layout, an efficient order, full speed, the camera
-only for the last few centimetres, and spread drop positions). Each routine, each of the six driver
-characters and the typical simulated driver play 20 paired runs on the public layout, and 20 paired
-runs spread over ten unseen layouts (same start, barrels placed at random away from the zones, the
-start and each other).
+only for the last few centimetres, and spread drop positions). Each routine, each driver character and
+the typical simulated driver play 20 paired runs on the public layout, and 20 paired runs over ten
+unseen layouts (two per layout; same start, barrels placed at random away from the zones, the start
+and each other).
 
-\paragraph{Results.} Figure~\ref{fig:verdict} and Table~\ref{tab:verdict} summarize the outcome. On
-the public layout the planner scores 4.00 points, ahead of the typical simulated driver (2.90) by
-a paired difference of $+1.10$ (95\% interval $+1.00$ to $+1.25$), and ahead of every driver
-character, including the two strongest ($+0.25$ and $+0.50$). On unseen layouts it scores 2.80: a
-drop of $1.20$ points ($-1.60$ to $-0.85$), no detectable difference from the typical simulated
-driver ($-0.05$; $-0.65$ to $+0.60$), and below the two strongest characters ($-1.35$ and $-1.00$).
-The vision routine scores 2.45 on the public layout and 2.40 on unseen layouts, a change that is
-equivalent to zero within the margin ($-0.05$; $-0.50$ to $+0.40$). The dead-reckoning routine,
-which also encodes the public layout, drops by 1.05.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{figs/verdict-unseen.pdf}
-\caption{Simulated AIM sorting: mean points on the public layout and on ten unseen layouts (20 paired
-runs per agent). The drivers are a parameterized, uncalibrated baseline.}
-\label{fig:verdict}
-\end{figure}
+\paragraph{Results.} Table~\ref{tab:verdict} summarizes the outcome. On the public layout the planner
+scores 4.00 points, ahead of the typical simulated driver (2.90) by a paired difference of $+1.10$
+($+1.00$ to $+1.25$). On unseen layouts it scores 2.80: a change of $-1.20$ ($-1.60$ to $-0.85$) and
+no difference found against the typical simulated driver ($-0.05$; $-0.65$ to $+0.60$). The vision
+routine scores 2.45 on the public layout and 2.35 on unseen layouts; its change ($-0.10$; $-0.55$ to
+$+0.40$) is small, but the interval is wider than the margin, so the outcome is no difference found,
+not equivalence. The dead-reckoning routine, which also encodes the public layout, changes by
+$-1.05$ ($-1.50$ to $-0.60$). Interval endpoints are exact at the resolution of the data: with 20 runs
+and integer points, bootstrap means fall on multiples of 0.05.
 
 \begin{table}[t]
 \centering\small
-\begin{tabular}{@{}lcccc@{}}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lccccc@{}}
 \toprule
-& \multicolumn{2}{c}{Public layout} & \multicolumn{2}{c}{Unseen layouts} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}
-Routine & Mean & vs typical driver & Mean & vs typical driver \\
+& \multicolumn{2}{c}{Public layout} & \multicolumn{2}{c}{Unseen layouts} & Change \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-6}
+Routine & Mean & vs typical driver & Mean & vs typical driver & unseen $-$ public \\
 \midrule
-Dead reckoning & 1.70 & $-1.20$ [$-1.50$, $-0.90$] worse & 0.65 & $-2.20$ [$-2.75$, $-1.55$] worse \\
-Vision & 2.45 & $-0.45$ [$-0.80$, $-0.10$] worse & 2.40 & $-0.45$ [$-1.05$, $+0.20$] n.d.f. \\
-Vision + tags & 2.15 & $-0.75$ [$-1.20$, $-0.35$] worse & 1.85 & $-1.00$ [$-1.50$, $-0.50$] worse \\
-Planner & 4.00 & $+1.10$ [$+1.00$, $+1.25$] better & 2.80 & $-0.05$ [$-0.65$, $+0.60$] n.d.f. \\
+Dead reckoning & 1.70 & $-1.20$ [$-1.50$, $-0.90$] worse & 0.65 & $-2.20$ [$-2.75$, $-1.55$] worse & $-1.05$ [$-1.50$, $-0.60$] \\
+Vision & 2.45 & $-0.45$ [$-0.80$, $-0.10$] worse & 2.35 & $-0.50$ [$-1.15$, $+0.20$] n.d.f. & $-0.10$ [$-0.55$, $+0.40$] \\
+Vision + tags & 2.25 & $-0.65$ [$-1.05$, $-0.30$] worse & 1.80 & $-1.05$ [$-1.55$, $-0.55$] worse & $-0.45$ [$-1.10$, $+0.15$] \\
+Planner & 4.00 & $+1.10$ [$+1.00$, $+1.25$] better & 2.80 & $-0.05$ [$-0.65$, $+0.60$] n.d.f. & $-1.20$ [$-1.60$, $-0.85$] \\
 \midrule
-Typical simulated driver & 2.90 & & 2.85 & \\
+Typical simulated driver & 2.90 & & 2.85 & & \\
 \bottomrule
-\end{tabular}
-\caption{Paired differences in points (of 6) with 95\% bootstrap intervals; n.d.f.\ = no difference
-found. Values are exact to two decimals; full results, including comparisons with each driver
-character, are in \texttt{results/aim-sort-verdict-v0.1.json}. The typical driver's paired runs
-average 2.90; the class median of per-driver means, used only to select that driver, is 2.83.}
+\end{tabular}}
+\caption{Simulated AIM sorting: points (of 6) with 95\% bootstrap intervals; n.d.f.\ = no difference
+found. The change column compares different layouts and is an unpaired bootstrap. The typical
+driver's paired runs average 2.90; the class median of per-driver means, used only to select that
+driver, is 2.83. Full results, including each driver character, are in
+\texttt{results/aim-sort-verdict-v0.1.json}.}
 \label{tab:verdict}
 \end{table}
 
-\paragraph{Interpretation.} The planner's public-layout advantage comes largely from knowing where the
-barrels are. This conclusion rests on a comparison of the routine with itself across layouts and
-does not depend on the simulated drivers; the comparisons with drivers additionally depend on the
-uncalibrated baseline and should be read as ``outperforms a parameterized simulated-driver
-baseline'', not as a statement about real students. Two further observations would plausibly
-carry over to real robots: the tag-homing routine loses time searching for the tag, and routines
-that drop every barrel at the same spot pick up the barrel already there. At AIM's top speed no
-agent sorts all six barrels in 45\,s (best runs score 4 or 5), which suggests the task's budget
-should be revisited.
+\paragraph{What the study shows, and what it does not.} The planner's public-layout advantage comes
+largely from knowing where the barrels are. That a routine which memorizes positions does worse when
+they move is expected; the point of the study is that the protocol catches it, and that a verdict
+based on the public layout alone would have recommended the planner. The within-routine change does
+not depend on the simulated drivers. Several limits apply. First, the planner was chosen as the
+strongest routine \emph{on the public layout}, so its public-layout margin is inflated by that
+selection; the unseen layouts were not used for selection or development and give the less biased
+estimate. Second, ten unseen layouts with two runs each is a small sample of layouts, so the
+intervals may understate layout-to-layout variability. Layout by layout
+(Appendix~\ref{app:layouts}) the planner scores above the typical simulated driver on four layouts,
+the same on three and below on three; more layouts are needed before such a comparison could be
+relied on. Third, at the
+simulated top speed no agent sorts all six barrels in 45\,s (best runs score 4 or 5). The goal score
+therefore measures partial progress under a tight budget rather than completion; this is a property
+of the task as specified, and whether the budget should be lengthened is an open question for the
+task's next version.
 
-\section{Feasibility demonstrations}\label{sec:feasibility}
+\subsection{Capture accuracy on synthetic video}
 
-\paragraph{Capture accuracy on synthetic video.} Table~\ref{tab:capture} reports per-frame errors over
-three render seeds. With tags the robot is found in every frame with a median error of about 1\,cm;
-without tags the median is about 3\,cm whether scale comes from a measured floor or from the robot's
-size, with about 8\% of frames left without a position. Synthetic video lacks reflections, blur,
-occlusion and lighting changes; real-world validation is the first planned pilot.
+Table~\ref{tab:capture} reports per-frame position errors on rendered video with known ground truth,
+over three render seeds. With tags the robot is found in every frame with a median error of about
+1\,cm; without tags the median is about 3\,cm whether scale comes from a measured floor or from the
+robot's size, and about 8\% of frames have no position. Synthetic video lacks reflections, blur,
+occlusion and lighting changes, and whether these errors or the missing frames change goal scores
+(for example on a 5\,cm waypoint tolerance) has not yet been measured. These figures are therefore a
+best case: errors on real footage are likely to be larger. They are not a validation.
 
 \begin{table}[t]
 \centering\small
@@ -356,29 +421,152 @@ No tags & measured floor & 3.2\,cm & 5.2\,cm & 8.2\% \\
 No tags & robot size only & 3.2\,cm & 5.4\,cm & 8.2\% \\
 \bottomrule
 \end{tabular}
-\caption{Capture accuracy on rendered video with known ground truth (medians over three render
-seeds; \texttt{paper/analysis/capture\_accuracy.py}).}
+\caption{Capture accuracy on rendered video (medians over three render seeds;
+\texttt{paper/analysis/capture\_accuracy.py}).}
 \label{tab:capture}
 \end{table}
 
-\paragraph{A real robot vacuum.} A household robot vacuum was filmed for 137\,s with a hand-held phone,
-without tags; scale came from the robot's size and unseen floor was excluded. It covered 85\% of
-3.24\,m$^2$ of visible floor with a 30\,cm cleaning width, driving 18.6\,m. This demonstrates the
-pipeline end to end on real footage; without ground truth it does not establish accuracy.
+\subsection{Demonstrations on real data}
 
-\paragraph{People in an open dataset.} We scored 120 motion-capture walks along one route (about 7\,m)
+\begin{figure}[tbp]
+\centering
+\includegraphics[height=7.5cm]{figs/hallway-tracked.jpg}
+\caption{Tag-free capture of a household robot vacuum from one hand-held phone video. Scale came
+from the robot's size; floor the camera could not see is excluded. There is no ground truth for this
+video.}
+\label{fig:vacuum}
+\end{figure}
+
+\paragraph{A robot vacuum.} A household robot vacuum was filmed for 137\,s with a hand-held phone,
+without tags (Figure~\ref{fig:vacuum}). The pipeline estimated that it covered 85\% of 3.24\,m$^2$ of
+visible floor with a 30\,cm cleaning width, driving 18.6\,m. This shows the pipeline running end to
+end on real footage; without ground truth it says nothing about accuracy.
+
+\paragraph{People in an open dataset.} I scored 120 motion-capture walks along one route (about 7\,m)
 from THÖR-MAGNI~\cite{thormagni2024}. All 120 reached the goal (median 6.8\,s), so the goal score
-could not separate walkers and secondary measures did; with a 60\,s budget a random walk reached
-the goal in 40\% of runs, showing that budgets should follow typical completion times.
+could not separate walkers; with a 60\,s budget a random walk reached the goal in 40\% of runs. The
+example shows that budgets need to follow typical completion times, or the goal score saturates.
 
-\paragraph{Index sensitivity.} On the synthetic boards whose simulated agents respect their robots'
-limits (two VEX V5 tasks and room coverage), we recomputed the index for 5{,}000 weight vectors
-drawn near the defaults (Dirichlet with concentration $50\,w$) and uniformly from the simplex
-(Table~\ref{tab:sens}). Under local changes, rankings are stable (median Kendall's $\tau\ge0.94$)
-and the top agent almost never changes; under arbitrary weights the coverage ranking is the least
-stable. Ranking by goal score alone agrees with the index at $\tau=0.81$ to $0.91$.
+\section{Discussion and limitations}\label{sec:limits}
 
-\begin{table}[t]
+The evidence supports three modest statements: the framework can be specified precisely and
+implemented reproducibly; its protocol, applied to simulated agents, distinguishes a public-layout
+advantage from one that generalizes; and tag-based and tag-free capture are accurate to a few
+centimetres on synthetic video. It does not yet support claims about real robots or people.
+
+The main limitations follow. The simulator is custom and uncalibrated: its robot model, noise and
+every driver trait are assumptions, and simulated agents are less variable than real ones (some score
+the same in every run), so intervals are likely narrower than they will be on real robots. Tag-free
+capture needs a visible floor rectangle, cannot measure heading during turns in place, and has been
+tested only on synthetic video; the effect of capture error on scores is untested. Delivery tasks need
+object positions, which the current capture tools do not measure. Goal scores depend on how goals and
+budgets are set, and the sorting task's budget may be too tight. The synthetic VEX AIM boards
+published on the project site under specification 0.2 contain simulated agents faster than the AIM
+robot's top speed; they are marked invalid and are not used here. Coverage scores model cleaning
+rather than measure it. Tasks and protocol change only through public RFCs so that such issues are
+fixed openly.
+
+\section{Future work}\label{sec:future}
+
+The next step is a small real-world accuracy experiment that does not need a motion-capture lab: a
+robot driven between measured floor markers, 20--30 trials filmed with a fixed camera, comparing the
+position and waypoint completion estimated by \mb{} (with and without tags) against the measured marks,
+and checking whether capture error or missing frames change goal scores. Further work, in order:
+scoring the same simulated runs from ground truth and from rendered-video capture to test how capture
+error propagates to scores and rankings; more unseen layouts, at several difficulty levels, with
+layout-level reporting and a comparison of public-layout and unseen-layout rankings; running the
+routines of Section~\ref{sec:eval} on a real AIM robot to measure the simulator's prediction error;
+and a paired comparison of real student drivers with their own teams' code, which would require
+parental consent, a host institution's youth-protection rules and an ethics review.
+
+\section{Conclusion}
+
+\mb{} proposes evaluating any robot agent, whether a person, code or a product, by how much of a
+task's goal it achieves, from what can be observed from outside, with an open scorer and an explicit
+protocol. The framework and tools are built and released, and a preliminary simulated study shows why
+unseen layouts belong in any verdict. The next step is to test the measurement on real robots.
+Comments are welcome at \url{https://motionbench.org/paper}.
+
+\section*{Author contributions}
+A.Y.\ conceived the project, developed the research questions, designed the evaluation framework and
+the experiments, specified the intended behaviour of the software, ran the experiments and reviewed the
+resulting analyses.
+
+\section*{Use of AI tools}
+AI-assisted tools, primarily Claude (Anthropic), used through claude.ai, supported software
+implementation (scorer, capture tools, simulators and analysis scripts), synthetic data generation,
+analysis scripting and manuscript drafting. AI-generated implementations and outputs were examined and
+tested by the author, who takes responsibility for the methods, reported results and conclusions. The
+checks made so far are the automated test suites in the repository (unit tests of the scorer and of
+the Python toolkit), the separate recount described in Section~\ref{sec:impl}, and reproduction of every
+reported number with \texttt{paper/reproduce.sh}; a set of hand-worked scoring examples is planned.
+AI tools are not listed as authors.
+
+\section*{Acknowledgements}
+The author thanks his friends and teammates on RoboBench and in VEX competition for the questions
+that started this work, his family for their support, and the THÖR-MAGNI authors for releasing their
+data.
+
+\section*{Ethics, data and code availability}
+No new data from human participants were collected for this paper; the human trajectories come from a
+published dataset~\cite{thormagni2024}. The robot-vacuum video was recorded by the author in a private
+home. Footage from a public event broadcast was used only to measure camera geometry for the match
+simulator (Appendix~\ref{app:matches}) and is not redistributed. Code (Apache-2.0), task
+specifications and data (CC~BY~4.0) are at \url{https://github.com/motionbenchmark/mb-core}; the
+version described here is the release tagged \release{}, and \texttt{paper/reproduce.sh} regenerates
+every number and figure (Appendix~\ref{app:repro}).
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+
+\appendix
+\section{Reproducing the results}\label{app:repro}
+\small
+Release: \release{} of \url{https://github.com/motionbenchmark/mb-core}. Environment used: Python 3.13,
+NumPy 2.5, SciPy 1.18, OpenCV 5.0, FFmpeg 6.1, Rust 1.97, motionbench 0.1.0 (specification 0.2); the
+exact versions and commit are written to \texttt{paper/results/environment.txt} on each run.
+\begin{verbatim}
+git clone https://github.com/motionbenchmark/mb-core && cd mb-core
+git checkout paper-v0.3
+pip install maturin
+(cd python && maturin build --release)
+pip install "target/wheels/motionbench-*.whl[tracker]"
+bash paper/reproduce.sh     # ~5 min
+\end{verbatim}
+Expected outputs: the synthetic board is byte-identical to \texttt{results/leaderboard-synthetic-v0.1.json};
+\texttt{paper/results/aim-sort-verdict.json} reproduces Table~\ref{tab:verdict};
+\texttt{aim-sort-per-layout.json} reproduces Table~\ref{tab:layouts}; \texttt{index-sensitivity.json} reproduces Table~\ref{tab:sens};
+\texttt{capture-accuracy.json} reproduces Table~\ref{tab:capture} (small differences are possible
+across OpenCV/FFmpeg versions). SHA-256 checksums of the deterministic outputs are in
+\texttt{paper/results/SHA256SUMS} and are checked by the script.
+\normalsize
+
+\section{Secondary measures and the experimental index}\label{app:index}
+
+\paragraph{Definitions.} Path efficiency $e=\min(1, L_{\text{ref}}/L)$, with $L$ the path driven and
+$L_{\text{ref}}$ the reference length: for waypoints, the straight-line length from the start through
+the waypoints reached; for deliveries, the greedy tour that repeatedly goes to the nearest remaining
+object and carries it to its zone centre, truncated at the number delivered; for coverage, the area
+covered divided by the tool width. $e=0$ when nothing was achieved. Consistency
+$c=\mathrm{clamp}(1-\sigma_S/\mu_S,0,1)$ with $\sigma_S$ the sample standard deviation of success over
+runs, $c=0$ when $\mu_S=0$, and $\sigma_S=0$ for a single run (which is why agents with fewer than five
+runs are unranked). Safety $s=1/(1+\bar v)\in(0,1]$ with $\bar v$ the mean number of contact or rule
+violations per run. The index is
+\[\mathrm{MBI}=0.50\,g+0.20\,e+0.15\,c+0.15\,s\;\in[0,1].\]
+The weights are a design choice, not an estimate of what performance means.
+
+\paragraph{When not to use it.} The index should not be used across tasks, to compare agents whose
+goal scores differ clearly (the goal score already answers the question), or where consistency is
+high only because the score is uniformly low, since $c$ does not distinguish the two.
+
+\paragraph{Weight sensitivity.} On the synthetic boards whose simulated agents respect their robots'
+limits, the index was recomputed for 5{,}000 weight vectors drawn near the defaults (Dirichlet with
+concentration $50\,w$) and uniformly from the simplex (Table~\ref{tab:sens}). Under local changes the
+rankings are stable (median Kendall's $\tau\ge0.94$); under arbitrary weights the coverage ranking is
+the least stable. Ranking by goal score alone agrees with the index at $\tau=0.81$ to $0.91$. This
+shows the ranking is insensitive to small changes in the weights, not that the weights are right.
+
+\begin{table}[h]
 \centering\small
 \begin{tabular}{@{}lccccc@{}}
 \toprule
@@ -396,98 +584,66 @@ MB-COVER@0.1 & 9 & 0.94 & 99.6\% & 0.83 (0.33) & 0.83 \\
 \label{tab:sens}
 \end{table}
 
-\paragraph{Extension: multi-robot matches.} The toolkit also includes a seeded 2-versus-2 match
-simulator, a renderer of broadcast-style video from a camera position measured on a real event
-broadcast, a per-robot report and a tracking benchmark. A baseline tracker finds 90--97\% of robot
-positions with a median error of 7--9\,cm on three simulated matches but switches identities 25--44
-times per match (IDF1~\cite{ristani2016} 48--66\%). We present this as infrastructure for future work.
+\section{Simulated driver parameters}\label{app:drivers}
 
-\section{Research roadmap}\label{sec:plan}
+Table~\ref{tab:drivers} lists the six characters. The class of twenty is drawn from a single skill
+level per student (Beta(2.2, 2.0)), from which each trait follows linearly with small noise
+(\texttt{class\_roster} in \texttt{python/motionbench/game/driver.py}); the typical driver selected by
+the median of class means has reaction 0.35\,s, speed use 0.71, steering shake 4.6\textdegree, precision
+0.66, decisions 0.81, mistakes 0.08 and hesitation 0.22. All values were set by hand to span a plausible
+range and have not been fitted to any person.
 
-Three pilots would test the hypotheses in Table~\ref{tab:status}. Each needs equipment or
-participants we do not have and is designed so that a host lab would also obtain a research output.
-\begin{enumerate}
-  \item \textbf{Real-world capture validation.} The same runs recorded with tags and without, against
-    a calibrated reference (for example motion capture), across rooms, lighting and camera
-    placements; report median and 90th-percentile error and failure rates.
-  \item \textbf{Real drivers versus their own code.} Student drivers and their teams' routines on the
-    same robot and layouts, paired by layout, at least ten runs per agent, on public and unseen
-    layouts. Involving minors requires parental consent, the host institution's youth-protection
-    rules and an ethics/IRB determination.
-  \item \textbf{Simulation to reality.} The routines of Section~\ref{sec:experiment} on a real AIM robot
-    and table with the same layouts; report the simulator's prediction error per routine, then fit the
-    driver baseline to filmed runs and re-check the verdicts.
-\end{enumerate}
+\begin{table}[h]
+\centering\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lcccccccc@{}}
+\toprule
+Character & Reaction (s) & Speed use & Shake (\textdegree) & Precision & Decisions & Mistakes & Hesitation & Strafe \\
+\midrule
+Rookie Riley & 0.55 & 0.55 & 9.0 & 0.30 & 0.55 & 0.16 & 0.25 & 0.0 \\
+Nervous Noah & 0.45 & 0.60 & 5.0 & 0.60 & 0.70 & 0.07 & 0.40 & 0.1 \\
+Average Alex & 0.40 & 0.70 & 5.0 & 0.55 & 0.75 & 0.08 & 0.15 & 0.2 \\
+Speedy Sloane & 0.30 & 1.00 & 7.0 & 0.40 & 0.70 & 0.13 & 0.05 & 0.3 \\
+Steady Sam & 0.35 & 0.55 & 3.0 & 0.85 & 0.85 & 0.03 & 0.10 & 0.3 \\
+Pro Priya & 0.22 & 0.95 & 2.0 & 0.85 & 0.95 & 0.02 & 0.03 & 0.6 \\
+\bottomrule
+\end{tabular}}
+\caption{Simulated driver characters. Decisions: probability of choosing the sensible next object;
+mistakes: probability per delivery of a fumble; hesitation: probability per decision of pausing.}
+\label{tab:drivers}
+\end{table}
 
-\section{Limitations}
+\section{Unseen layouts, layout by layout}\label{app:layouts}
 
-Most results are simulated and encode our assumptions (robot size, accelerations, camera field of
-view, friction, every driver trait). Simulated agents are less variable than real ones --- some score
-the same in every run --- so intervals are likely narrower than they will be on real robots. The
-synthetic VEX AIM boards published with specification 0.2 contain simulated agents faster than the
-AIM robot's top speed; they are marked invalid on the project site and excluded from this paper,
-pending regeneration. Tag-free capture needs a visible floor rectangle and has been validated only on
-synthetic video. Coverage scores model cleaning rather than measure it. Goal scores depend on how
-goals and budgets are set, which is why tasks and protocol change only through public RFCs.
+Table~\ref{tab:layouts} groups the unseen-layout runs of Table~\ref{tab:verdict} by layout (two runs
+per layout; the script \texttt{per\_layout.py} in \texttt{paper/analysis} replays the same runs and adds
+none). The planner
+scores above the typical simulated driver on four layouts, the same on three and below on three; its
+per-layout means range from 1.5 to 4.0, against 1.0 to 3.0 for the vision routine.
 
-\section{Conclusion}
+\begin{table}[h]
+\centering\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lccccccccccc@{}}
+\toprule
+Agent & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & All \\
+\midrule
+Dead reckoning & 0.5 & 0.0 & 1.5 & 1.5 & 0.0 & 1.0 & 0.0 & 2.0 & 0.0 & 0.0 & 0.65 \\
+Vision & 3.0 & 3.0 & 3.0 & 3.0 & 2.5 & 3.0 & 1.5 & 1.0 & 2.0 & 1.5 & 2.35 \\
+Vision + tags & 1.5 & 0.0 & 2.0 & 0.0 & 3.0 & 3.0 & 3.0 & 1.0 & 2.5 & 2.0 & 1.80 \\
+Planner & 1.5 & 3.0 & 3.5 & 3.0 & 2.5 & 3.0 & 4.0 & 3.0 & 3.0 & 1.5 & 2.80 \\
+Typical sim.\ driver & 3.0 & 2.0 & 3.0 & 2.0 & 3.0 & 3.0 & 3.5 & 3.0 & 3.0 & 3.0 & 2.85 \\
+\bottomrule
+\end{tabular}}
+\caption{Mean points (of 6) per unseen layout, simulated.}
+\label{tab:layouts}
+\end{table}
 
-\mb{} proposes measuring how much of a task's goal any agent achieves, from its trajectory alone,
-with an open scorer and an explicit protocol. The framework and tools are built and released; a
-preliminary simulated experiment shows why unseen layouts belong in any verdict. Whether the method
-measures real robots and real people accurately is the open question, and the roadmap above is how
-we intend to answer it. Comments are welcome at \url{https://motionbench.org/paper}.
+\section{Extension: multi-robot matches}\label{app:matches}
 
-\section*{Author contributions}
-A.Y.\ conceived the project and the research questions, designed the methodology and the experiments,
-directed the development of the software and the generation of synthetic data through prompts he
-wrote, ran the experiments, validated the results, and reviewed and approved the manuscript.
-
-\section*{Use of AI tools}
-The software (scorer, capture tools, simulators and analysis scripts) was written with Claude
-(Anthropic), used through claude.ai, from prompts written by the author; the synthetic datasets and
-simulated runs were also generated this way. The text of this manuscript was drafted with the same
-assistant from the author's direction and revised by him. The idea, the research questions, the
-design of the experiments, their execution and the validation of every reported result are the
-author's. AI tools are not authors of this work; the author takes full responsibility for its content.
-
-\section*{Acknowledgements}
-The author thanks his friends and teammates on RoboBench and in VEX competition for the questions
-that started this work, his family for their support, and the THÖR-MAGNI authors for releasing their
-data.
-
-\section*{Ethics, data and code availability}
-No new data from human participants were collected for this paper; the human trajectories come from a
-published dataset~\cite{thormagni2024}. The robot-vacuum video was recorded by the author in a private
-home. Footage from a public event broadcast was used only to measure camera geometry and is not
-redistributed. Code (Apache-2.0), task specifications and data (CC~BY~4.0) are at
-\url{https://github.com/motionbenchmark/mb-core}; \texttt{paper/reproduce.sh} regenerates every number
-and figure (Appendix~\ref{app:repro}).
-
-\bibliographystyle{plainnat}
-\bibliography{refs}
-
-\appendix
-\section{Reproducing the results}\label{app:repro}
-\small
-Environment used: Python 3.13, NumPy 2.5, SciPy 1.18, OpenCV 5.0, FFmpeg 6.1, Rust 1.97, motionbench 0.1.0
-(specification 0.2); exact versions are written to \texttt{paper/results/environment.txt} on each run.
-\begin{verbatim}
-git clone https://github.com/motionbenchmark/mb-core && cd mb-core
-pip install maturin
-(cd python && maturin build --release)
-pip install "target/wheels/motionbench-*.whl[tracker]"
-bash paper/reproduce.sh     # ~5 min; --full adds the match benchmark
-\end{verbatim}
-Expected outputs: the synthetic board is byte-identical to \texttt{results/leaderboard-synthetic-v0.1.json};
-\texttt{paper/results/aim-sort-verdict.json} reproduces Table~\ref{tab:verdict};
-\texttt{index-sensitivity.json} reproduces Table~\ref{tab:sens}; \texttt{capture-accuracy.json} reproduces
-Table~\ref{tab:capture} (small differences are possible across OpenCV/FFmpeg versions). SHA-256 checksums
-of the deterministic outputs are in \texttt{paper/results/SHA256SUMS} and are checked by the script.
-
-\section{Index definition: edge cases}
-$g$ uses the task's maximum score; $e$ is clamped to $[0,1]$; $c=0$ when mean success is zero, and
-$c=1-\sigma_S/\mu_S$ clamped to $[0,1]$ otherwise, with $\sigma_S$ the sample standard deviation
-($\sigma_S=0$ for a single run, which is why agents with fewer than five runs are unranked); $s=1/(1+\bar v)$
-lies in $(0,1]$. All four terms therefore lie in $[0,1]$, and so does the index.
+The toolkit also includes a seeded 2-versus-2 match simulator, a renderer of broadcast-style video
+from a camera position measured on a real event broadcast, a per-robot report and a tracking
+benchmark. A baseline tracker finds 90--97\% of robot positions with a median error of 7--9\,cm on
+three simulated matches but switches identities 25--44 times per match (IDF1~\cite{ristani2016}
+48--66\%). It is infrastructure for future work and is not used in the paper's conclusions.
 \end{document}

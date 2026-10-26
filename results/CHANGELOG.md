@@ -4,6 +4,18 @@ Every change to a published board or result, newest first. Boards carry the spec
 scorer version they were produced with; results under an older spec stay valid as
 results under that spec. See [docs/protocol.md](../docs/protocol.md).
 
+## 2026-10-26
+- **`aim-sort-verdict-v0.1.json` regenerated with the current simulator.** The published file
+  had been produced before the simulator changes of 2026-10-24 (AprilTag signs, camera
+  model), so it did not reproduce from the repository. Dead reckoning, the planner and every
+  driver are unchanged. Vision: unseen 2.40 -> 2.35, change from public -0.05 -> -0.10.
+  Vision + tags: public 2.15 -> 2.25, unseen 1.85 -> 1.80.
+- **Equivalence is strict.** A comparison is "equivalent" only when its 95% range lies
+  strictly inside the margin. The vision routine's change from public to unseen is now
+  "no difference found" (-0.10, range -0.55 to +0.40; before: "equivalent").
+- Per-layout results added (`paper/results/aim-sort-per-layout.json`, the same runs grouped
+  by layout).
+
 ## 2026-10-24 (later)
 - **Game verdicts are paired** (same seeds for every agent), resampled over layouts then runs
   on unseen layouts, and use four outcomes with a 0.5-point equivalence margin

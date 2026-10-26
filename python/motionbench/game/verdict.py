@@ -15,7 +15,8 @@ Design of the comparison
 * **Four outcomes**, with an equivalence margin ``margin`` (default 0.5 points):
 
     better / worse        the 95% range of the paired difference excludes zero
-    equivalent            the 95% range lies inside [-margin, +margin]
+    equivalent            the 95% range lies strictly inside (-margin, +margin); a 95%
+                          range is a conservative form of two one-sided tests
     no difference found   neither: the range includes zero but is wider than the margin
 
   "No difference found" is not "the same": more runs may separate them.
@@ -87,7 +88,7 @@ def outcome(lo: float, hi: float, margin: float) -> str:
         return "better"
     if hi < 0:
         return "worse"
-    if -margin <= lo and hi <= margin:
+    if -margin < lo and hi < margin:  # strictly inside: an interval touching the margin is not equivalence
         return "equivalent"
     return "no difference found"
 

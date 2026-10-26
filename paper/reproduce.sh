@@ -33,6 +33,9 @@ motionbench game verdict games/aim-sort --layout dev-01 \
 cp "$OUT/verdict/verdict.json" "$OUT/aim-sort-verdict.json"
 rm -rf "$OUT/verdict"
 
+echo "== 2b. the unseen-layout runs, layout by layout"
+python3 paper/analysis/per_layout.py
+
 echo "== 3. index weight sensitivity"
 python3 paper/analysis/index_sensitivity.py
 

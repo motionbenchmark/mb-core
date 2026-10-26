@@ -1,4 +1,4 @@
-motionbench commit: 3db2035
+motionbench commit: f7af9e6
 motionbench: motionbench 0.1.0 (spec 0.2)
 python 3.13.16
 numpy 2.5.3

@@ -1,3 +1,36 @@
+# Paper: changes from v0.2 to v0.3
+
+v0.3 publishes the framework and its methodology. The data illustrate the method and are
+not the claim; experiments the second review asked for are listed as pending work rather
+than added.
+
+| Review point (second review) | What changed in v0.3 |
+|---|---|
+| Author | Single author, Abhay Yadav; contributions, AI use and acknowledgements completed |
+| Title and framing | "Agent-Independent Robot Evaluation through Goal-Referenced Outcome Scoring: An Open Framework and Preliminary Evaluation in Simulation"; new abstract along the reviewer's lines; "no empirical claim about real robots, code or people" stated in the introduction |
+| "Trajectory alone" too broad (E) | Now "externally observed trajectories and task-state measurements"; Section 3 explains which goals depend on the path and which on object positions |
+| Novelty unclear (A) | Related work says which ideas are not new; comparison table (Table 3); framework figure (Figure 1) |
+| Predictable main result (B) | Presented as a demonstration that the protocol catches a public-layout advantage, with the selection effect stated; new experiments listed under future work |
+| Index justification (C) | Index moved to Appendix B, explicitly optional and unused in conclusions; precise definition of the efficiency reference length; when not to use the index; consistency and safety problems named |
+| Statistics (D) | Bootstrap replicates (4,000) and method (percentile) stated; equivalence defined as strictly inside the margin, related to two one-sided tests; margin's basis stated; paired simulated runs distinguished from independent replicates; winner-selection bias discussed; per-layout results (Appendix D, `analysis/per_layout.py`, no new runs) |
+| Equivalence of the vision routine | The equivalence rule is now strict in the code as well; the vision routine's change is "no difference found" |
+| Results did not reproduce from the repository | The published AIM verdict predated simulator changes; regenerated with the current code (`results/CHANGELOG.md`). Planner and dead-reckoning results are unchanged; vision and vision + tags change by 0.05 to 0.15 points |
+| Simulator validity, 45 s budget | Stated as assumptions and as a property of the task in Sections 4 and 6; no completion in 45 s noted as partial-progress measurement |
+| Table 1, Table 2 | Physical measurements separated from simulated and synthetic; tasks marked by whether they are used in this paper |
+| Verified tier | Labelled a proposed procedure not yet exercised |
+| Driver parameters | Appendix C lists every trait |
+| Vacuum figure | Its own, larger figure |
+| Missing-frame bias | Stated as untested |
+| Multi-robot matches, roadmap | Matches moved to Appendix E; roadmap shortened to future work led by a small real-world accuracy experiment |
+| Speculative sentences | Removed ("would plausibly carry over", "equipment we do not have", grant-like endings) |
+| Introduction | Rewritten in the author's first person from the competition and RoboBench motivation |
+| AI disclosure | Reviewer's wording; lists the checks actually made instead of "validated every result" |
+| Fixed release | The paper names release tag `paper-v0.3` |
+
+Pending (not in v0.3): real-world accuracy experiment; capture-error propagation to scores;
+more unseen layouts at several difficulties and ranking stability; failure-case figure;
+hand-worked scoring examples; simulator-to-reality comparison.
+
 # Paper: changes from v0.1 to v0.2
 
 How each point of the external review was addressed.

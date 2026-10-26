@@ -114,7 +114,7 @@ The drivers are a **parameterized, uncalibrated baseline**: a verdict says the c
 - **Resampling unit.** Public: paired runs. Unseen: layouts first, then runs within them,
   so the range covers variation across layouts.
 - **Four outcomes**, with an equivalence margin of 0.5 points: **better** or **worse** when
-  the 95% range excludes zero; **equivalent** when the range lies inside ±0.5; **no
+  the 95% range excludes zero; **equivalent** when the range lies strictly inside ±0.5 (a range touching the margin is not equivalence); **no
   difference found** otherwise. No difference found is not the same as equivalent.
 - A routine's **change from public to unseen** is a comparison with itself and does not
   depend on the drivers at all.
@@ -124,8 +124,8 @@ The four sample routines (45 s, 6 points possible; `results/aim-sort-verdict-v0.
 | routine | public | vs typical driver | unseen | vs typical driver | change |
 |---|---|---|---|---|---|
 | `deadreckon_v1.py` | 1.70 | worse (-1.20) | 0.65 | worse (-2.20) | worse (-1.05) |
-| `vision_v2.py` | 2.45 | worse (-0.45) | 2.40 | no difference found (-0.45) | equivalent (-0.05) |
-| `vision_tags_v3.py` | 2.15 | worse (-0.75) | 1.85 | worse (-1.00) | no difference found (-0.30) |
+| `vision_v2.py` | 2.45 | worse (-0.45) | 2.35 | no difference found (-0.50) | no difference found (-0.10) |
+| `vision_tags_v3.py` | 2.25 | worse (-0.65) | 1.80 | worse (-1.05) | no difference found (-0.45) |
 | `planner_v4.py` | 4.00 | better (+1.10) | 2.80 | no difference found (-0.05) | worse (-1.20) |
 
 The typical simulated driver scores 2.90 on the public layout and 2.85 on unseen

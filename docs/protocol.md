@@ -38,7 +38,7 @@ Draft, open for comment (GitHub Discussions, category "Protocol").
   (same seeds: same layouts and robot imperfections), on the public layout and on 10
   unseen layouts; the typical simulated driver is the median of a simulated class of 20
   (`motionbench game verdict` defaults). Outcomes are better / worse (95% range excludes
-  zero), equivalent (range within ±0.5 points) or no difference found.
+  zero), equivalent (range strictly inside ±0.5 points) or no difference found.
 
 ## 4. Layouts
 

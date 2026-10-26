@@ -394,6 +394,7 @@ def test_paired_bootstrap_and_outcomes():
     assert lo <= d <= hi
     assert outcome(0.1, 0.9, 0.5) == "better" and outcome(-0.9, -0.1, 0.5) == "worse"
     assert outcome(-0.3, 0.4, 0.5) == "equivalent" and outcome(-0.8, 0.4, 0.5) == "no difference found"
+    assert outcome(-0.5, 0.4, 0.5) == "no difference found"  # touching the margin is not equivalence
 
 
 def test_game_verdict_compares_code_with_drivers():

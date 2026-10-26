@@ -2,7 +2,7 @@
  "game": "AIM-SORT@0.1",
  "title": "VEX AIM barrel sorting",
  "layout": "dev-01",
- "max_points": 6,
+ "max_points": 6.0,
  "time_s": 45.0,
  "simulated": true,
  "baseline": "parameterized simulated drivers (uncalibrated)",
@@ -63,13 +63,13 @@
    },
    "vision_tags_v3.py": {
     "runs": 20,
-    "mean_points": 2.15,
+    "mean_points": 2.25,
     "median_points": 2.5,
-    "worst_points": 0.0,
+    "worst_points": 1.0,
     "best_points": 3.0,
     "full_score_runs": 0,
     "mean_finish_s": null,
-    "mean_path_m": 4.33,
+    "mean_path_m": 4.32,
     "mean_bumps": 1.1,
     "errors": []
    },
@@ -110,7 +110,7 @@
     "best_points": 2.0,
     "full_score_runs": 0,
     "mean_finish_s": null,
-    "mean_path_m": 3.53,
+    "mean_path_m": 3.52,
     "mean_bumps": 0.15,
     "errors": []
    },
@@ -191,7 +191,7 @@
     "best_points": 4.0,
     "full_score_runs": 0,
     "mean_finish_s": null,
-    "mean_path_m": 6.05,
+    "mean_path_m": 6.06,
     "mean_bumps": 0.95,
     "errors": []
    },
@@ -381,58 +381,58 @@
    },
    "vision_tags_v3.py": {
     "typical student": {
-     "diff_points": -0.75,
+     "diff_points": -0.65,
      "ci95": [
-      -1.2,
-      -0.35
+      -1.05,
+      -0.3
      ],
      "verdict": "worse"
     },
     "Rookie Riley": {
-     "diff_points": 0.15,
+     "diff_points": 0.25,
      "ci95": [
-      -0.3,
-      0.55
+      -0.1,
+      0.6
      ],
      "verdict": "no difference found"
     },
     "Nervous Noah": {
-     "diff_points": 0.05,
+     "diff_points": 0.15,
      "ci95": [
-      -0.4,
-      0.451
+      -0.25,
+      0.5
      ],
-     "verdict": "equivalent"
+     "verdict": "no difference found"
     },
     "Average Alex": {
-     "diff_points": -0.45,
+     "diff_points": -0.35,
      "ci95": [
-      -0.95,
+      -0.8,
       0.05
      ],
      "verdict": "no difference found"
     },
     "Speedy Sloane": {
-     "diff_points": -1.6,
+     "diff_points": -1.5,
      "ci95": [
-      -2.05,
-      -1.2
+      -1.9,
+      -1.15
      ],
      "verdict": "worse"
     },
     "Steady Sam": {
-     "diff_points": 0.15,
+     "diff_points": 0.25,
      "ci95": [
-      -0.3,
-      0.55
+      -0.15,
+      0.6
      ],
      "verdict": "no difference found"
     },
     "Pro Priya": {
-     "diff_points": -1.35,
+     "diff_points": -1.25,
      "ci95": [
-      -1.7,
-      -1.0
+      -1.6,
+      -0.9
      ],
      "verdict": "worse"
     }
@@ -502,10 +502,10 @@
    "headline": "On the public layout it scores 1.20 points less than the typical simulated driver (95% range -1.50 to -0.90). On unseen layouts it scores 2.20 points less than the typical simulated driver (95% range -2.75 to -1.55). Its own score drops from public to unseen (-1.05, 95% range -1.50 to -0.60)."
   },
   "vision_v2.py": {
-   "headline": "On the public layout it scores 0.45 points less than the typical simulated driver (95% range -0.80 to -0.10). On unseen layouts it shows no detectable difference from the typical simulated driver (-0.45, 95% range -1.05 to +0.20). Its own score holds from public to unseen (-0.05, 95% range -0.50 to +0.40)."
+   "headline": "On the public layout it scores 0.45 points less than the typical simulated driver (95% range -0.80 to -0.10). On unseen layouts it shows no detectable difference from the typical simulated driver (-0.50, 95% range -1.15 to +0.20). Its own score shows no detectable change from public to unseen (-0.10, 95% range -0.55 to +0.40)."
   },
   "vision_tags_v3.py": {
-   "headline": "On the public layout it scores 0.75 points less than the typical simulated driver (95% range -1.20 to -0.35). On unseen layouts it scores 1.00 points less than the typical simulated driver (95% range -1.50 to -0.50). Its own score shows no detectable change from public to unseen (-0.30, 95% range -1.00 to +0.35)."
+   "headline": "On the public layout it scores 0.65 points less than the typical simulated driver (95% range -1.05 to -0.30). On unseen layouts it scores 1.05 points less than the typical simulated driver (95% range -1.55 to -0.55). Its own score shows no detectable change from public to unseen (-0.45, 95% range -1.10 to +0.15)."
   },
   "planner_v4.py": {
    "headline": "On the public layout it scores 1.10 points more than the typical simulated driver (95% range +1.00 to +1.25). On unseen layouts it shows no detectable difference from the typical simulated driver (-0.05, 95% range -0.65 to +0.60). Its own score drops from public to unseen (-1.20, 95% range -1.60 to -0.85)."
@@ -527,26 +527,26 @@
    },
    "vision_v2.py": {
     "runs": 20,
-    "mean_points": 2.4,
+    "mean_points": 2.35,
     "median_points": 3.0,
     "worst_points": 1.0,
     "best_points": 3.0,
     "full_score_runs": 0,
     "mean_finish_s": null,
-    "mean_path_m": 3.72,
+    "mean_path_m": 3.75,
     "mean_bumps": 2.05,
     "errors": []
    },
    "vision_tags_v3.py": {
     "runs": 20,
-    "mean_points": 1.85,
+    "mean_points": 1.8,
     "median_points": 2.0,
     "worst_points": 0.0,
     "best_points": 3.0,
     "full_score_runs": 0,
     "mean_finish_s": null,
-    "mean_path_m": 3.84,
-    "mean_bumps": 2.2,
+    "mean_path_m": 3.83,
+    "mean_bumps": 2.3,
     "errors": []
    },
    "planner_v4.py": {
@@ -566,14 +566,14 @@
    "rookie-riley": {
     "name": "Rookie Riley",
     "runs": 20,
-    "mean_points": 2.15,
+    "mean_points": 2.1,
     "median_points": 2.0,
-    "worst_points": 2.0,
+    "worst_points": 1.0,
     "best_points": 3.0,
     "full_score_runs": 0,
     "mean_finish_s": null,
-    "mean_path_m": 3.34,
-    "mean_bumps": 0.55,
+    "mean_path_m": 3.35,
+    "mean_bumps": 0.6,
     "errors": []
    },
    "nervous-noah": {
@@ -605,14 +605,14 @@
    "speedy-sloane": {
     "name": "Speedy Sloane",
     "runs": 20,
-    "mean_points": 4.15,
+    "mean_points": 4.2,
     "median_points": 4.0,
     "worst_points": 3.0,
     "best_points": 5.0,
     "full_score_runs": 0,
     "mean_finish_s": null,
-    "mean_path_m": 5.92,
-    "mean_bumps": 1.2,
+    "mean_path_m": 5.93,
+    "mean_bumps": 1.15,
     "errors": []
    },
    "steady-sam": {
@@ -637,8 +637,8 @@
     "best_points": 5.0,
     "full_score_runs": 0,
     "mean_finish_s": null,
-    "mean_path_m": 5.63,
-    "mean_bumps": 1.35,
+    "mean_path_m": 5.62,
+    "mean_bumps": 1.3,
     "errors": []
    }
   },
@@ -665,10 +665,10 @@
      "verdict": "worse"
     },
     "Rookie Riley": {
-     "diff_points": -1.5,
+     "diff_points": -1.45,
      "ci95": [
-      -1.95,
-      -1.0
+      -1.9,
+      -0.95
      ],
      "verdict": "worse"
     },
@@ -689,10 +689,10 @@
      "verdict": "worse"
     },
     "Speedy Sloane": {
-     "diff_points": -3.5,
+     "diff_points": -3.55,
      "ci95": [
-      -3.9,
-      -3.05
+      -4.0,
+      -3.1
      ],
      "verdict": "worse"
     },
@@ -715,9 +715,9 @@
    },
    "vision_v2.py": {
     "typical student": {
-     "diff_points": -0.45,
+     "diff_points": -0.5,
      "ci95": [
-      -1.05,
+      -1.15,
       0.2
      ],
      "verdict": "no difference found"
@@ -725,47 +725,47 @@
     "Rookie Riley": {
      "diff_points": 0.25,
      "ci95": [
-      -0.201,
-      0.7
+      -0.3,
+      0.75
      ],
      "verdict": "no difference found"
     },
     "Nervous Noah": {
-     "diff_points": -0.05,
+     "diff_points": -0.1,
      "ci95": [
-      -0.7,
+      -0.8,
       0.6
      ],
      "verdict": "no difference found"
     },
     "Average Alex": {
-     "diff_points": -0.5,
+     "diff_points": -0.55,
      "ci95": [
-      -1.05,
-      0.05
+      -1.1,
+      0.0
      ],
      "verdict": "no difference found"
     },
     "Speedy Sloane": {
-     "diff_points": -1.75,
+     "diff_points": -1.85,
      "ci95": [
-      -2.2,
-      -1.3
+      -2.35,
+      -1.4
      ],
      "verdict": "worse"
     },
     "Steady Sam": {
-     "diff_points": 0.3,
+     "diff_points": 0.25,
      "ci95": [
-      -0.35,
+      -0.4,
       0.9
      ],
      "verdict": "no difference found"
     },
     "Pro Priya": {
-     "diff_points": -1.4,
+     "diff_points": -1.45,
      "ci95": [
-      -1.75,
+      -1.9,
       -0.95
      ],
      "verdict": "worse"
@@ -773,57 +773,57 @@
    },
    "vision_tags_v3.py": {
     "typical student": {
-     "diff_points": -1.0,
+     "diff_points": -1.05,
      "ci95": [
-      -1.5,
-      -0.5
+      -1.55,
+      -0.55
      ],
      "verdict": "worse"
     },
     "Rookie Riley": {
      "diff_points": -0.3,
      "ci95": [
-      -1.05,
+      -1.0,
       0.35
      ],
      "verdict": "no difference found"
     },
     "Nervous Noah": {
-     "diff_points": -0.6,
+     "diff_points": -0.65,
      "ci95": [
-      -1.25,
+      -1.35,
       0.05
      ],
      "verdict": "no difference found"
     },
     "Average Alex": {
-     "diff_points": -1.05,
+     "diff_points": -1.1,
      "ci95": [
-      -1.75,
-      -0.4
+      -1.8,
+      -0.45
      ],
      "verdict": "worse"
     },
     "Speedy Sloane": {
-     "diff_points": -2.3,
+     "diff_points": -2.4,
      "ci95": [
-      -3.1,
-      -1.5
+      -3.2,
+      -1.6
      ],
      "verdict": "worse"
     },
     "Steady Sam": {
-     "diff_points": -0.25,
+     "diff_points": -0.3,
      "ci95": [
-      -0.9,
-      0.35
+      -0.95,
+      0.3
      ],
      "verdict": "no difference found"
     },
     "Pro Priya": {
-     "diff_points": -1.95,
+     "diff_points": -2.0,
      "ci95": [
-      -2.65,
+      -2.7,
       -1.35
      ],
      "verdict": "worse"
@@ -839,10 +839,10 @@
      "verdict": "no difference found"
     },
     "Rookie Riley": {
-     "diff_points": 0.65,
+     "diff_points": 0.7,
      "ci95": [
-      0.05,
-      1.15
+      0.1,
+      1.2
      ],
      "verdict": "better"
     },
@@ -863,10 +863,10 @@
      "verdict": "no difference found"
     },
     "Speedy Sloane": {
-     "diff_points": -1.35,
+     "diff_points": -1.4,
      "ci95": [
-      -1.9,
-      -0.75
+      -2.0,
+      -0.8
      ],
      "verdict": "worse"
     },
@@ -898,18 +898,18 @@
     "verdict": "worse"
    },
    "vision_v2.py": {
-    "diff_points": -0.05,
+    "diff_points": -0.1,
     "ci95": [
-     -0.5,
+     -0.55,
      0.4
     ],
-    "verdict": "equivalent"
+    "verdict": "no difference found"
    },
    "vision_tags_v3.py": {
-    "diff_points": -0.3,
+    "diff_points": -0.45,
     "ci95": [
-     -1.0,
-     0.35
+     -1.1,
+     0.15
     ],
     "verdict": "no difference found"
    },

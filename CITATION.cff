@@ -1,9 +1,10 @@
 cff-version: 1.2.0
 message: "If you use MotionBench, please cite it as below."
-title: "MotionBench: an open benchmark for goal-directed agents in bounded spaces"
+title: "MotionBench: a goal-referenced framework for evaluating robot performance from trajectory data"
 type: software
 authors:
-  - name: "The MotionBench Authors"
+  - family-names: "Yadav"
+    given-names: "Abhay"
 version: 0.1.0
 date-released: 2026-10-22
 license: Apache-2.0
