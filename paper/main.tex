@@ -17,8 +17,8 @@
 
 \title{\mb{}: A Goal-Referenced Framework for Evaluating\\Robot Performance from Trajectory Data\\[0.5em]
 \large Design, Open-Source Implementation, and Preliminary Experiments}
-\author{\todo{Student author 1}\quad \todo{Student author 2}\quad \todo{other authors, if any}\\[0.3em]
-\small Independent researchers \quad \todo{contact email}\\
+\author{Abhay Yadav\\[0.3em]
+\small Independent researcher, San Francisco Bay Area, California, USA \quad \todo{contact email}\\
 \small \url{https://motionbench.org} \quad \url{https://github.com/motionbenchmark/mb-core}}
 \date{Draft v0.2, October 2026}
 
@@ -47,6 +47,11 @@ comparison of real drivers with their own code, are the next research objectives
 
 Students in robot competitions open every match with a period in which the robot runs its own
 code, followed by a period of human driving, and they argue about which of the two is better.
+This work grew out of that argument in the author's own VEX competitions, and out of RoboBench,
+an earlier project with friends: a real-time loop in which large language models write VEX robot
+code, the code runs, and the results feed back, to see how quickly the models learn to operate
+in a real VEX environment. Both raised the same need for a fair, repeatable way to say how well
+an attempt went.
 The question generalizes: how much of a job does a given agent --- a person, team-written code,
 AI-written code, a person with robot assistance, or a commercial robot --- actually get done?
 Answering it fairly is difficult. Match scores mix in opponents and luck; product claims are
@@ -434,19 +439,26 @@ measures real robots and real people accurately is the open question, and the ro
 we intend to answer it. Comments are welcome at \url{https://motionbench.org/paper}.
 
 \section*{Author contributions}
-\todo{Describe who did what, for example using the CRediT roles: conceptualization; software (scorer,
-capture, simulator); experiments; writing; supervision. State the contribution of each student
-author and of any adult mentor.}
+A.Y.\ conceived the project and the research questions, designed the methodology and the experiments,
+directed the development of the software and the generation of synthetic data through prompts he
+wrote, ran the experiments, validated the results, and reviewed and approved the manuscript.
 
 \section*{Use of AI tools}
-\todo{Describe accurately how AI assistance was used, for example: ``Parts of the software and of this
-manuscript were drafted with an AI coding assistant under the authors' direction; the authors designed
-the study, reviewed and tested all code, checked every reported number against the released results,
-and take responsibility for the content.''}
+The software (scorer, capture tools, simulators and analysis scripts) was written with Claude
+(Anthropic), used through claude.ai, from prompts written by the author; the synthetic datasets and
+simulated runs were also generated this way. The text of this manuscript was drafted with the same
+assistant from the author's direction and revised by him. The idea, the research questions, the
+design of the experiments, their execution and the validation of every reported result are the
+author's. AI tools are not authors of this work; the author takes full responsibility for its content.
+
+\section*{Acknowledgements}
+The author thanks his friends and teammates on RoboBench and in VEX competition for the questions
+that started this work, his family for their support, and the THÖR-MAGNI authors for releasing their
+data.
 
 \section*{Ethics, data and code availability}
 No new data from human participants were collected for this paper; the human trajectories come from a
-published dataset~\cite{thormagni2024}. The robot-vacuum video was recorded by the authors in a private
+published dataset~\cite{thormagni2024}. The robot-vacuum video was recorded by the author in a private
 home. Footage from a public event broadcast was used only to measure camera geometry and is not
 redistributed. Code (Apache-2.0), task specifications and data (CC~BY~4.0) are at
 \url{https://github.com/motionbenchmark/mb-core}; \texttt{paper/reproduce.sh} regenerates every number
