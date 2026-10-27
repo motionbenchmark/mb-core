@@ -39,6 +39,9 @@ python3 paper/analysis/per_layout.py
 echo "== 2c. where the points went (same runs, classified)"
 python3 paper/analysis/failure_accounting.py > /dev/null
 
+echo "== 2d. budget and layout sensitivity (same runs, re-scored at earlier cut-offs)"
+python3 paper/analysis/budget_sensitivity.py > /dev/null
+
 echo "== 3. index weight sensitivity"
 python3 paper/analysis/index_sensitivity.py
 

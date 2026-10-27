@@ -79,8 +79,16 @@ from externally observed task outcomes. Its design objectives are that the evalu
 gives the same score, and recordings of the same behaviour give similar scores) and cheap enough to
 run with a phone camera. This paper develops the scoring framework and protocol, demonstrates them
 in simulation, and identifies the real-world validation needed to establish measurement accuracy
-and repeatability; it does not claim to have established those objectives. The contributions
-are:
+and repeatability; it does not claim to have established those objectives.
+
+What the paper does claim holds by construction: every agent is scored from an externally observed
+trace and nothing else, by one explicit, deterministic and open scorer. The scoring parameters on top
+of that (goal definitions, tolerances, budgets, the equivalence margin, the weights of the secondary
+index) are a first proposal. They are versioned, reported with every result and changed only through
+public RFCs, so that results stay comparable within a specification version while the specification
+itself is revised as evidence arrives (Table~\ref{tab:fixed}). A \mb{} score is therefore a measurement
+under a stated specification, not yet a validated estimate of real-world performance. The
+contributions are:
 \begin{enumerate}
   \item a \textbf{goal-referenced scoring model} that reports the share of a task's goal achieved,
     beside chance, with comparisons to people only where people use the same means, and an
@@ -101,6 +109,9 @@ The simulated study is illustrative; within it, I observe that:
     barrels, against 20 on the public layout.
   \item \textbf{Most missing points, for every agent, are barrels never reached in time,} which
     suggests the 45\,s budget, not sorting skill, limits scores on this task.
+  \item \textbf{The time budget can change which code looks best.} Re-scoring the same runs at
+    shorter budgets, the best routine on unseen layouts is the vision routine at 25--30\,s and the
+    planner at 35--45\,s.
   \item \textbf{Capture is accurate to about 1\,cm with printed tags and 3\,cm without} on synthetic
     video; real footage is untested.
 \end{enumerate}
@@ -224,7 +235,9 @@ which the robot's path cannot determine and must be measured separately.
 
 \paragraph{Tasks.} A task specifies an arena (size, obstacles, zones), the robot footprint, a time
 budget, public layouts, rules for generating unseen layouts, and a goal of one of three kinds:
-\emph{waypoints} (reach each in order within position and heading tolerances), \emph{delivery} (each
+\emph{waypoints} (reach each in order within position and heading tolerances; a waypoint counts
+when a recorded sample lies within both tolerances, with no interpolation between samples, so a
+near-miss scores nothing), \emph{delivery} (each
 object rests in its target zone at the end) or \emph{coverage} (share of free floor swept by a tool of
 given width). Table~\ref{tab:tasks} lists the current task specifications and which of them are used
 in this paper; they use competition hardware but never copy a season's game. A task carries its own
@@ -234,22 +247,46 @@ and the software by the scorer version (0.1.0). Every report records all three.
 \begin{table}[t]
 \centering\small
 \resizebox{\linewidth}{!}{%
-\begin{tabular}{@{}lllllll@{}}
+\begin{tabular}{@{}llllllll@{}}
 \toprule
-Task & Platform & Goal & Arena & Budget & People comparable & Used here \\
+Task & Platform & Goal & Arena & Budget & People comparable & From video today & Used here \\
 \midrule
-MB-VEX-NAV@1.0 & VEX V5 & 6 waypoints, 5\,cm / 5\textdegree & 3.66\,m square & 20\,s & yes & index (App.~\ref{app:index}) \\
-MB-VEX-PICK@1.0 & VEX V5 & deliver 6 objects & 3.66\,m square & 60\,s & yes & index (App.~\ref{app:index}) \\
-MB-AIM-NAV@0.1 & VEX AIM & 5 waypoints, 3\,cm / 10\textdegree & 1.83 $\times$ 1.22\,m & 20\,s & yes & --- \\
-MB-AIM-SORT@0.1 & VEX AIM & sort 6 barrels by colour & 1.83 $\times$ 1.22\,m & 45\,s & yes & main study \\
-MB-COVER@0.1 & floor robots & cover free floor, 30\,cm tool & 4 $\times$ 3\,m & 180\,s & no & index (App.~\ref{app:index}) \\
-MB-FIELD-HALLWAY@0.1 & robot vacuum & cover visible floor & 1.3 $\times$ 3.0\,m & 137\,s & no & demonstration \\
+MB-VEX-NAV@1.0 & VEX V5 & 6 waypoints, 5\,cm / 5\textdegree & 3.66\,m square & 20\,s & yes & tags$^a$ & index (App.~\ref{app:index}) \\
+MB-VEX-PICK@1.0 & VEX V5 & deliver 6 objects & 3.66\,m square & 60\,s & yes & no$^b$ & index (App.~\ref{app:index}) \\
+MB-AIM-NAV@0.1 & VEX AIM & 5 waypoints, 3\,cm / 10\textdegree & 1.83 $\times$ 1.22\,m & 20\,s & yes & tags$^a$ & --- \\
+MB-AIM-SORT@0.1 & VEX AIM & sort 6 barrels by colour & 1.83 $\times$ 1.22\,m & 45\,s & yes & no$^b$ & main study \\
+MB-COVER@0.1 & floor robots & cover free floor, 30\,cm tool & 4 $\times$ 3\,m & 180\,s & no & yes & index (App.~\ref{app:index}) \\
+MB-FIELD-HALLWAY@0.1 & robot vacuum & cover visible floor & 1.3 $\times$ 3.0\,m & 137\,s & no & yes & demonstration \\
 \bottomrule
 \end{tabular}}
 \caption{Current task specifications. Only MB-AIM-SORT has a controlled (simulated) experiment;
 the others are implemented and used only for the demonstrations indicated. ``People comparable'': a
-person can do the same job with the same means, for example by driving the same robot.}
+person can do the same job with the same means, for example by driving the same robot. ``From video
+today'': whether the released capture tools can produce the trace from phone video. $^a$Heading
+tolerances need printed tags; tag-free capture takes heading from the direction of travel.
+$^b$Delivery needs final object positions, which the capture tools do not yet measure; these tasks
+can be scored today from simulators or from object positions entered by hand.}
 \label{tab:tasks}
+\end{table}
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}p{0.47\linewidth}p{0.47\linewidth}@{}}
+\toprule
+\textbf{Fixed by design} & \textbf{Provisional, versioned, changed by RFC} \\
+\midrule
+Agents are scored only from an externally observed trace (poses, events, final task state) &
+Goal definitions, tolerances and budgets of each task \\[2pt]
+One open, deterministic scorer for every kind of agent & The equivalence margin ($\pm0.5$ points for sorting) \\[2pt]
+The headline is the share of the task's goal, with chance shown beside it & The chance policy (a motion-level random walk) \\[2pt]
+Results carry tier, capture method and specification version, and are never mixed unlabelled &
+The secondary measures and the weights of the experimental index \\[2pt]
+Public and unseen layouts; every attempt reported & Run counts, number of unseen layouts, people-comparison guard (10\%) \\
+\bottomrule
+\end{tabular}
+\caption{What the framework fixes and what it treats as a first proposal. Results under an older
+specification remain valid as results under that specification.}
+\label{tab:fixed}
 \end{table}
 
 \subsection{Scoring}
@@ -342,7 +379,12 @@ waypoint reached exactly at the time limit and one after it, a gap in the record
 exactly on a zone edge and one just outside, the delivery reference length, consistency, chance, the
 people-comparison guard, a single coverage pass and wall-contact episodes. All seventeen pass. When
 first written, two of the hand derivations were wrong and the scorer was right; both were corrected.
-Returning the same report for the same trace says nothing about whether the
+Seven properties that hold by construction are also checked on 40 random traces each
+(\texttt{python/tests/test\_properties.py}): the same trace always gives the same report; goal share and
+path efficiency stay in $[0,1]$; the agent's class, identifier and name do not change a run's score;
+shifting every timestamp by a constant does not change it; appending samples never lowers a waypoint
+score; extending a path never lowers coverage; and moving one object into its zone raises a delivery
+score by exactly one. Returning the same report for the same trace says nothing about whether the
 trace or the task specification is right; capture accuracy and task design are examined separately.
 
 \paragraph{Capture.} With printed AprilTags~\cite{olson2011} in the arena corners and on the robot, a
@@ -548,6 +590,38 @@ with 16 barrels in the other colour's zone on the public layout. These categorie
 the simulated runs; they are the kind of breakdown the scorer's events make possible, not findings
 about real robots.
 
+\subsection{Sensitivity to the budget and to the layouts}
+
+The scoring parameters are provisional, so it matters how much they move conclusions. Without new
+runs, every run of the study can be re-scored as if the match had ended earlier: a barrel counts if,
+at the last recorded instant before the cut-off, it is not held and lies in its own zone (at 45\,s this
+rule agrees with the game's score in 425 of 440 runs; in the other 15, a barrel that lies in its
+zone at the last recorded instant is held by the robot in the game's final state, so the cut-off rule
+counts one barrel more).
+Longer budgets would need new runs and are not studied. Table~\ref{tab:budget} compares the ranking
+of the 11 agents at each cut-off with the ranking at 45\,s. \textbf{Rankings move with the budget,
+and on unseen layouts the best routine changes:} the vision routine leads the routines at 25 and
+30\,s, the planner from 35\,s. The leading agent overall does not change (the planner on the public
+layout, the fastest driver character on unseen ones). Between the public and the unseen layouts, the
+ranking of the 11 agents at 45\,s agrees only at Kendall's $\tau=0.66$. Both results argue for
+reporting budget sensitivity with a task and for unseen layouts in every verdict.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Budget & 25\,s & 30\,s & 35\,s & 40\,s & 45\,s \\
+\midrule
+$\tau$ with the 45\,s ranking, public & 0.58 & 0.69 & 0.73 & 0.81 & 1 \\
+$\tau$ with the 45\,s ranking, unseen & 0.80 & 0.84 & 0.94 & 0.98 & 1 \\
+Best routine, unseen & vision & vision & planner & planner & planner \\
+\bottomrule
+\end{tabular}
+\caption{Re-scoring the same simulated runs at shorter budgets (11 agents, 20 runs each per setting;
+\texttt{paper/analysis/budget\_sensitivity.py}). Kendall's $\tau$ compares agents' mean scores.}
+\label{tab:budget}
+\end{table}
+
 \subsection{Capture accuracy on synthetic video}
 
 Table~\ref{tab:capture} reports per-frame position errors on rendered video with known ground truth,
@@ -652,8 +726,13 @@ where people may appear; \mb{} publishes paths, not footage, and videos showing 
 without permission. \emph{Over-trusting simulation:} a simulated verdict says which code to try on
 the robot first, not that code beats people; outputs label simulated results in every view.
 \emph{Product claims:} comparisons of commercial robots measured in one home are not product ratings,
-and the field tier is reviewed before publication. Any study with real participants, especially
-minors, needs consent and an ethics review.
+and the field tier is reviewed before publication. \emph{Studies with people:} no data from human
+participants were collected for this paper, so no ethics approval was sought. Any future pilot with
+people, and especially with minors, will need a host institution's ethics review (or an IRB
+determination); written consent from a parent or guardian and the participant's own assent; the
+option to opt out before any recording starts and to have data deleted later; random agent
+identifiers instead of names; and publication of trajectories only, without footage or metadata that
+could identify a home or a school.
 
 \section*{Author contributions}
 A.Y.\ conceived the project, developed the research questions, designed the evaluation framework and
@@ -718,7 +797,7 @@ bash paper/reproduce.sh     # ~5 min
 Expected outputs: the synthetic board is byte-identical to \texttt{results/leaderboard-synthetic-v0.1.json};
 \texttt{paper/results/aim-sort-verdict.json} reproduces Table~\ref{tab:verdict};
 \texttt{aim-sort-per-layout.json} reproduces Table~\ref{tab:layouts}; \texttt{aim-sort-failures.json}
-reproduces Table~\ref{tab:failures}; \texttt{index-sensitivity.json} reproduces Table~\ref{tab:sens};
+reproduces Table~\ref{tab:failures}; \texttt{aim-sort-budget.json} reproduces Table~\ref{tab:budget}; \texttt{index-sensitivity.json} reproduces Table~\ref{tab:sens};
 \texttt{capture-accuracy.json} reproduces Table~\ref{tab:capture} (small differences are possible
 across OpenCV/FFmpeg versions). SHA-256 checksums of the deterministic outputs are in
 \texttt{paper/results/SHA256SUMS} and are checked by the script.

@@ -13,6 +13,12 @@ runs: every new number is counted or replotted from the runs already in the pape
 | Failure breakdown | Table 6: what happened to every barrel (sorted, never picked, carried, misplaced, re-grabbed), counted from the runs' final states and events (`analysis/failure_accounting.py`) |
 | Broader impacts | New section: ranking people, video of people, over-trusting simulation, product claims |
 | Appendix | Overview list; implementation details (hardware, runtime, seeds, time step); an example task specification and trace |
+| Claim made by construction | Introduction states what holds by construction (external observability, one deterministic open scorer) and that scoring parameters are a versioned first proposal; Table 4 separates what is fixed by design from what is provisional |
+| Properties by construction | Seven properties checked on random traces (`python/tests/test_properties.py`): determinism, bounds, agent-blindness, time-origin invariance, waypoint and coverage monotonicity, delivery counting |
+| Waypoint near-misses | Defined in Section 3: a recorded sample must lie within both tolerances; no interpolation |
+| Delivery capture | Task table marks which tasks can be captured from video today; delivery needs object positions |
+| Budget and layout sensitivity | Section 6.2 and Table 8: the same runs re-scored at 25–45 s cut-offs; on unseen layouts the best routine changes with the budget; public vs unseen rankings agree at Kendall's τ = 0.66 (`analysis/budget_sensitivity.py`) |
+| Ethics detail | Broader impacts lists what a future pilot with people needs: ethics review, parental consent and assent, opt-out before recording, deletion, random identifiers, trajectories only |
 | Release | Tag `paper-v0.5` |
 
 # Paper: changes from v0.3 to v0.4
