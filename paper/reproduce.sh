@@ -44,6 +44,7 @@ python3 paper/analysis/capture_accuracy.py
 
 echo "== 5. figures"
 (cd paper && python3 make_figs.py results/aim-sort-verdict.json)
+python3 paper/make_vacuum_fig.py
 
 if [[ "${1:-}" == "--full" ]]; then
   echo "== 6. match tracking benchmark"

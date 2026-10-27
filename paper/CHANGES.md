@@ -1,3 +1,23 @@
+# Paper: changes from v0.3 to v0.4
+
+After a third review. No new data were collected.
+
+| Review point | What changed in v0.4 |
+|---|---|
+| Research question not answered by the evidence | Fair, repeatable and cheap are stated as design objectives; the paper says it develops and demonstrates the framework and names the validation still needed |
+| How routines were developed and selected | New paragraph "Routine development and selection": one version of each routine, debugged on the public layout (a development layout), no alternative planners, driver traits not changed after any comparison, unseen layouts generated after the routines were final |
+| Simulator and scorer may share assumptions | Seventeen hand-worked scoring cases with derivations (`docs/handworked-cases.md`, `python/tests/test_handworked.py`), including tolerance boundaries, the time limit, missing samples, zone edges, a coverage pass and wall contact; all pass. Two of the first hand derivations were wrong, not the scorer |
+| Chance baseline underspecified | Defined: the random walk's action space, sampling and observation, how chance is computed and shown, why it is 0 on delivery tasks, and that a task-level random policy is not implemented |
+| Bootstrap wording | "Exact at the resolution of the data" replaced with the number of resamples, the interval method and the limited resolution |
+| Vacuum 85% | Called a demonstration of the scoring output, not a validated estimate |
+| Figure 2 too small | Split: the simulator image and a full-width chart with larger labels and values |
+| Figure 3 | Now shows the tracked path top-down with swept and unseen floor (`make_vacuum_fig.py`); the drawing re-implements the scorer's coverage rule and checks it gives the scorer's 85.0% |
+| Repetition and tone | Shorter qualifiers in the introduction and Section 6; "What the study shows, and what it does not" is now "Interpretation"; "three modest statements" reworded |
+| Release | Tag `paper-v0.4`; reproduction checked from a clean clone |
+
+Still pending: real-world accuracy experiment; capture-error propagation to scores; more unseen
+layouts; a task-level chance policy.
+
 # Paper: changes from v0.2 to v0.3
 
 v0.3 publishes the framework and its methodology. The data illustrate the method and are
