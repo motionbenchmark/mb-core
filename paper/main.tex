@@ -567,13 +567,15 @@ every number and figure (Appendix~\ref{app:repro}).
 \small
 Release: \release{} of \url{https://github.com/motionbenchmark/mb-core}. Environment used: Python 3.13,
 NumPy 2.5, SciPy 1.18, OpenCV 5.0, FFmpeg 6.1, Rust 1.97, motionbench 0.1.0 (specification 0.2); the
-exact versions and commit are written to \texttt{paper/results/environment.txt} on each run.
+exact versions and commit are written to \texttt{paper/results/environment.txt} on each run. These
+steps were checked from a fresh clone in a new Python virtual environment, where every checksum
+matched.
 \begin{verbatim}
 git clone https://github.com/motionbenchmark/mb-core && cd mb-core
 git checkout paper-v0.4
 pip install maturin
 (cd python && maturin build --release)
-pip install "target/wheels/motionbench-*.whl[tracker]"
+pip install "target/wheels/motionbench-*.whl[tracker]" scipy matplotlib
 bash paper/reproduce.sh     # ~5 min
 \end{verbatim}
 Expected outputs: the synthetic board is byte-identical to \texttt{results/leaderboard-synthetic-v0.1.json};

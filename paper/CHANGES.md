@@ -13,7 +13,7 @@ After a third review. No new data were collected.
 | Figure 2 too small | Split: the simulator image and a full-width chart with larger labels and values |
 | Figure 3 | Now shows the tracked path top-down with swept and unseen floor (`make_vacuum_fig.py`); the drawing re-implements the scorer's coverage rule and checks it gives the scorer's 85.0% |
 | Repetition and tone | Shorter qualifiers in the introduction and Section 6; "What the study shows, and what it does not" is now "Interpretation"; "three modest statements" reworded |
-| Release | Tag `paper-v0.4`; reproduction checked from a clean clone |
+| Release | Tag `paper-v0.4`; reproduction checked from a fresh clone in a new virtual environment (all checksums match); the install line now names SciPy and Matplotlib, which the analyses need |
 
 Still pending: real-world accuracy experiment; capture-error propagation to scores; more unseen
 layouts; a task-level chance policy.
