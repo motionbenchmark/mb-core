@@ -36,6 +36,9 @@ rm -rf "$OUT/verdict"
 echo "== 2b. the unseen-layout runs, layout by layout"
 python3 paper/analysis/per_layout.py
 
+echo "== 2c. where the points went (same runs, classified)"
+python3 paper/analysis/failure_accounting.py > /dev/null
+
 echo "== 3. index weight sensitivity"
 python3 paper/analysis/index_sensitivity.py
 
@@ -45,6 +48,7 @@ python3 paper/analysis/capture_accuracy.py
 echo "== 5. figures"
 (cd paper && python3 make_figs.py results/aim-sort-verdict.json)
 python3 paper/make_vacuum_fig.py
+python3 paper/make_teaser.py
 
 if [[ "${1:-}" == "--full" ]]; then
   echo "== 6. match tracking benchmark"

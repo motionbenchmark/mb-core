@@ -1,0 +1,104 @@
+{
+ "note": "Simulated. Same runs as the verdict; barrels per run (6 each), summed over 20 runs.",
+ "categories": [
+  "sorted",
+  "wrong zone",
+  "outside a zone",
+  "carried",
+  "never picked"
+ ],
+ "public": {
+  "deadreckon_v1.py": {
+   "sorted": 34,
+   "wrong zone": 16,
+   "outside a zone": 0,
+   "carried": 0,
+   "never picked": 70,
+   "re-grabs": 0,
+   "runs": 20
+  },
+  "vision_v2.py": {
+   "sorted": 49,
+   "wrong zone": 0,
+   "outside a zone": 0,
+   "carried": 6,
+   "never picked": 65,
+   "re-grabs": 7,
+   "runs": 20
+  },
+  "vision_tags_v3.py": {
+   "sorted": 45,
+   "wrong zone": 0,
+   "outside a zone": 0,
+   "carried": 15,
+   "never picked": 60,
+   "re-grabs": 21,
+   "runs": 20
+  },
+  "planner_v4.py": {
+   "sorted": 80,
+   "wrong zone": 0,
+   "outside a zone": 0,
+   "carried": 20,
+   "never picked": 20,
+   "re-grabs": 0,
+   "runs": 20
+  },
+  "typical simulated driver": {
+   "sorted": 58,
+   "wrong zone": 0,
+   "outside a zone": 0,
+   "carried": 7,
+   "never picked": 55,
+   "re-grabs": 4,
+   "runs": 20
+  }
+ },
+ "unseen": {
+  "deadreckon_v1.py": {
+   "sorted": 13,
+   "wrong zone": 11,
+   "outside a zone": 0,
+   "carried": 1,
+   "never picked": 95,
+   "re-grabs": 0,
+   "runs": 20
+  },
+  "vision_v2.py": {
+   "sorted": 47,
+   "wrong zone": 0,
+   "outside a zone": 1,
+   "carried": 7,
+   "never picked": 65,
+   "re-grabs": 10,
+   "runs": 20
+  },
+  "vision_tags_v3.py": {
+   "sorted": 36,
+   "wrong zone": 0,
+   "outside a zone": 1,
+   "carried": 13,
+   "never picked": 70,
+   "re-grabs": 19,
+   "runs": 20
+  },
+  "planner_v4.py": {
+   "sorted": 56,
+   "wrong zone": 0,
+   "outside a zone": 0,
+   "carried": 4,
+   "never picked": 60,
+   "re-grabs": 2,
+   "runs": 20
+  },
+  "typical simulated driver": {
+   "sorted": 57,
+   "wrong zone": 1,
+   "outside a zone": 2,
+   "carried": 15,
+   "never picked": 45,
+   "re-grabs": 14,
+   "runs": 20
+  }
+ }
+}

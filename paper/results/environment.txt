@@ -1,4 +1,4 @@
-motionbench commit: 60c99ca
+motionbench commit: 0823d84
 motionbench: motionbench 0.1.0 (spec 0.2)
 python 3.13.16
 numpy 2.5.3

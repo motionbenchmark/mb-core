@@ -1,3 +1,20 @@
+# Paper: changes from v0.4 to v0.5
+
+Restructured along the lines of a well-cited benchmark paper (LoCoMo, arXiv:2402.17753). No new
+runs: every new number is counted or replotted from the runs already in the paper.
+
+| What | Change |
+|---|---|
+| Page-1 example | Figure 1 shows the planner's path on the public layout (4 of 6) and on an unseen one (2 of 6), from the existing runs (`make_teaser.py`) |
+| Introduction | Contributions followed by numbered key observations in bold |
+| Comparison | Table 2 compares named benchmarks (Meta-World, CALVIN, LIBERO, Habitat, SimplerEnv, RoboDojo, RoboArena, IEC 62929) on setting, what is evaluated, whether the benchmark runs the agent's software, whether human operators are scored, and the score |
+| Section order | Framework (tasks and observations, scoring, protocol) → Implementation and released benchmark → Experimental setup (agents in four groups) → Results → Conclusion → Limitations (named paragraphs) → Broader impacts |
+| Released data | Table 4: every released set with layouts, agents, runs and source |
+| Failure breakdown | Table 6: what happened to every barrel (sorted, never picked, carried, misplaced, re-grabbed), counted from the runs' final states and events (`analysis/failure_accounting.py`) |
+| Broader impacts | New section: ranking people, video of people, over-trusting simulation, product claims |
+| Appendix | Overview list; implementation details (hardware, runtime, seeds, time step); an example task specification and trace |
+| Release | Tag `paper-v0.5` |
+
 # Paper: changes from v0.3 to v0.4
 
 After a third review. No new data were collected.
