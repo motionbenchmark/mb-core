@@ -18,10 +18,10 @@
 \newcommand{\todo}[1]{\textcolor{red!70!black}{[#1]}}
 \newcommand{\release}{\texttt{paper-v0.5}}
 
-\title{\mb{}: Agent-Independent Robot Evaluation\\through Goal-Referenced Outcome Scoring\\[0.5em]
+\title{\mb{}: Controller-Independent Robot Evaluation\\through Goal-Referenced Outcome Scoring\\[0.5em]
 \large An Open Framework and Preliminary Evaluation in Simulation}
 \author{Abhay Yadav\\[0.3em]
-\small Independent researcher, San Francisco Bay Area, California, USA \quad \todo{contact email}\\
+\small Independent researcher, San Francisco Bay Area, California, USA \quad \href{mailto:paper@motionbench.org}{paper@motionbench.org}\\
 \small \url{https://motionbench.org} \quad \url{https://github.com/motionbenchmark/mb-core}}
 \date{Draft v0.5, October 2026}
 
@@ -332,8 +332,11 @@ different tasks. The index is therefore secondary, never averaged across tasks, 
 paper's conclusions, and can be ignored; its definition and weight sensitivity are in
 Appendix~\ref{app:index}.
 
-\paragraph{Ranks.} For display, agents share a rank while their intervals overlap the leader's. This
-is a presentation convention, not a test of equivalence.
+\paragraph{Ordering.} Boards order agents by mean goal score. As a display aid, the current boards
+also mark agents whose 95\% intervals overlap the leader's interval by giving them the leader's rank.
+Overlapping intervals are not a test of equivalence, so this marking is used in no comparison in this
+paper; differences between agents are judged only with the paired protocol of
+Section~\ref{sec:protocol}, and the display convention is a candidate for revision by RFC.
 
 \subsection{Evaluation protocol}\label{sec:protocol}
 
@@ -593,17 +596,19 @@ about real robots.
 \subsection{Sensitivity to the budget and to the layouts}
 
 The scoring parameters are provisional, so it matters how much they move conclusions. Without new
-runs, every run of the study can be re-scored as if the match had ended earlier: a barrel counts if,
-at the last recorded instant before the cut-off, it is not held and lies in its own zone (at 45\,s this
-rule agrees with the game's score in 425 of 440 runs; in the other 15, a barrel that lies in its
-zone at the last recorded instant is held by the robot in the game's final state, so the cut-off rule
-counts one barrel more).
+runs, every run of the study can be re-scored as if the match had ended earlier. The authoritative
+score is the game's: after the routine stops, objects are allowed to come to rest, and a barrel counts
+if its centre is in its own colour's zone and it is neither held by nor touching the robot. Runs do not
+contain that settled state at earlier times, so the sensitivity analysis applies the same rule to the
+last recorded instant at or before each cut-off, without settling. At 45\,s the two agree in 439 of 440
+runs; in the remaining one, a barrel released 0.06\,s before the end was still moving at the last
+recorded instant and came to rest outside its zone, which the game scores and the cut-off rule cannot.
 Longer budgets would need new runs and are not studied. Table~\ref{tab:budget} compares the ranking
 of the 11 agents at each cut-off with the ranking at 45\,s. \textbf{Rankings move with the budget,
 and on unseen layouts the best routine changes:} the vision routine leads the routines at 25 and
 30\,s, the planner from 35\,s. The leading agent overall does not change (the planner on the public
 layout, the fastest driver character on unseen ones). Between the public and the unseen layouts, the
-ranking of the 11 agents at 45\,s agrees only at Kendall's $\tau=0.66$. Both results argue for
+ranking of the 11 agents at 45\,s agrees only at Kendall's $\tau=0.67$. Both results argue for
 reporting budget sensitivity with a task and for unseen layouts in every verdict.
 
 \begin{table}[t]
@@ -612,8 +617,8 @@ reporting budget sensitivity with a task and for unseen layouts in every verdict
 \toprule
 Budget & 25\,s & 30\,s & 35\,s & 40\,s & 45\,s \\
 \midrule
-$\tau$ with the 45\,s ranking, public & 0.58 & 0.69 & 0.73 & 0.81 & 1 \\
-$\tau$ with the 45\,s ranking, unseen & 0.80 & 0.84 & 0.94 & 0.98 & 1 \\
+$\tau$ with the 45\,s ranking, public & 0.59 & 0.74 & 0.75 & 0.81 & 1 \\
+$\tau$ with the 45\,s ranking, unseen & 0.76 & 0.83 & 0.87 & 0.95 & 1 \\
 Best routine, unseen & vision & vision & planner & planner & planner \\
 \bottomrule
 \end{tabular}
@@ -673,23 +678,6 @@ from THÖR-MAGNI~\cite{thormagni2024}. All 120 reached the goal (median 6.8\,s),
 could not separate walkers; with a 60\,s budget a random walk reached the goal in 40\% of runs. The
 example shows that budgets need to follow typical completion times, or the goal score saturates.
 
-\section{Conclusion}
-
-\mb{} proposes evaluating any robot agent, whether a person, code or a product, by how much of a
-task's goal it achieves, from what can be observed from outside, with an open scorer and an explicit
-protocol. The framework and tools are built and released, and a preliminary simulated study shows why
-unseen layouts belong in any verdict and what a breakdown of lost points can reveal. The next step is a small real-world accuracy experiment that does not need a motion-capture lab: a
-robot driven between measured floor markers, 20--30 trials filmed with a fixed camera, comparing the
-position and waypoint completion estimated by \mb{} (with and without tags) against the measured marks,
-and checking whether capture error or missing frames change goal scores. Further work, in order:
-scoring the same simulated runs from ground truth and from rendered-video capture to test how capture
-error propagates to scores and rankings; more unseen layouts, at several difficulty levels, with
-layout-level reporting and a comparison of public-layout and unseen-layout rankings; running the
-routines of Section~\ref{sec:setup} on a real AIM robot to measure the simulator's prediction error;
-and a paired comparison of real student drivers with their own teams' code, which would require
-parental consent, a host institution's youth-protection rules and an ethics review.
-Comments are welcome at \url{https://motionbench.org/paper}.
-
 \section{Limitations}\label{sec:limits}
 
 \paragraph{Simulation is not reality.} The simulator is custom and uncalibrated: its robot model,
@@ -733,6 +721,23 @@ determination); written consent from a parent or guardian and the participant's 
 option to opt out before any recording starts and to have data deleted later; random agent
 identifiers instead of names; and publication of trajectories only, without footage or metadata that
 could identify a home or a school.
+
+\section{Conclusion}
+
+\mb{} proposes evaluating any robot agent, whether a person, code or a product, by how much of a
+task's goal it achieves, from what can be observed from outside, with an open scorer and an explicit
+protocol. The framework and tools are built and released, and a preliminary simulated study shows why
+unseen layouts belong in any verdict and what a breakdown of lost points can reveal. The next step is a small real-world accuracy experiment that does not need a motion-capture lab: a
+robot driven between measured floor markers, 20--30 trials filmed with a fixed camera, comparing the
+position and waypoint completion estimated by \mb{} (with and without tags) against the measured marks,
+and checking whether capture error or missing frames change goal scores. Further work, in order:
+scoring the same simulated runs from ground truth and from rendered-video capture to test how capture
+error propagates to scores and rankings; more unseen layouts, at several difficulty levels, with
+layout-level reporting and a comparison of public-layout and unseen-layout rankings; running the
+routines of Section~\ref{sec:setup} on a real AIM robot to measure the simulator's prediction error;
+and a paired comparison of real student drivers with their own teams' code, which would require
+parental consent, a host institution's youth-protection rules and an ethics review.
+Comments are welcome at \url{https://motionbench.org/paper}.
 
 \section*{Author contributions}
 A.Y.\ conceived the project, developed the research questions, designed the evaluation framework and

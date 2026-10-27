@@ -19,6 +19,8 @@ runs: every new number is counted or replotted from the runs already in the pape
 | Delivery capture | Task table marks which tasks can be captured from video today; delivery needs object positions |
 | Budget and layout sensitivity | Section 6.2 and Table 8: the same runs re-scored at 25–45 s cut-offs; on unseen layouts the best routine changes with the budget; public vs unseen rankings agree at Kendall's τ = 0.66 (`analysis/budget_sensitivity.py`) |
 | Ethics detail | Broader impacts lists what a future pilot with people needs: ethics review, parental consent and assent, opt-out before recording, deletion, random identifiers, trajectories only |
+| Final review | Title says "Controller-Independent" (independence from the controller interface, not from hardware); the board's shared-rank display is described as a display aid used in no comparison; the budget re-scoring applies the game's full rule (not held and not touching the robot), now agreeing with the game's score in 439 of 440 runs, with the one remaining difference explained; Conclusion moved after Limitations and Broader impacts |
+| Final review | Contact email paper@motionbench.org; title says "Controller-Independent" (independence from the controller interface, not from hardware); the board's shared-rank display is described as a display aid used in no comparison; the budget re-scoring applies the game's full rule (not held and not touching the robot), now agreeing with the game's score in 439 of 440 runs, with the one remaining difference explained; Conclusion moved after Limitations and Broader impacts |
 | Release | Tag `paper-v0.5` |
 
 # Paper: changes from v0.3 to v0.4

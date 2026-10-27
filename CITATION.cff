@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use MotionBench, please cite it as below."
-title: "MotionBench: a goal-referenced framework for evaluating robot performance from trajectory data"
+title: "MotionBench: Controller-Independent Robot Evaluation through Goal-Referenced Outcome Scoring"
 type: software
 authors:
   - family-names: "Yadav"

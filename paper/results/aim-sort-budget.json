@@ -25,38 +25,38 @@
    "30": {
     "deadreckon_v1.py": 1.5,
     "vision_v2.py": 1.85,
-    "vision_tags_v3.py": 1.9,
+    "vision_tags_v3.py": 1.85,
     "planner_v4.py": 3.0,
     "Rookie Riley": 1.0,
     "Nervous Noah": 1.05,
     "Average Alex": 1.85,
-    "Speedy Sloane": 2.45,
+    "Speedy Sloane": 2.35,
     "Steady Sam": 1.0,
-    "Pro Priya": 2.15,
+    "Pro Priya": 2.1,
     "typical simulated driver": 1.75
    },
    "35": {
     "deadreckon_v1.py": 1.5,
-    "vision_v2.py": 2.1,
+    "vision_v2.py": 2.0,
     "vision_tags_v3.py": 2.15,
     "planner_v4.py": 3.0,
     "Rookie Riley": 1.4,
     "Nervous Noah": 1.5,
-    "Average Alex": 1.95,
+    "Average Alex": 1.9,
     "Speedy Sloane": 2.85,
     "Steady Sam": 1.15,
-    "Pro Priya": 2.8,
+    "Pro Priya": 2.65,
     "typical simulated driver": 2.0
    },
    "40": {
     "deadreckon_v1.py": 1.7,
     "vision_v2.py": 2.15,
-    "vision_tags_v3.py": 2.5,
+    "vision_tags_v3.py": 2.45,
     "planner_v4.py": 3.95,
     "Rookie Riley": 1.85,
     "Nervous Noah": 1.85,
     "Average Alex": 2.45,
-    "Speedy Sloane": 3.1,
+    "Speedy Sloane": 3.05,
     "Steady Sam": 1.55,
     "Pro Priya": 3.05,
     "typical simulated driver": 2.35
@@ -64,14 +64,14 @@
    "45": {
     "deadreckon_v1.py": 1.7,
     "vision_v2.py": 2.45,
-    "vision_tags_v3.py": 2.4,
+    "vision_tags_v3.py": 2.3,
     "planner_v4.py": 4.0,
-    "Rookie Riley": 2.05,
-    "Nervous Noah": 2.15,
-    "Average Alex": 2.75,
-    "Speedy Sloane": 3.8,
+    "Rookie Riley": 2.0,
+    "Nervous Noah": 2.1,
+    "Average Alex": 2.6,
+    "Speedy Sloane": 3.75,
     "Steady Sam": 2.0,
-    "Pro Priya": 3.55,
+    "Pro Priya": 3.5,
     "typical simulated driver": 2.9
    }
   },
@@ -81,90 +81,90 @@
     "vision_v2.py": 1.5,
     "vision_tags_v3.py": 1.35,
     "planner_v4.py": 1.4,
-    "Rookie Riley": 1.05,
+    "Rookie Riley": 1.0,
     "Nervous Noah": 1.3,
     "Average Alex": 1.5,
-    "Speedy Sloane": 2.35,
+    "Speedy Sloane": 2.3,
     "Steady Sam": 1.1,
-    "Pro Priya": 2.05,
-    "typical simulated driver": 1.65
+    "Pro Priya": 1.9,
+    "typical simulated driver": 1.6
    },
    "30": {
     "deadreckon_v1.py": 0.4,
     "vision_v2.py": 1.85,
-    "vision_tags_v3.py": 1.55,
+    "vision_tags_v3.py": 1.5,
     "planner_v4.py": 1.75,
-    "Rookie Riley": 1.35,
-    "Nervous Noah": 1.7,
+    "Rookie Riley": 1.3,
+    "Nervous Noah": 1.65,
     "Average Alex": 1.9,
-    "Speedy Sloane": 3.0,
-    "Steady Sam": 1.45,
+    "Speedy Sloane": 2.85,
+    "Steady Sam": 1.4,
     "Pro Priya": 2.8,
-    "typical simulated driver": 2.0
+    "typical simulated driver": 1.85
    },
    "35": {
     "deadreckon_v1.py": 0.4,
     "vision_v2.py": 1.9,
-    "vision_tags_v3.py": 1.6,
+    "vision_tags_v3.py": 1.5,
     "planner_v4.py": 2.25,
-    "Rookie Riley": 1.45,
-    "Nervous Noah": 1.95,
-    "Average Alex": 2.25,
-    "Speedy Sloane": 3.35,
-    "Steady Sam": 1.75,
+    "Rookie Riley": 1.35,
+    "Nervous Noah": 1.9,
+    "Average Alex": 2.05,
+    "Speedy Sloane": 3.3,
+    "Steady Sam": 1.7,
     "Pro Priya": 3.05,
     "typical simulated driver": 2.3
    },
    "40": {
     "deadreckon_v1.py": 0.65,
     "vision_v2.py": 2.1,
-    "vision_tags_v3.py": 1.9,
+    "vision_tags_v3.py": 1.8,
     "planner_v4.py": 2.5,
     "Rookie Riley": 1.9,
-    "Nervous Noah": 2.15,
-    "Average Alex": 2.65,
-    "Speedy Sloane": 3.8,
-    "Steady Sam": 1.95,
-    "Pro Priya": 3.5,
+    "Nervous Noah": 2.0,
+    "Average Alex": 2.6,
+    "Speedy Sloane": 3.6,
+    "Steady Sam": 1.9,
+    "Pro Priya": 3.4,
     "typical simulated driver": 2.6
    },
    "45": {
     "deadreckon_v1.py": 0.65,
     "vision_v2.py": 2.35,
-    "vision_tags_v3.py": 1.9,
+    "vision_tags_v3.py": 1.8,
     "planner_v4.py": 2.8,
     "Rookie Riley": 2.1,
-    "Nervous Noah": 2.5,
+    "Nervous Noah": 2.45,
     "Average Alex": 2.9,
     "Speedy Sloane": 4.2,
-    "Steady Sam": 2.15,
+    "Steady Sam": 2.1,
     "Pro Priya": 3.8,
-    "typical simulated driver": 2.9
+    "typical simulated driver": 2.85
    }
   }
  },
  "check_45s": {
   "public": {
    "runs": 220,
-   "agree_with_game_score": 210
+   "agree_with_game_score": 219
   },
   "unseen": {
    "runs": 220,
-   "agree_with_game_score": 215
+   "agree_with_game_score": 220
   }
  },
  "tau_vs_45s": {
   "public": {
-   "25": 0.584,
-   "30": 0.685,
-   "35": 0.734,
-   "40": 0.807
+   "25": 0.589,
+   "30": 0.743,
+   "35": 0.748,
+   "40": 0.811
   },
   "unseen": {
-   "25": 0.796,
-   "30": 0.844,
-   "35": 0.944,
-   "40": 0.981
+   "25": 0.759,
+   "30": 0.833,
+   "35": 0.87,
+   "40": 0.953
   }
  },
  "leader": {
@@ -199,5 +199,5 @@
    "45": "planner_v4.py"
   }
  },
- "tau_public_vs_unseen_45s": 0.661
+ "tau_public_vs_unseen_45s": 0.667
 }
